@@ -37,14 +37,14 @@ def MainMenu():
     displayInfo = pygame.display.Info() 
         
     # Center splash screen
-    splashScreenRect = splashScreen.img.get_rect(center=(displayInfo.current_w / 2, (displayInfo.current_h / 2)))
+    splashScreenRect = splashScreen.img.get_rect(center=(int(displayInfo.current_w / 2), int((displayInfo.current_h / 2))))
 
     #Make buttons
     buttonJoin = Button(pygame.image.load("join_button.png"),0)
     buttonQuit = Button(pygame.image.load("quit_button.png"),1)
 
-    buttonJoin.rect = buttonJoin.img.get_rect(center=(displayInfo.current_w / 2, (displayInfo.current_h / numButtons - buttonJoin.img.get_height()) + buttonJoin.img.get_height() * buttonJoin.position))
-    buttonQuit.rect = buttonQuit.img.get_rect(center=(displayInfo.current_w / 2, (displayInfo.current_h / numButtons - buttonQuit.img.get_height()) + buttonQuit.img.get_height() * buttonQuit.position))
+    buttonJoin.rect = buttonJoin.img.get_rect(center=(int(displayInfo.current_w / 2), (int(displayInfo.current_h / numButtons) - buttonJoin.img.get_height()) + buttonJoin.img.get_height() * buttonJoin.position))
+    buttonQuit.rect = buttonQuit.img.get_rect(center=(int(displayInfo.current_w / 2), (int(displayInfo.current_h / numButtons) - buttonQuit.img.get_height()) + buttonQuit.img.get_height() * buttonQuit.position))
 
     # Draw surfaces to screen
     screen.blit(splashScreen.img, splashScreenRect)
@@ -54,20 +54,19 @@ def MainMenu():
 
     for event in pygame.event.get():
         if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
+            exit()
         if event.type == MOUSEBUTTONDOWN:
             if buttonJoin.rect.collidepoint((mouseX, mouseY)):
                 lobby()
             if buttonQuit.rect.collidepoint((mouseX, mouseY)):
-                pygame.quit()
-                sys.exit()
+                exit()
 
 def lobby():
     
     # Track the mouse movement
     textInput = pygame_textinput.TextInput()
     
+    # Allows blinking cursor
     clock = pygame.time.Clock()
 
     # Make window size of lobby graphic
@@ -83,10 +82,10 @@ def lobby():
         events = pygame.event.get()    
         
         for event in events:
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 exit()
         
-        
+        # This is only true if the "Return" key is pressed, use to send text to server
         # if textInput.update(events):
             # print(textInput.get_text())
         textInput.update(events)
