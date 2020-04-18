@@ -3,10 +3,10 @@ import socket
 
 class Network:
     def __init__(self):
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         self.server = "2a02:4780:1:1::1:94bb"
         self.port = 42069
-        self.addr = (self.server, self.port)
+        self.addr = (self.server, self.port, 0, 0)
         self.pos = self.connect()
 
     def getPos(self):
