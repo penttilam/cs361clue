@@ -2,7 +2,8 @@ import socket
 from _thread import *
 import sys
 
-server = "2a02:4780:1:1::1:94bb"  # my local ipv4
+
+server = "45.132.241.193"  # my local ipv4
 port = 42069
 
 # IPV4, will need to be updated for IPV6!!!
