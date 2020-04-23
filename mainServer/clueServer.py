@@ -1,6 +1,9 @@
+from cluePServer import *
+
 import socket
 from _thread import *
 import sys
+
 
 ## this is a IPV4 connection
 server = "45.132.241.193"
@@ -22,6 +25,7 @@ print("Clue server started, waiting for players to connect :D")
 
 ## the connection to the client 
 def threaded_client(conn, player):
+
    varify = 'Player '+ repr(player) +' Connected'
    conn.send(str.encode(str(varify)))
    reply = ""
@@ -47,13 +51,19 @@ def threaded_client(conn, player):
    conn.close()
 
 ## this is the server running 
-currentPlayer = 1
+playerNumber = 1
+lobbyNumber = 1
 while True:
-    conn, addr = s.accept()
-    print("Connected to: ", addr, " as player ", currentPlayer)
 
-    start_new_thread(threaded_client, (conn, currentPlayer))
-    currentPlayer += 1
+   playerId = "p" + str(playerNumber)
+   conn, addr = s.accept()
+   print("Connected to: " + str(addr) + " as player " + str(playerId))
+
+   playerId = Player(playerId, conn, addr)
+   playerId.connected()
+
+   start_new_thread(threaded_client, (conn, playerNumber))
+   playerNumber += 1
 
 
 
