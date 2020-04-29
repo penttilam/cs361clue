@@ -15,7 +15,7 @@ WHITE = (255, 255, 255)
 
 pygame.init()
 
-gameDisplay = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Aizawa Card <3')
 
 clock = pygame.time.Clock()
@@ -23,23 +23,42 @@ done = False
 cardImg = pygame.image.load('card.png')
 
 
-def card(x,y):
-    gameDisplay.blit(cardImg, (x,y))
+# this will eventually become ze card class
+def card(x, y):
+    win.blit(cardImg, (x, y))
 
 
 x = (SCREEN_WIDTH * 0.04)
 y = (SCREEN_HEIGHT * 0.04)
+
+x_change = 0
 
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
 
-    gameDisplay.fill(BLACK)
-    card(x,y)
+        ############################
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                x_change = -5
+            elif event.key == pygame.K_RIGHT:
+                x_change = 5
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                x_change = 0
+        ######################
+    ##
+    x += x_change
+
+    win.fill(BLACK)
+    card(x, y)
 
     pygame.display.update()
     clock.tick(60)
 
 pygame.quit()
 quit()
+
+
+##################
