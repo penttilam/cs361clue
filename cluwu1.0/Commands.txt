@@ -1,0 +1,32 @@
+Client-Server commands
+
+Commands are built in block
+<block1>:<block2>:<block3>
+
+<block1> - contains the player Id
+<block2> - contains the clients command
+<block3+> - contains additional complex arguements/information it is a list i will stay in a block a complex object might use multiple blocks instead
+
+Each block is then broken into arguement pieces
+<block2> = arg1.arg2.arg3
+
+arg1 is reservered for the main arguement type connected, lobby, game
+arg2 is reservered for what the the main arguement is doingA
+arg3 is reservered for an actual dynamic arguement type for the sub arguement
+
+
+Client commands the server currently accepts:
+
+lobby.new:<lobby name string>   ## This creates a new lobby with the name <lobby name string> and puts you in it
+   returns: confirmation
+lobby.join.<lobby name string>  ## This places the client in a pre existing lobby with the name <lovvy name string>
+   returns: confirmation
+lobby.lobbies                   ## This returns a the current lobbies and number of players in blocks <block 3+> as lobNm.plyrNum
+   returns: lobby name and occpancy
+lobby.players                   ## This returns a the players in the clients current lobby <block3> as plyrNm1.plyrNm2.plyrNm3
+   returns: player names
+
+
+
+quit                            ## This will break the server loop removing the client from a lobby if in one and terminating their connection
+
