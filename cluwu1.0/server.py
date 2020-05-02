@@ -74,7 +74,10 @@ def Threaded_Client(player, lobbyList):
                             #lobbyInfo += "."
                             #lobbyInfo += str(x.getPNumber())
 
-                        #player.sendClient(lobbyInfo)
+                        player.sendClient(lobbyInfo)
+                        print(cLobbies)
+                        player.sendClientLobby(cLobbies)
+
 
                     ##Sub-command join check
                     if command[1] == "join":
