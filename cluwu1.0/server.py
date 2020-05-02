@@ -67,7 +67,8 @@ def Threaded_Client(player, lobbyList):
                         cLobbies = []
                         for x in lobbyList:
                             lId = x.getId()
-                            cLobbies.append((lId = CLobby(x.getId(), x.getPNumber(), x.getPName())))
+                            lId = CLobby(x.getId(), x.getPNumber(), x.getPName())
+                            cLobbies.append(lId)
                             #lobbyInfo += ":"
                             #lobbyInfo += x.getId()
                             #lobbyInfo += "."
