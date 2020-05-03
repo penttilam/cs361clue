@@ -63,7 +63,7 @@ def Threaded_Client(player, lobbyList):
 
                         ##run command to compile a string of arguements composed of
                         ## lobbyname:numberPlayers
-                        lobbyInfo = "lobby.list"
+                        lobbyInfo = "lobby.list.confirmed"
                         cLobbies = []
                         for x in lobbyList:
                             lId = x.getId()
@@ -73,11 +73,9 @@ def Threaded_Client(player, lobbyList):
                             #lobbyInfo += x.getId()
                             #lobbyInfo += "."
                             #lobbyInfo += str(x.getPNumber())
-
                         player.sendClient(lobbyInfo)
                         print(cLobbies)
                         player.sendClientLobby(cLobbies)
-
 
                     ##Sub-command join check
                     if command[1] == "join":
@@ -103,6 +101,7 @@ def Threaded_Client(player, lobbyList):
                 ##Base-command quit checked
                 elif command[0] == "quit":
                     player.sendClient("quit")
+                    break
 
         except:
             break
