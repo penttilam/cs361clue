@@ -4,4 +4,8 @@ class Cards:
         self.cardCategory = cardCategory
         self.cardPic = cardPic
 
+    def createSCard(self):
+        tempCard = sCard(self.cardName, self.cardCategory)
+        return tempCard
+
 
