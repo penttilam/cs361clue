@@ -67,3 +67,9 @@ class Player():
         self.conn.send(pickle.dumps(str(self.id) + ":" + str(message)))
         print("    Sent  --  " + str(self.id) + ":" + str(message))
 
+    ##send a cLobby object to player client
+    def sendClientLobby(self, cLobbyList):
+        self.conn.send(pickle.dumps(cLobbyList))
+        print("     Sent -- object.cLobby")
+
+
