@@ -69,10 +69,7 @@ def Threaded_Client(player, lobbyList):
                             lId = x.getId()
                             lId = CLobby(x.getId(), x.getPNumber(), x.getPName())
                             cLobbies.append(lId)
-                            #lobbyInfo += ":"
-                            #lobbyInfo += x.getId()
-                            #lobbyInfo += "."
-                            #lobbyInfo += str(x.getPNumber())
+
                         player.sendClient(lobbyInfo)
                         print(cLobbies)
                         player.sendClientLobby(cLobbies)
@@ -82,9 +79,16 @@ def Threaded_Client(player, lobbyList):
 
                         ##run command to find a lobby object based on the name given
                         ## once an object name matches the lobby name the player is added to the object
+                        hasLobby = False
                         for x in lobbyList:
                             if x.getId() == action[2]:
                                 x.addPlayer(player)
+                                hasLobby = True
+
+                        if hasLobby == False:
+                            player.sendClient("lobby.join:" + str(player.getId()) + ".fail")
+
+
 
                     ##Sub-command get players names in lobby
                     if command[1] == "players":
@@ -97,6 +101,21 @@ def Threaded_Client(player, lobbyList):
                             lobbyInfo += "."
 
                         player.sendClient(lobbyInfo)
+
+                    ##Sub-command to remove player from current ly
+                    if command[1] == "leave":
+                        player.leaveLobby(lobbyList) 
+
+                    ##Sub-command to remove player from current ly
+                    if command[1] == "ready":
+                        if player.getReady() == False:
+                            player.setReady(True) 
+                            player.sendClient("lobby.ready:" + str(player.getReady()))
+                        elif player.getReady() == True:
+                            player.setReady(False)
+                            player.sendClient("lobby.ready:" + str(player.getReady()))
+                        else:
+                            player.sendClient("lobby.ready:SeriouslyHowDidYouFuckItUpThisBad?")
 
                 ##Base-command quit checked
                 elif command[0] == "quit":
