@@ -52,10 +52,10 @@
     {
          "colours":
          {
-            "normal_bg": "#FF69B4",
-            "hovered_bg": "#F207A1",
+            "normal_bg": "#720A0A",
+            "hovered_bg": "#DD1130",
             "disabled_bg": "#25292e",
-            "selected_bg": "#365880",
+            "selected_bg": "#0A7A0A",
             "active_bg": "#365880",
             "dark_bg": "#21282d",
             "normal_text": "#bbbbbb",
