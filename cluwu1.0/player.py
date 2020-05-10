@@ -16,6 +16,11 @@ class Player():
         self.lobbyId = 0       ## this is the players current lobby id
         ##game info
 
+        self.myCards = []
+
+        self.char = " "
+        self.turn = 0
+
         ##events
         self.event_click_create_lobby = False
 
@@ -47,6 +52,24 @@ class Player():
     ##this returns current lobby idea
     def getLobby(self):
         return self.lobbyId
+
+    def getTurn(self):
+        return self.turn
+
+    def setTurn(self, turn):
+        self.turn = turn 
+
+    def addCard(self, newCard):
+        self.myCards.append(newCard) 
+
+    def getDeck(self): 
+        return self.myCards
+
+    def setChar(self, char):
+        self.char = char
+
+    def getChar(self):
+        return self.char
 
     ##this sets the current lobby idea
     def setLobby(self, lobbyId):
