@@ -1,89 +1,152 @@
-from cards import Cards
 import random
+from player import *
 
-class sCard:
+class sCards:
 
     def __init__(self, cardName, cardCategory):
         self.cardName = cardName
         self.cardCategory = cardCategory
 
-    def createDeck():
+def createDeck(nameList):
 
-        sDeck = []
+    numPlayers = 0
 
-        dakimakura = Cards("dakimakura", "weapon")
-        katana = Cards("katana", "weapon")
-        manga = Cards("manga", "weapon")
-        bento = Cards("bento", "weapon")
-        curse = Cards("curse", "weapon")
-        mecha = Cards("mecha", "weapon")
+    for y in nameList:
+        numPlayers += 1
 
-        weapon = [dakimakura, katana, manga, bento, curse, mecha]
+    sDeck = []
 
-        shrine = Cards("shrine", "location")
-        library = Cards("library", "location")
-        tearoom = Cards("tearoom", "location")
-        karaoke = Cards("karaoke", "location")
-        lovehotel = Cards("lovehotel", "location")
-        mangastore = Cards("mangastore", "location")
-        school = Cards("school", "location")
-        hotsprings = Cards("hotsprings", "location")
-        beach = Cards("beach", "location")
+    dakimakura = sCards("dakimakura", "weapon")
+    katana = sCards("katana", "weapon")
+    manga = sCards("manga", "weapon")
+    bento = sCards("bento", "weapon")
+    curse = sCards("curse", "weapon")
+    mecha = sCards("mecha", "weapon")
 
-        location = [shrine, library, tearoom, karaoke, lovehotel, mangastore, school, hotsprings, beach]
+    weapon = [dakimakura, katana, manga, bento, curse, mecha]
 
-        colonelmustard = Cards("colonelmustard", "people")
-        mrgreen = Cards("mrgreen", "people")
-        mrswhite = Cards("mrswhite", "people")
-        mspeacock = Cards("mspeacock", "people")
-        msscarlet = Cards("msscarlet", "people")
-        professorplum = Cards("professorplum", "people")
+    shrine = sCards("shrine", "location")
+    library = sCards("library", "location")
+    tearoom = sCards("tearoom", "location")
+    karaoke = sCards("karaoke", "location")
+    lovehotel = sCards("lovehotel", "location")
+    mangastore = sCards("mangastore", "location")
+    school = sCards("school", "location")
+    hotsprings = sCards("hotsprings", "location")
+    beach = sCards("beach", "location")
 
-        people = [colonelmustard, mrgreen, mrswhite, mspeacock, msscarlet, professorplum]
+    location = [shrine, library, tearoom, karaoke, lovehotel, mangastore, school, hotsprings, beach]
 
-        mPeople = random.choice(people)
-        mWeapon = random.choice(weapon)
-        mLocation = random.choice(location)
+    colonelmustard = sCards("colonelmustard", "people")
+    mrgreen = sCards("mrgreen", "people")
+    mrswhite = sCards("mrswhite", "people")
+    mspeacock = sCards("mspeacock", "people")
+    msscarlet = sCards("msscarlet", "people")
+    professorplum = sCards("professorplum", "people")
 
-        people.remove(mPeople)
-        weapon.remove(mWeapon)
-        location.remove(mLocation)
+    people = [colonelmustard, mrgreen, mrswhite, mspeacock, msscarlet, professorplum]
 
-        guilty = [mPeople, mWeapon, mLocation]
+    mPeople = random.choice(people)
+    mWeapon = random.choice(weapon)
+    mLocation = random.choice(location)
 
-        print(mPeople.cardName, mWeapon.cardName, mLocation.cardName)
+    people.remove(mPeople)
+    weapon.remove(mWeapon)
+    location.remove(mLocation)
 
-        print(" ")
+    print("Guilty Cards: ") 
+    guilty = [mPeople, mWeapon, mLocation]
 
-        for card in weapon:
-            print(card.cardName)
+    print(mPeople.cardName, mWeapon.cardName, mLocation.cardName)
 
-        print(" ")
+    sDeck.extend(weapon)
+    sDeck.extend(location)
+    sDeck.extend(people)
 
-        for card in location:
-            print(card.cardName)
+    print("\nShuffling remaining cards...")
 
-        print(" ")
+    random.shuffle(sDeck)
 
-        for card in people:
-            print(card.cardName)
+    print("Shuffled Cards: \n") 
 
-        sDeck.extend(weapon)
-        sDeck.extend(location)
-        sDeck.extend(people)
+    for card in sDeck:
+        print(card.cardName)
 
-        print(" ")
+    remCards = 18 % numPlayers
+    divCards = (18 - remCards)/numPlayers
 
-        print("Remaining Cards:")
+    print("\nDividing up cards...") 
+    for x in nameList:
+        y = 0
+        while y < divCards:
+            y += 1 
+            tempCard = sDeck[0] 
+            x.addCard(tempCard)
+            sDeck.pop(0) 
+        
 
-        for card in sDeck:
-            print(card.cardName)
+    print("Dividing remainder cards...")         
+    if divCards > 0:
+        y = 0 
+        while y < remCards:
+            y += 1 
+            extraCard = sDeck[0]
+            nameList[0].addCard(extraCard) 
+            sDeck.pop(0)
 
-        print(" ")
-        print("Shuffled: ")
+    print("\n\nPlayer Decks") 
+    for z in nameList:
+        print("\nCURRENT PLAYER: ")
+        print(z.getId())
+        deckList = [] 
+        deckList = z.getDeck() 
+        for q in deckList:
+            print(q.cardName)
 
-        random.shuffle(sDeck)
+    charChoices = ["Mrs White", "Colonel Mustard", "Mr Green", "Professor Plum", "Ms Peacock"]
+    
+    assignChar = ["Ms Scarlet"] 
 
-        for card in sDeck:
-            print(card.cardName)
+    random.shuffle(charChoices)
+    
+    x = 0
+    while x < numPlayers - 1:
+        randChar = charChoices[x]
+        assignChar.append(randChar) 
+        x += 1
+
+    random.shuffle(assignChar)
+
+    c = 0
+    for p in nameList:
+        p.setChar(assignChar[c])
+        c += 1
+
+
+    for x in nameList:
+        print("\n\nCharacter for " + x.getId()) 
+        print(x.getChar())
+
+
+    h = 2
+    for x in nameList: 
+        tempChar = x.getChar() 
+
+        if tempChar == "Ms Scarlet":
+            x.setTurn(1)
+        else:
+            x.setTurn(h)
+            h += 1
+        
+
+    print("\nPlayer Turns: ") 
+
+    for x in nameList: 
+        print(x.getId() ,"'s turn is ", x.getTurn())
+
+
+
+
+
+
 

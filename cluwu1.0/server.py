@@ -5,6 +5,7 @@ from player import Player
 import pickle
 from lobby import Lobby
 from cLobby import CLobby
+from sCard import * 
 
 ##this is the IPV4 connection
 server = "45.132.241.193"
@@ -117,6 +118,24 @@ def Threaded_Client(player, lobbyList):
                         else:
                             player.sendClient("lobby.ready:SeriouslyHowDidYouFuckItUpThisBad?")
 
+
+#############################################################################################################################################
+                    if command[1] == "passCards":
+                        lobby = player.getLobby()
+                        namelist = []
+                        namelist = lobby.getPlayers()
+                        
+
+                        print("players in lobby: ") 
+                        for x in namelist: 
+                            print(x.id)
+
+                            
+                        createDeck(namelist)  
+                        player.sendClient("Hello")
+######################################################################################################################
+#
+ 
                 ##Base-command quit checked
                 elif command[0] == "quit":
                     player.sendClient("quit")
