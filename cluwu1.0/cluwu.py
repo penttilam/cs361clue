@@ -5,6 +5,7 @@ import sys; sys.path.insert(0, "..")
 import pygame_gui
 from cLobby import CLobby
 from network import Network
+from notebook import createNotebook
 
 #runs main menu
 def openMainMenu():
@@ -243,33 +244,71 @@ def gameBoard(gameName, id):
     window_surface = pygame.display.set_mode((width, height))
     manager = pygame_gui.UIManager((width, height),'./ourTheme.json')
     
+    panelManager= pygame_gui.UIManager((width, height),'./panelTheme.json')
+    
     #managers used to set color 
     rdyManager = pygame_gui.UIManager((width, height),'./rdyTheme.json')
     
     #bool variable shows if the player is ready or not
     rdyFlag = True
+    handFlag = True
+    notebookFlag = True
     
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
     gameBoard = addImage('./images/board.png', 1, background, width/2, height/2, width, height)
 
+    #button that tells the server wether or not the user is ready and displays visuals to the user 
     readyButtonX = width/17
     readyButtonY = height/2
     readyButtonW = width/10
     readyButtonH = height/20
     readyButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((readyButtonX, readyButtonY), (readyButtonW, readyButtonH)), text='Not Ready', manager=rdyManager)
 
+    #button that opens the hand 
+    handButtonX = (width*16)/17-(width/10)
+    handButtonY = height/2
+    handButtonW = width/10
+    handButtonH = height/20
+    handButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((handButtonX, handButtonY), (handButtonW, handButtonH)), text='Hand', manager=manager)
+
+    #button that opens the notebook 
+    notebookButtonX = (width*16)/17-(width/10)
+    notebookButtonY = height/2+height/20
+    notebookButtonW = width/10
+    notebookButtonH = height/20
+    notebookButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((notebookButtonX, notebookButtonY), (notebookButtonW, notebookButtonH)), text='Notebook', manager=manager)
+    
+    #button that sends the user back to the main menu
     backButtonX = width/17
     backButtonY = height/2+height/20
     backButtonW = width/10
     backButtonH = height/20
     backButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
     
+    #initilization of the notebook panel
+    notebookX = width
+    notebookY = height/8
+    notebookW = width/4
+    notebookH = (3*height)/4
+    notebook = pygame_gui.elements.UIPanel(relative_rect=pygame.Rect((notebookX, notebookY), (notebookW, notebookH)), starting_layer_height = 1, manager = panelManager)
+    notePadImage = pygame_gui.elements.UIImage(relative_rect=pygame.Rect((0, 0), (notebookW, notebookH)), image_surface = pygame.image.load('./images/clueNotepad.png') , manager= panelManager, container = notebook.get_container())
+    buttonsList = createNotebook(notebook, panelManager, notebookW, notebookH)
+    #list that holds integers used to determine what should be displayed in each button
+    buttonFlags = [0]*21
+    
+    #initilization of the hand panel
+    handX = width
+    handY = height/3
+    handW = width/2
+    handH = height/3
+    hand = pygame_gui.elements.UIPanel(relative_rect=pygame.Rect((handX, handY), (handW, handH)), starting_layer_height = 1, manager = panelManager)
+    
+    
     player.game=gameName
     player.id=id
     print(player.id)
     print(player.game)
-    
     clock = pygame.time.Clock()           
     while True:
         time_delta = clock.tick(60)/1000.0 
@@ -301,6 +340,53 @@ def gameBoard(gameName, id):
                     readyButton.unselect()
                     readyButton.set_text("Not Ready")
                 rdyFlag = not rdyFlag
+            
+            #opens the notebook 
+            if ((event.type == pygame.USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == notebookButton)):
+                if notebookX == width:
+                    notebookButton.select()
+                    notebookX= (width*3)/8   
+                    handX = width
+                    handButton.unselect()
+                else: 
+                    notebookX = width
+                notebook.set_relative_position((notebookX,notebookY))
+                hand.set_relative_position((handX,handY))
+                
+            buttonCounter = 0
+            #goes through list of buttons and checks events for each button
+            for button in buttonsList:
+                #first time button is pressed select it and set text to X
+                #"closes" the hand if it is open
+                if ((event.type == pygame.USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == button)):
+                    if buttonFlags[buttonCounter] == 0:
+                        button.select()
+                        button.set_text("X")
+                        buttonFlags[buttonCounter]=1
+                    #second button press set text to O
+                    elif buttonFlags[buttonCounter] == 1:
+                        button.select()
+                        button.set_text(u'\u2713')
+                        buttonFlags[buttonCounter]=2
+                    #finally return button to original state
+                    elif buttonFlags[buttonCounter] == 2:
+                        button.set_text(" ")
+                        buttonFlags[buttonCounter]=0
+                buttonCounter=buttonCounter+1
+                        
+            if ((event.type == pygame.USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == handButton)):
+                #defines the notebook, image and close button 
+                #"closes" the notebook if it is open
+                if handX == width:
+                    handButton.select()
+                    handX= width/4   
+                    notebookX = width
+                    notebookButton.unselect()
+                else: 
+                    handX = width
+                hand.set_relative_position((handX,handY))
+                notebook.set_relative_position((notebookX,notebookY))
+          
             #events for back button    
             if ((event.type == pygame.USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == backButton) or (event.type == pygame.KEYDOWN and event.key == K_ESCAPE)):
                width=1000
@@ -312,9 +398,14 @@ def gameBoard(gameName, id):
             manager.update(time_delta)
             rdyManager.process_events(event)
             rdyManager.update(time_delta)
+            panelManager.process_events(event)
+            panelManager.update(time_delta)
+           
             window_surface.blit(background, (0, 0))
-            manager.draw_ui(window_surface)
+            #window_surface.blit(notebookSurface, (0, 0))
             rdyManager.draw_ui(window_surface)
+            manager.draw_ui(window_surface)
+            panelManager.draw_ui(window_surface)
             
         pygame.display.update()
        
