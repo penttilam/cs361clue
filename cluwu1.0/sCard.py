@@ -142,7 +142,7 @@ def createDeck(nameList):
     print("\nPlayer Turns: ") 
 
     for x in nameList: 
-        print(x.getId() ,"'s turn is ", x.getTurn())
+        print(x.getId() ,"'s turn is ", x.getTurn()) 
 
 
 
