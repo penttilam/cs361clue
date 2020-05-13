@@ -11,4 +11,8 @@ class CLobby:
     
     def getPNumber(self):
         return self.pNumber
-    
+   
+    def getPList(self):
+        return pList
+
+
