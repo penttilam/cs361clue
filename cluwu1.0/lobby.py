@@ -2,6 +2,9 @@
 ## This is a Class for creating a lobby it will hold palyers before directing them into a game
 ##
 
+from cLobby import CLobby
+
+
 class Lobby:
     def __init__(self, host_player, lobbyId):
         self.id = lobbyId                 ## This is the lobby ID stored as a string
@@ -57,4 +60,16 @@ class Lobby:
             if not x.getReady():
                 return False
         return True
+
+    def getCLobby(self):
+        cPlayerList = []
+        for players in self.players:
+            cPlayerList.append(players.getCPlayer())
+        clobby = self.id
+        clobby = cLobby(self.id, self.numberPlayers ,cPlayerList)
+        return clobby
+
+
+
+
 

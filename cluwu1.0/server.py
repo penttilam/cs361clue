@@ -94,6 +94,14 @@ def readyCommand(player):
     else:
         player.sendClient("lobby.ready:SeriouslyHowDidYouFuckItUpThisBad?")
 
+def updateCommand(player, lobbyList):
+    player.sendClient("lobby.update:confirmed")
+    for lobby in lobbylist:
+        if lobby == player.getLobby():
+            lobby.getCLobby()
+    player.sendClientLobby()
+
+
 
 ##This is the subset of lobby actions
 def lobbyCommand(block1, block2, player, lobbyList):
@@ -113,7 +121,8 @@ def lobbyCommand(block1, block2, player, lobbyList):
         readyCommand(player)
     elif arguements[1] == "start":
         startCommand(player, lobbyList)
-
+    elif arguements[1] == "update":
+        updateCommand(player, lobbyList)
 
 ##This is the command interperter from the client
 def clientCommand(clientCommand, player, lobbyList):

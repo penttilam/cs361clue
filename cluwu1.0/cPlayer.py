@@ -1,21 +1,15 @@
-class cPlayer:
-    def __init__(self, playerId):
+class CPlayer:
+    def __init__(self, playerId, ready, character):
         self.id = playerId
-        self.ready = False
-        self.char = ""
+        self.ready = ready
+        self.char = character
 
     def getId(self):
         return self.id
 
-    def setReady(ready):
-        self.ready = ready
-
-    def getReady(ready):
+    def getReady(self, ready):
         return self.ready
     
-    def setChar(character):
-        self.char = character
-
-    def getChar(character):
+    def getChar(self, character):
         return self.char
 
