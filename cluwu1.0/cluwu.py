@@ -3,16 +3,22 @@ import pygame_gui
 # import sys; sys.path.insert(0, "..")
 from pygame.locals import *
 from pygame import surface
+from cPlayer import CPlayer
 from cLobby import CLobby
 from network import Network
 from notebook import createNotebook
+
+
+#what does all this do?
 KEYDOWN = 2
 K_ESCAPE = 27
 K_RETURN = 13
 USEREVENT = 24
 QUIT = 12
 MOUSEBUTTONDOWN = 5
-clock = pygame.time.Clock()
+
+#was there a reason clock was here?
+
 #runs main menu
 def OpenMainMenu():
     #pygame surface
@@ -261,14 +267,25 @@ def startLobby(gameName, id):
     backButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
     
     #text box to display player ids and ready status 
-    playerStatusX = int((width*16)/17-(width/10))
+    playerStatusX = int((width*16)/17-(width/9))
     playerStatusY = int(height/4)
-    playerStatusW = int(width/10)
+    playerStatusW = int(width/7)
     playerStatuaH = int(height/20)
-    playerStatus = pygame_gui.elements.UITextBox(html_text="player1<br>player2<br>player3<br>player4<br>player4<br>player4" ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+    netConn.send("lobby.update")
+    currentLobbyPlayerStatus = netConn.catch()
+    playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
     while True:
         time_delta = clock.tick(60) / 1000.0
+        #update the text box to let players know who is ready etc...
+        tmp=currentLobbyPlayerStatus
+        netConn.send("lobby.update")
+        currentLobbyPlayerStatus = netConn.catch()   
+        #if player number changes kill the text box and create a new one with updated information.
+        if not currentLobbyPlayerStatus == tmp:
+            playerStatus.kill()
+            playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 netConn.send("quit")
@@ -298,6 +315,8 @@ def startLobby(gameName, id):
             windowSurface.blit(background, (0, 0))
             rdyManager.draw_ui(windowSurface)
             manager.draw_ui(windowSurface)
+        
+        #netConn.send("lobby.update")
         pygame.display.update()
 
 def gameBoard(gameName, id):
@@ -414,16 +433,16 @@ def gameBoard(gameName, id):
 #font is the font defined
 #color is your choice of color
 #location int
-#surface the screen object you are adding this to
+#on the screen object you are adding this to
 # x and y locations, integer pixel positions
 #locations can be updated in the future to add other alignments,center, left right etc....
-def addImage(img, location, surface, x, y, xRes, yRes):
+def addImage(img, location, on, x, y, xRes, yRes):
     imgObj = pygame.image.load(img)
     imgObj = pygame.transform.scale(imgObj, (xRes, yRes))
     imgRect = imgObj.get_rect()
     if location == 1:
         imgRect.center = (int(x), int(y))
-    surface.blit(imgObj, imgRect)
+    on.blit(imgObj, imgRect)
     return imgObj
 
 #create the window, displays splash screen on click starts the main menu
@@ -462,6 +481,7 @@ height = 1000
 
 #create pygame area to add splash image to
 windowSurface = pygame.display.set_mode((width, height))
+clock = pygame.time.Clock()
 
 #run the program
 splash()
