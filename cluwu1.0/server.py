@@ -94,12 +94,13 @@ def readyCommand(player):
     else:
         player.sendClient("lobby.ready:SeriouslyHowDidYouFuckItUpThisBad?")
 
+##this function updates the current clobby for the client
 def updateCommand(player, lobbyList):
     player.sendClient("lobby.update:confirmed")
-    for lobby in lobbylist:
-        if lobby == player.getLobby():
-            lobby.getCLobby()
-    player.sendClientLobby()
+    for lobby in lobbyList:
+        if lobby.getId() == player.getLobby().getId():
+            clientLobby = lobby.getCLobby()
+    player.sendClientLobby(clientLobby)
 
 
 

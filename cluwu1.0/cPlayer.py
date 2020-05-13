@@ -7,9 +7,9 @@ class CPlayer:
     def getId(self):
         return self.id
 
-    def getReady(self, ready):
+    def getReady(self):
         return self.ready
     
-    def getChar(self, character):
+    def getChar(self):
         return self.char
 

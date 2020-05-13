@@ -66,7 +66,7 @@ class Lobby:
         for players in self.players:
             cPlayerList.append(players.getCPlayer())
         clobby = self.id
-        clobby = cLobby(self.id, self.numberPlayers ,cPlayerList)
+        clobby = CLobby(self.id, self.numberPlayers, cPlayerList)
         return clobby
 
 
