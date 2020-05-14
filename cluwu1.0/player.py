@@ -5,6 +5,7 @@
 import pickle
 import pygame
 import sys
+from cPlayer import CPlayer
 
 class Player():
     def __init__(self, playerId, conn):
@@ -94,5 +95,11 @@ class Player():
     def sendClientLobby(self, cLobbyList):
         self.conn.send(pickle.dumps(cLobbyList))
         print("     Sent -- object.cLobby")
+
+    def getCPlayer(self):
+        cplayer = self.id
+        cplayer = CPlayer(self.id, self.ready, self.char)
+        return cplayer
+        
 
 

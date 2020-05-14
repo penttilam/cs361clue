@@ -3,16 +3,22 @@ import pygame_gui
 # import sys; sys.path.insert(0, "..")
 from pygame.locals import *
 from pygame import surface
+from cPlayer import CPlayer
 from cLobby import CLobby
 from network import Network
 from notebook import createNotebook
+
+
+#what does all this do?
 KEYDOWN = 2
 K_ESCAPE = 27
 K_RETURN = 13
 USEREVENT = 24
 QUIT = 12
 MOUSEBUTTONDOWN = 5
-clock = pygame.time.Clock()
+
+#was there a reason clock was here?
+
 #runs main menu
 def OpenMainMenu():
     #pygame surface
@@ -58,7 +64,7 @@ def OpenMainMenu():
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == hostButton):
                 #when host is pressed starts the game list by calling the function
                 print(event.type)
-                return startNewGame()
+                return hostGame()
 
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == joinButton):
                 #when join button is pressed starts the game list by calling the function
@@ -76,7 +82,7 @@ def OpenMainMenu():
         pygame.display.update()
 
 #starts new game
-def startNewGame():
+def hostGame():
     #pygame surface
     # windowSurface = pygame.display.set_mode((width, height))
     manager = pygame_gui.UIManager((width, height), './ourTheme.json')
@@ -121,7 +127,7 @@ def startNewGame():
 
             if (((event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == startButton) or (event.type == KEYDOWN and event.key == K_RETURN)) and gameName.get_text() != ""):
                 print(netConn.send("lobby.new:"+gameName.get_text()))
-                return gameBoard(gameName.get_text(), userId)
+                return startLobby(gameName.get_text(), userId)
 
             manager.process_events(event)
             manager.update(time_delta)
@@ -202,7 +208,7 @@ def startGameList():
 
                 #if success start game
                 if command[1] == "success":
-                    gameBoard(gameName, userId)
+                    startLobby(gameName, userId)
 
                 #otherwise refresh the lobby list
                 else:
@@ -233,6 +239,86 @@ class Player:
 
 player = Player()
 
+def startLobby(gameName, id):
+    width = 1600
+    height = 900
+    #pygame surface
+    windowSurface = pygame.display.set_mode((width, height))
+    manager = pygame_gui.UIManager((width, height), './ourTheme.json')
+    #managers used to set color
+    rdyManager = pygame_gui.UIManager((width, height), './rdyTheme.json')
+    background = pygame.Surface((width, height))
+    background.fill(manager.ui_theme.get_colour('dark_bg'))
+    # gameBoard = 
+    addImage('./images/board.png', 1, background, width/2, height/2, width, height)
+    
+    #button that tells the server wether or not the user is ready and displays visuals to the user
+    readyButtonX = int(width/17)
+    readyButtonY = int(height/2)
+    readyButtonW = int(width/10)
+    readyButtonH = int(height/20)
+    readyButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((readyButtonX, readyButtonY), (readyButtonW, readyButtonH)), text='Not Ready', manager=rdyManager)
+    
+    #button that sends the user back to the main menu
+    backButtonX = int(width/17)
+    backButtonY = int(height/2+height/20)
+    backButtonW = int(width/10)
+    backButtonH = int(height/20)
+    backButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
+    
+    #text box to display player ids and ready status 
+    playerStatusX = int((width*16)/17-(width/9))
+    playerStatusY = int(height/4)
+    playerStatusW = int(width/7)
+    playerStatuaH = int(height/20)
+    netConn.send("lobby.update")
+    currentLobbyPlayerStatus = netConn.catch()
+    playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+
+    while True:
+        time_delta = clock.tick(60) / 1000.0
+        #update the text box to let players know who is ready etc...
+        tmp=currentLobbyPlayerStatus
+        netConn.send("lobby.update")
+        currentLobbyPlayerStatus = netConn.catch()   
+        #if player number changes kill the text box and create a new one with updated information.
+        if not currentLobbyPlayerStatus == tmp:
+            playerStatus.kill()
+            playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                netConn.send("quit")
+                raise SystemExit
+            #events for ready button
+            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == readyButton):
+                #if player presses the ready button
+                netConn.send("lobby.ready")
+                # netConn.send("lobby.passCards")
+                #change color from red to green and back when button is pushed
+                if readyButton.text == "Not Ready":
+                    readyButton.select()
+                    readyButton.set_text("Ready")
+                else:
+                    readyButton.unselect()
+                    readyButton.set_text("Not Ready")
+            #events for back button
+            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == backButton) or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                    width = 1000
+                    height = 1000
+                    netConn.send("lobby.leave")
+                    return OpenMainMenu()
+            manager.process_events(event)
+            manager.update(time_delta)
+            rdyManager.process_events(event)
+            rdyManager.update(time_delta)
+            windowSurface.blit(background, (0, 0))
+            rdyManager.draw_ui(windowSurface)
+            manager.draw_ui(windowSurface)
+        
+        #netConn.send("lobby.update")
+        pygame.display.update()
+
 def gameBoard(gameName, id):
     width = 1600
     height = 900
@@ -250,13 +336,6 @@ def gameBoard(gameName, id):
     # gameBoard = 
     addImage('./images/board.png', 1, background, width/2, height/2, width, height)
 
-    #button that tells the server wether or not the user is ready and displays visuals to the user
-    readyButtonX = int(width/17)
-    readyButtonY = int(height/2)
-    readyButtonW = int(width/10)
-    readyButtonH = int(height/20)
-    readyButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((readyButtonX, readyButtonY), (readyButtonW, readyButtonH)), text='Not Ready', manager=rdyManager)
-
     #button that opens the hand
     handButtonX = int((width*16)/17-(width/10))
     handButtonY = int(height/2)
@@ -270,13 +349,6 @@ def gameBoard(gameName, id):
     notebookButtonW = int(width/10)
     notebookButtonH = int(height/20)
     notebookButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((notebookButtonX, notebookButtonY), (notebookButtonW, notebookButtonH)), text='Notebook', manager=manager)
-
-    #button that sends the user back to the main menu
-    backButtonX = int(width/17)
-    backButtonY = int(height/2+height/20)
-    backButtonW = int(width/10)
-    backButtonH = int(height/20)
-    backButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
 
     #initilization of the notebook panel
     notebookX = int(width)
@@ -296,7 +368,6 @@ def gameBoard(gameName, id):
     handH = int(height/3)
     hand = pygame_gui.elements.UIPanel(relative_rect=pygame.Rect((handX, handY), (handW, handH)), starting_layer_height=1, manager=panelManager)
 
-
     player.game = gameName
     player.id = id
     print(player.id)
@@ -309,20 +380,6 @@ def gameBoard(gameName, id):
             if event.type == QUIT:
                 netConn.send("quit")
                 raise SystemExit
-
-            #events for ready button
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == readyButton):
-                #if player presses the ready button
-                netConn.send("lobby.ready")
-                # netConn.send("lobby.passCards")
-
-                #change color from red to green and back when button is pushed
-                if readyButton.text == "Not Ready":
-                    readyButton.select()
-                    readyButton.set_text("Ready")
-                else:
-                    readyButton.unselect()
-                    readyButton.set_text("Not Ready")
 
             #opens the notebook
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == notebookButton):
@@ -357,14 +414,6 @@ def gameBoard(gameName, id):
                     handX = width
                 hand.set_relative_position((handX, handY))
                 notebook.set_relative_position((notebookX, notebookY))
-
-            #events for back button
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == backButton) or (event.type == KEYDOWN and event.key == K_ESCAPE):
-                width = 1000
-                height = 1000
-                netConn.send("lobby.leave")
-                return OpenMainMenu()
-
             manager.process_events(event)
             manager.update(time_delta)
             rdyManager.process_events(event)
@@ -384,16 +433,16 @@ def gameBoard(gameName, id):
 #font is the font defined
 #color is your choice of color
 #location int
-#surface the screen object you are adding this to
+#on the screen object you are adding this to
 # x and y locations, integer pixel positions
 #locations can be updated in the future to add other alignments,center, left right etc....
-def addImage(img, location, surface, x, y, xRes, yRes):
+def addImage(img, location, on, x, y, xRes, yRes):
     imgObj = pygame.image.load(img)
     imgObj = pygame.transform.scale(imgObj, (xRes, yRes))
     imgRect = imgObj.get_rect()
     if location == 1:
         imgRect.center = (int(x), int(y))
-    surface.blit(imgObj, imgRect)
+    on.blit(imgObj, imgRect)
     return imgObj
 
 #create the window, displays splash screen on click starts the main menu
@@ -432,6 +481,7 @@ height = 1000
 
 #create pygame area to add splash image to
 windowSurface = pygame.display.set_mode((width, height))
+clock = pygame.time.Clock()
 
 #run the program
 splash()
