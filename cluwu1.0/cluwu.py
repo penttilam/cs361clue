@@ -1,5 +1,6 @@
 import pygame
 import pygame_gui
+import time
 # import sys; sys.path.insert(0, "..")
 from pygame.locals import *
 from pygame import surface
@@ -252,6 +253,13 @@ def startLobby(gameName, id):
     # gameBoard = 
     addImage('./images/board.png', 1, background, width/2, height/2, width, height)
     
+    #button that starts the game when all players are ready, NOT visible to peons
+    startButtonX = int(width)
+    startButtonY = int(height/2-height/20)
+    startButtonW = int(width/10)
+    startButtonH = int(height/20)
+    startButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((startButtonX, startButtonY), (startButtonW, startButtonH)), text='Start Game', manager=manager)
+
     #button that tells the server wether or not the user is ready and displays visuals to the user
     readyButtonX = int(width/17)
     readyButtonY = int(height/2)
@@ -266,6 +274,8 @@ def startLobby(gameName, id):
     backButtonH = int(height/20)
     backButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
     
+    
+
     #text box to display player ids and ready status 
     playerStatusX = int((width*16)/17-(width/9))
     playerStatusY = int(height/4)
@@ -278,13 +288,22 @@ def startLobby(gameName, id):
     while True:
         time_delta = clock.tick(60) / 1000.0
         #update the text box to let players know who is ready etc...
-        tmp=currentLobbyPlayerStatus
+        tmp = currentLobbyPlayerStatus
         netConn.send("lobby.update")
-        currentLobbyPlayerStatus = netConn.catch()   
+        currentLobbyPlayerStatus = netConn.catch()
         #if player number changes kill the text box and create a new one with updated information.
+
         if not currentLobbyPlayerStatus == tmp:
             playerStatus.kill()
             playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+
+        if currentLobbyPlayerStatus.getPList()[0].getId() == netConn.getId():
+            startButtonX = int(width/17)
+            startButton.set_relative_position((startButtonX,startButtonY))
+            if currentLobbyPlayerStatus.getLReady():
+                startButton.enable()
+            else:
+                startButton.disable()
 
         for event in pygame.event.get():
             if event.type == QUIT:

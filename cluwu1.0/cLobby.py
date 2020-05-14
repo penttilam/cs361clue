@@ -2,10 +2,11 @@ from player import Player
 from cPlayer import CPlayer
 
 class CLobby:
-    def __init__(self, lobbyId, pNumber, lPlayers):
+    def __init__(self, lobbyId, pNumber, lPlayers, lReady):
         self.id = lobbyId
         self.pNumber = pNumber
         self.pList = lPlayers
+        self.lReady = False
         
     def getId(self):
         return self.id
@@ -15,11 +16,10 @@ class CLobby:
    
     def getPList(self):
         return self.pList
-<<<<<<< Updated upstream
 
+    def getLReady(self):
+        return self.lReady
 
-=======
-    
     def htmlStringify(self):
         htmlString = "<b>Lobby name: " + self.id + "<br></b>" 
         for player in self.pList:
@@ -29,4 +29,3 @@ class CLobby:
                 else:
                     htmlString +="Ready up little bitch<br>"
         return htmlString
->>>>>>> Stashed changes
