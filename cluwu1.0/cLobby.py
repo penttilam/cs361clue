@@ -15,10 +15,6 @@ class CLobby:
    
     def getPList(self):
         return self.pList
-<<<<<<< Updated upstream
-
-
-=======
     
     def htmlStringify(self):
         htmlString = "<b>Lobby name: " + self.id + "<br></b>" 
@@ -29,4 +25,3 @@ class CLobby:
                 else:
                     htmlString +="Ready up little bitch<br>"
         return htmlString
->>>>>>> Stashed changes
