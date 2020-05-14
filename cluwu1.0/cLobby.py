@@ -6,7 +6,7 @@ class CLobby:
         self.id = lobbyId
         self.pNumber = pNumber
         self.pList = lPlayers
-        self.lReady = False
+        self.lReady = lReady
         
     def getId(self):
         return self.id

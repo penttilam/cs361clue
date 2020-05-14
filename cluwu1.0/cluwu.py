@@ -280,13 +280,13 @@ def startLobby(gameName, id):
     playerStatusX = int((width*16)/17-(width/9))
     playerStatusY = int(height/4)
     playerStatusW = int(width/7)
-    playerStatuaH = int(height/20)
+    playerStatusH = int(height/20)
     netConn.send("lobby.update")
     currentLobbyPlayerStatus = netConn.catch()
-    playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+    playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify(), relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
     while True:
-        time_delta = clock.tick(60) / 1000.0
+        time_delta = clock.tick(1000) / 1000.0
         #update the text box to let players know who is ready etc...
         tmp = currentLobbyPlayerStatus
         netConn.send("lobby.update")
@@ -295,7 +295,7 @@ def startLobby(gameName, id):
 
         if not currentLobbyPlayerStatus == tmp:
             playerStatus.kill()
-            playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+            playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
         if currentLobbyPlayerStatus.getPList()[0].getId() == netConn.getId():
             startButtonX = int(width/17)

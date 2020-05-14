@@ -50,7 +50,8 @@ def listCommand(player, lobbyList):
     cLobbies = []
     for lobby in lobbyList:
         lobbyId = lobby.getId()
-        lobbyId = CLobby(lobby.getId(), lobby.getPNumber(), lobby.getPName())
+        lobbyId = CLobby(lobby.getId(), lobby.getPNumber(), lobby.getPName(), lobby.getLReady())
+        print(lobbyId)
         cLobbies.append(lobbyId)
     player.sendClientLobby(cLobbies)
 
