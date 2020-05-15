@@ -11,15 +11,7 @@ from notebook import createNotebook
 # from GameTile import GameTile
 from Button import Button
 
-#what does all this do?
-KEYDOWN = 2
-K_ESCAPE = 27
-K_RETURN = 13
-USEREVENT = 24
-QUIT = 12
-MOUSEBUTTONDOWN = 5
-
-#was there a reason clock was here?
+#was there a reason clock was here? It's used as a global, probably should be at the top?
 
 #runs main menu
 def OpenMainMenu():
@@ -36,46 +28,42 @@ def OpenMainMenu():
     menuLabelH = int(height/10)
     pygame_gui.elements.ui_label.UILabel(pygame.Rect((menuLabelX, menuLabelY), (menuLabelW, menuLabelH)), text="Main Menu", manager=manager)
 
-    hostButtonX = int(width/2-width/20)
-    hostButtonY = int(height/2-height/10)
-    hostButtonW = int(width/10)
-    hostButtonH = int(height/20)
-    # Host button
-    Button(hostButtonX, hostButtonY, hostButtonW, hostButtonH, 'Host', manager)
-    #hostButton.fill(manager.ui_theme.get_colour('pinkMF'))
 
-    joinButtonX = int(width/2-width/20)
-    joinButtonY = int(height/2-height/20)
-    joinButtonW = int(width/10)
-    joinButtonH = int(height/20)
-    # Join button
-    Button(joinButtonX, joinButtonY, joinButtonW, joinButtonH, 'Join', manager)
+    hostButton = Button('Host', manager)
+    hostButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
+    hostButton.setWidthHeight(int(width/10), int(height/20))
+    
+    
+    joinButton = Button('Join', manager)
+    joinButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/20))
+    joinButton.setWidthHeight(int(width/10), int(height/20))
+    
+    
+    quitButton = Button("Quit", manager, shortcutKey=K_ESCAPE)
+    quitButton.setXLocYLoc(int(width/2-width/20), int(height/2))
+    quitButton.setWidthHeight(int(width/10), int(height/20))
 
-    quitButtonX = int(width/2-width/20)
-    quitButtonY = int(height/2)
-    quitButtonW = int(width/10)
-    quitButtonH = int(height/20)
-    quitButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((quitButtonX, quitButtonY), (quitButtonW, quitButtonH)), text='Quit', manager=manager)
+    manager.draw_ui(windowSurface)
 
     while True:
         time_delta = clock.tick(60)/1000.0
         for event in pygame.event.get():
             if event.type == QUIT:
-                print(event.type)
                 netConn.send("quit")
                 raise SystemExit
 
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.text == "Host"):
+            if hostButton.getClickedStatus(event):
+                print("host clicked")
                 #when host is pressed starts the game list by calling the function
-                print(event.type)
                 return hostGame()
 
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.text == "Join"):
+            if joinButton.getClickedStatus(event):
+                print("join clicked")
                 #when join button is pressed starts the game list by calling the function
-                print(event.type)
                 return startGameList()
 
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == quitButton):
+            if quitButton.getClickedStatus(event):
+                print("quit clicked")
                 netConn.send("quit")
                 raise SystemExit
 
@@ -88,7 +76,7 @@ def OpenMainMenu():
 #starts new game
 def hostGame():
     #pygame surface
-    # windowSurface = pygame.display.set_mode((width, height))
+    windowSurface = pygame.display.set_mode((width, height))
     manager = pygame_gui.UIManager((width, height), './ourTheme.json')
 
     background = pygame.Surface((width, height))
@@ -106,20 +94,15 @@ def hostGame():
     gameNameTextBoxH = int(height/20)
     gameName = pygame_gui.elements.ui_text_entry_line.UITextEntryLine(relative_rect=pygame.Rect((gameNameTextBoxX, gameNameTextBoxY), (gameNameTextBoxW, gameNameTextBoxH)), manager=manager)
 
-    startButtonX = int(width/2-width/20)
-    startButtonY = int(height/2-height/10)
-    startButtonW = int(width/10)
-    startButtonH = int(height/20)
-    # startButton
-    Button(startButtonX, startButtonY, startButtonW, startButtonH, "Start Game", manager)
+    startButton = Button("Start Game", manager, shortcutKey=K_RETURN)
+    startButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
+    startButton.setWidthHeight(int(width/10), int(height/20))
+    
 
-    backButtonX = int(width/2-width/20)
-    backButtonY = int(height/2-height/20)
-    backButtonW = int(width/10)
-    backButtonH = int(height/20)
-    # back button
-    Button(backButtonX, backButtonY, backButtonW, backButtonH, "Back", manager)
-    #pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
+    backButton = Button("Back", manager, shortcutKey=K_ESCAPE)
+    backButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/20))
+    backButton.setWidthHeight(int(width/10), int(height/20))
+
 
     # Tile1 = GameTile(width/2, height/2, 50, 50, 0)
 
@@ -131,10 +114,11 @@ def hostGame():
                 netConn.send("quit")
                 raise SystemExit
 
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.text == "Back") or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if backButton.getClickedStatus(event):
+                print("back clicked")
                 return OpenMainMenu()
 
-            if (((event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.text == "Start Game") or (event.type == KEYDOWN and event.key == K_RETURN)) and gameName.get_text() != ""):
+            if startButton.getClickedStatus(event) and gameName.get_text() != "":
                 print(netConn.send("lobby.new:"+gameName.get_text()))
                 return startLobby(gameName.get_text(), userId)
 
@@ -169,29 +153,20 @@ def startGameList():
 
     gameSelectList = pygame_gui.elements.ui_selection_list.UISelectionList(relative_rect=pygame.Rect((gameSelectListX, gameSelectListY), (gameSelectListW, gameSelectListH)), item_list=lobbyList, manager=manager)
 
-    #button location and initilization
-    joinButtonX = int(width/2-width/20)
-    joinButtonY = int(height/2)
-    joinButtonW = int(width/10)
-    joinButtonH = int(height/20)
     # Join Game button
-    joinButton = Button(joinButtonX, joinButtonY, joinButtonW, joinButtonH, 'Join Game', manager)
+    joinButton = Button('Join Game', manager)
+    joinButton.setXLocYLoc(int(width/2-width/20), int(height/2))
+    joinButton.setWidthHeight(int(width/10), int(height/20))
 
-    #button location and initilization
-    refreshButtonX = int(width/2-width/20)
-    refreshButtonY = int(height/2+height/20)
-    refreshButtonW = int(width/10)
-    refreshButtonH = int(height/20)
     # Refresh button
-    refreshButton = Button(refreshButtonX, refreshButtonY, refreshButtonW, refreshButtonH, 'Refresh', manager)
+    refreshButton = Button('Refresh', manager)
+    refreshButton.setXLocYLoc(int(width/2-width/20), int(height/2+height/20))
+    refreshButton.setWidthHeight(int(width/10), int(height/20))
 
-    #button location and initilization
-    backButtonX = int(width/2-width/20)
-    backButtonY = int(height/2+height/10)
-    backButtonW = int(width/10)
-    backButtonH = int(height/20)
     # Back button
-    backButton = Button(backButtonX, backButtonY, backButtonW, backButtonH, 'Back', manager)
+    backButton = Button('Back', manager, shortcutKey=K_ESCAPE)
+    backButton.setXLocYLoc(int(width/2-width/20), int(height/2+height/10))
+    backButton.setWidthHeight(int(width/10), int(height/20))
 
     while True:
         time_delta = clock.tick(60)/1000.0
@@ -204,7 +179,7 @@ def startGameList():
                 raise SystemExit
 
             #events for join button
-            if joinButton.event(event):
+            if joinButton.getClickedStatus(event):
                 #send gameSelectList.get_single_selection() to server, make connection to the game lobby
                 #if game list selection isn't valid refresh the list
                 if not gameSelectList.get_single_selection():
@@ -225,11 +200,11 @@ def startGameList():
                     return startGameList()
 
             #events for refresh button
-            if refreshButton.event(event):
+            if refreshButton.getClickedStatus(event):
                 return startGameList()
 
             #events for back button
-            if backButton.event(event):
+            if backButton.getClickedStatus(event):
                 return OpenMainMenu()
 
             manager.process_events(event)
@@ -252,42 +227,35 @@ player = Player()
 def startLobby(gameName, userId):
     width = 1600
     height = 900
+ 
+    # List of managers used to set themes
+    managerList = []
+    manager = pygame_gui.UIManager((width, height), './ourTheme.json')
+    managerList.append(manager)
+    rdyManager = pygame_gui.UIManager((width, height), './rdyTheme.json')
+    managerList.append(rdyManager)
+    notRdyManager = pygame_gui.UIManager((width, height), './notRdyTheme.json')
+    managerList.append(notRdyManager)
+
     #pygame surface
     windowSurface = pygame.display.set_mode((width, height))
-    manager = pygame_gui.UIManager((width, height), './ourTheme.json')
-    #managers used to set color
-    rdyManager = pygame_gui.UIManager((width, height), './rdyTheme.json')
-    notRdyManager = pygame_gui.UIManager((width, height), './notRdyTheme.json')
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
-    # gameBoard = 
     addImage('./images/board.png', 1, background, width/2, height/2, width, height)
     
-    #button that starts the game when all players are ready, NOT visible to peons
-    startButtonX = int(width)
-    startButtonY = int(height/2-height/20)
-    startButtonW = int(width/10)
-    startButtonH = int(height/20)
-    # Start button
-    startButton = Button(startButtonX, startButtonY, startButtonW, startButtonH, 'Start Game', manager)
+    # Button that starts the game when all players are ready, NOT visible to peons
+    startButton = Button('Start Game', manager)
+    startButton.setXLocYLoc(int(width), int(height/2-height/20))
+    startButton.setWidthHeight(int(width/10), int(height/20))
 
-    #button that tells the server wether or not the user is ready and displays visuals to the user
-    readyButtonX = int(width/17)
-    readyButtonY = int(height/2)
-    readyButtonW = int(width/10)
-    readyButtonH = int(height/20)
-    # Ready button
-    readyButton = Button(readyButtonX, readyButtonY, readyButtonW, readyButtonH, 'Not Ready', notRdyManager)
-    
-    #button that sends the user back to the main menu
-    backButtonX = int(width/17)
-    backButtonY = int(height/2+height/20)
-    backButtonW = int(width/10)
-    backButtonH = int(height/20)
-    # Back button
-    backButton = Button(backButtonX, backButtonY, backButtonW, backButtonH, 'Back', manager)
-    
-    
+    # Button that tells the server if player is ready and displays visuals to the player
+    readyButton = Button('Not Ready', notRdyManager)
+    readyButton.setXLocYLoc(int(width/17), int(height/2))
+    readyButton.setWidthHeight(int(width/10), int(height/20))
+
+    backButton = Button('Back', manager)
+    backButton.setXLocYLoc(int(width/17), int(height/2+height/20))
+    backButton.setWidthHeight(int(width/10), int(height/20))
 
     #text box to display player ids and ready status 
     playerStatusX = int((width*16)/17-(width/9))
@@ -322,81 +290,81 @@ def startLobby(gameName, userId):
             if event.type == QUIT:
                 netConn.send("quit")
                 raise SystemExit
-            if startButton.event(event):
+
+            if startButton.getClickedStatus(event):
                 gameBoard(gameName, userId)
+
             #events for ready button
-            if readyButton.event(event):
+            if readyButton.getClickedStatus(event):
                 #if player presses the ready button
                 netConn.send("lobby.ready")
                 # netConn.send("lobby.passCards")
                 #change color from red to green and back when button is pushed
                 if readyButton.getText() == "Not Ready":
-                    readyButton.setManager(rdyManager)
                     readyButton.setText("Ready")
+                    readyButton.setManager(rdyManager)
                 else:
-                    readyButton.setManager(notRdyManager)
                     readyButton.setText("Not Ready")
-            if backButton.event(event):
+                    readyButton.setManager(notRdyManager)
+
+            if backButton.getClickedStatus(event):
                     width = 1000
                     height = 1000
                     netConn.send("lobby.leave")
                     return OpenMainMenu()
 
-            manager.process_events(event)
-            manager.update(time_delta)
-            rdyManager.process_events(event)
-            rdyManager.update(time_delta)
-            notRdyManager.process_events(event)
-            notRdyManager.update(time_delta)
+            # Update events based on clock ticks
+            for each in managerList:
+                each.process_events(event)
+                each.update(time_delta)
+
+            # Redraw the background
             windowSurface.blit(background, (0, 0))
-            rdyManager.draw_ui(windowSurface)
-            notRdyManager.draw_ui(windowSurface)
-            manager.draw_ui(windowSurface)
-        
+            
+            # Redraw the window objects
+            for each in managerList:
+                each.draw_ui(windowSurface)
+                print(each)
+
         #netConn.send("lobby.update")
         pygame.display.update()
 
 def gameBoard(gameName, userId):
     width = 1600
     height = 900
-    #pygame surface
+    
+    # List of managers used to set themes
+    managerList = []
     windowSurface = pygame.display.set_mode((width, height))
     manager = pygame_gui.UIManager((width, height), './ourTheme.json')
-
+    managerList.append(manager)
     panelManager = pygame_gui.UIManager((width, height), './panelTheme.json')
+    managerList.append(panelManager)
     tileManager = pygame_gui.UIManager((width, height), './tileTheme.json')
-    #managers used to set color
-    rdyManager = pygame_gui.UIManager((width, height), './rdyTheme.json')
+    managerList.append(tileManager)
 
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
-    # gameBoard = 
     addImage('./images/board.png', 1, background, width/2, height/2, width, height)
 
     # Tile buttonnnnnnns
+    # tileButton = []
     # for x in range(60):
     #     for y in range(30):
-    #         tileButtonX = 15+int((width/60)*(x))
-    #         tileButtonY = int(((height*y)/30))
-    #         tileButtonW = 30
-    #         tileButtonH = 15
-    #         tileButton = []
-    #         tileButton.append(Button(tileButtonX, tileButtonY, tileButtonW, tileButtonH, "", tileManager))
+    #         button = Button("", tileManager)
+    #         button.setXLocYLoc(15+int((width/60)*x), int(((height*y)/30)))
+    #         button.setWidthHeight(30, 15)
+    #         tileButton.append(button)
 
+    # Button to display player's hand of cards
+    handButton = Button('Hand', manager)
+    handButton.setXLocYLoc(int((width*16)/17-(width/10)), int(height/2))
+    handButton.setWidthHeight(int(width/10), int(height/20))
 
-    #button that opens the hand
-    handButtonX = int((width*16)/17-(width/10))
-    handButtonY = int(height/2)
-    handButtonW = int(width/10)
-    handButtonH = int(height/20)
-    handButton = Button(handButtonX, handButtonY, handButtonW, handButtonH, 'Hand', manager)
-
-    #button that opens the notebook
-    notebookButtonX = int((width*16)/17-(width/10))
-    notebookButtonY = int(height/2+height/20)
-    notebookButtonW = int(width/10)
-    notebookButtonH = int(height/20)
-    notebookButton = Button(notebookButtonX, notebookButtonY, notebookButtonW, notebookButtonH, 'Notebook', manager)
+    # Button to display the player's notebook
+    notebookButton = Button('Notebook', manager)
+    notebookButton.setXLocYLoc(int((width*16)/17-(width/10)), int(height/2+height/20))
+    notebookButton.setWidthHeight(int(width/10), int(height/20))
 
     #initilization of the notebook panel
     notebookX = int(width)
@@ -404,10 +372,10 @@ def gameBoard(gameName, userId):
     notebookW = int(width/4)
     notebookH = int((3*height)/4)
     notebook = pygame_gui.elements.UIPanel(relative_rect=pygame.Rect((notebookX, notebookY), (notebookW, notebookH)), starting_layer_height=1, manager=panelManager)
-    # notePadImage =
     pygame_gui.elements.UIImage(relative_rect=pygame.Rect((0, 0), (notebookW, notebookH)), image_surface=pygame.image.load('./images/clueNotepad.png'), manager=panelManager, container=notebook.get_container())
-    createNotebook(notebook, panelManager, notebookW, notebookH)
-    #list that holds integers used to determine what should be displayed in each button
+    
+    # Creates a Button object to allow interaction with checkboxe buttons
+    checkBoxButton = createNotebook(notebook, panelManager, notebookW, notebookH)
 
     #initilization of the hand panel
     handX = int(width)
@@ -430,59 +398,58 @@ def gameBoard(gameName, userId):
                 netConn.send("quit")
                 raise SystemExit
 
-            
+            # This will be where we check player movement to tiles in range
             # for butt in tileButton:
-            #     if butt.event(event):
-            #         print(butt.getXY())
-            #opens the notebook
-            if notebookButton.event(event):
+            # if butt.getClickedStatus(event):
+            #     print(butt.getXLocYLoc())
+
+            # Open the Notebook
+            if notebookButton.getClickedStatus(event):
+                # Shows Notebook, hides Hand if it is open
                 if notebookX == width:
                     notebookButton.select()
                     notebookX = (width*3)/8
                     handX = width
                     handButton.unselect()
-                else:
+                else: # Hides Notebook
                     notebookX = width
                 notebook.set_relative_position((notebookX, notebookY))
                 hand.set_relative_position((handX, handY))
 
-            #Cycles checkboxes between blank, X, and checked
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.object_ids == [None, 'checkBoxes']):
+            # Cycles Notebook checkboxes between blank, X, and checked
+            if (checkBoxButton.getClickedStatus(event)): 
                 if event.ui_element.text == " ":
                     event.ui_element.set_text("X")
                 elif event.ui_element.text == "X":
                     event.ui_element.set_text(u'\u2713')
                 elif event.ui_element.text == u'\u2713':
                     event.ui_element.set_text(" ")
-            
-            if handButton.event(event):
-                #defines the notebook, image and close button
-                #"closes" the notebook if it is open
+
+            # Open the Hand
+            if handButton.getClickedStatus(event):
+                # Shows Hand, hides Notebook if it is open
                 if handX == width:
                     handButton.select()
                     handX = width/4
                     notebookX = width
                     notebookButton.unselect()
-                else:
+                else: # Hides the hand
                     handX = width
                 hand.set_relative_position((handX, handY))
                 notebook.set_relative_position((notebookX, notebookY))
-            manager.process_events(event)
-            manager.update(time_delta)
-            rdyManager.process_events(event)
-            rdyManager.update(time_delta)
-            panelManager.process_events(event)
-            panelManager.update(time_delta)
-            tileManager.update(time_delta)
-            tileManager.process_events(event)
-            manager.draw_ui(windowSurface)
-            windowSurface.blit(background, (0, 0))
-            rdyManager.draw_ui(windowSurface)
-            
-            manager.draw_ui(windowSurface)
-            panelManager.draw_ui(windowSurface)
-            tileManager.draw_ui(windowSurface)
 
+            # Update events based on clock ticks
+            for each in managerList:
+                each.process_events(event)
+                each.update(time_delta)
+
+            # Redraw the background
+            windowSurface.blit(background, (0, 0))
+            
+            # Redraw the window objects
+            for each in managerList:
+                each.draw_ui(windowSurface)
+            
         pygame.display.update()
 
 #function takes
@@ -502,19 +469,22 @@ def addImage(img, location, on, x, y, xRes, yRes):
     on.blit(imgObj, imgRect)
     return imgObj
 
-#create the window, displays splash screen on click starts the main menu
+# Create the window, displays splash screen on click starts the main menu
 def splash():
     while True:
         # Track the mouse movement
         mousePos = pygame.mouse.get_pos()
-        #add splash screen
-        splash = addImage('images/splashScreen.jpg', 1, windowSurface, width/2, height/2, width, height)
-        #quit when mouse is clocked
 
+        # Add splash screen
+        splash = addImage('images/splashScreen.jpg', 1, windowSurface, width/2, height/2, width, height)
+        
+        
         for event in pygame.event.get():
+            # Quit when window X button is clicked
             if event.type == QUIT:
                 netConn.send("quit")
                 raise SystemExit
+            # Display menu options if splash screen is clicked
             if event.type == MOUSEBUTTONDOWN:
                 if splash.get_rect().collidepoint(mousePos):
                     OpenMainMenu()

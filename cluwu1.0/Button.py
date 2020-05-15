@@ -3,53 +3,73 @@ import pygame_gui
 from pygame.locals import *
 
 class Button:
-    def __init__(self, xLoc, yLoc, width, height, buttText, manager):
+    
+
+    def __init__(self, buttText, manager, xLoc=0, yLoc=0, width=0, height=0, container="", object_id="", shortcutKey="None"):
         self.x = xLoc
         self.y = yLoc
         self.w = width
         self.h = height
         self.text = buttText
         self.manager = manager
-        self.object_ids = str(self.x)+str(self.y)+str(self.w)
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, self.h)), text=self.text, manager=self.manager, object_id=self.object_ids)
+        self.container = container
+        self.shortcutKey = shortcutKey
+        if (object_id == ""):
+            self.object_ids = str(xLoc)+str(yLoc)+str(width)
+        else:
+            self.object_ids = object_id
+        self.newButton()
+        
+    def newButton(self):
+        if (self.container == ""):
+            self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, self.h)), text=self.text, manager=self.manager, object_id=self.object_ids)
+        else:
+            self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, self.h)), text=self.text, manager=self.manager, container=self.container, object_id=self.object_ids)
 
     def getText(self):
         return self.text
-    def getXY(self):
+    def getXLocYLoc(self):
         return "X="+str(self.x)+", Y="+str(self.y)
-    def getX(self):
+    def getXLoc(self):
         return self.x
-    def getY(self):
+    def getYLoc(self):
         return self.y
 
-
     def setX(self,x):
-        self.button.set_relative_position((x,self.y))
+        self.x = x
+        self.button.set_relative_position((self.x, self.y))
 
-    def sety(self,y):
-        self.button.set_relative_position((self.x,y))
+    def setYLoc(self,y):
+        self.y = y
+        self.button.set_relative_position((self.x, self.y))
     
-    def setXY(self, x, y):
-        self.button.set_relative_position((x,y))
+    def setXLocYLoc(self, x, y):
+        self.x = x
+        self.y = y
+        self.button.set_relative_position((self.x, self.y))
 
     def setText(self, text):
         self.text = text
         self.button.set_text(self.text)
 
-    def setW(self, w):
+    def setWidth(self, w):
         self.button.kill()
+        self.w = w
         self.object_ids = str(self.x)+str(self.y)+str(w)
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (w, self.h)), text=self.text, manager=self.manager, object_id=self.object_ids)
-
-    def setH(self, h):
+        self.newButton()
+ 
+    def setHeight(self, h):
         self.button.kill()
+        self.h = h
         self.object_ids = str(self.x)+str(self.y)+str(self.w)
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, h)), text=self.text, manager=self.manager, object_id=self.object_ids)
+        self.newButton()
 
-    def setWH(self, w, h):
+    def setWidthHeight(self, w, h):
         self.button.kill()
+        self.w = w
+        self.h = h
         self.object_ids = str(self.x)+str(self.y)+str(w)
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (w, h)), text=self.text, manager=self.manager, object_id=self.object_ids)
+        self.newButton()
 
     def enable(self):
         self.button.enable()
@@ -66,11 +86,14 @@ class Button:
     def unselect(self):
         self.button.unselect()
 
-    def setManager(self, manager):
+    def setManager(self, newManager):
         self.button.kill()
-        self.manager = manager
-        self.object_ids = str(self.x)+str(self.y)+str(self.w)
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, self.h)), text=self.text, manager=manager, object_id=self.object_ids)
+        self.manager = newManager
+        self.newButton()
 
-    def event(self, event):
-        return (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.object_ids == self.button.object_ids) or (event.type == KEYDOWN and event.key == K_ESCAPE)
+    def getClickedStatus(self, event):
+        if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED):
+            if (self.shortcutKey == "None"):
+                return (event.ui_element.object_ids == self.button.object_ids)
+            else:
+                return (event.ui_element.object_ids == self.button.object_ids) or (event.type == KEYDOWN and event.key == shortcutKey)
