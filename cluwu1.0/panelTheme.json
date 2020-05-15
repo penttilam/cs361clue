@@ -75,19 +75,6 @@
             "border": "#5e6060",
             "filled_bar": "#f4251b",
             "unfilled_bar": "#CCCCCC"
-         },
-         "images":
-         {
-            "normal_image":
-            {
-                "path": "./images/",
-                "resource": "norm_button.png"
-            },
-            "selected_image":
-            {
-                "path": "./images/",
-                "resource": "x_button.png"
-            }
         },
          "prototype": "#default_shape_style"
      },

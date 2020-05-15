@@ -9,7 +9,7 @@ class GameTile:
         self.w = width
         self.h = height
         manager = pygame_gui.UIManager((self.w, self.h), './tileTheme.json')
-        pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.w, self.h)), text="", manager=manager)
+        # self.button pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.w, self.h)), text="", manager=manager)
 
     def getXLoc(self):
         return self.xLoc

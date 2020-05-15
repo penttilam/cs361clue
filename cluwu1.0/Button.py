@@ -10,11 +10,19 @@ class Button:
         self.h = height
         self.text = buttText
         self.manager = manager
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, self.h)), text=self.text, manager=self.manager)
+        self.object_ids = str(self.x)+str(self.y)+str(self.w)
+        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, self.h)), text=self.text, manager=self.manager, object_id=self.object_ids)
 
     def getText(self):
         return self.text
-    
+    def getXY(self):
+        return "X="+str(self.x)+", Y="+str(self.y)
+    def getX(self):
+        return self.x
+    def getY(self):
+        return self.y
+
+
     def setX(self,x):
         self.button.set_relative_position((x,self.y))
 
@@ -30,15 +38,18 @@ class Button:
 
     def setW(self, w):
         self.button.kill()
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (w, self.h)), text=self.text, manager=self.manager)        
+        self.object_ids = str(self.x)+str(self.y)+str(w)
+        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (w, self.h)), text=self.text, manager=self.manager, object_id=self.object_ids)
 
     def setH(self, h):
         self.button.kill()
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, h)), text=self.text, manager=self.manager)        
+        self.object_ids = str(self.x)+str(self.y)+str(self.w)
+        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, h)), text=self.text, manager=self.manager, object_id=self.object_ids)
 
     def setWH(self, w, h):
         self.button.kill()
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (w, h)), text=self.text, manager=self.manager)
+        self.object_ids = str(self.x)+str(self.y)+str(w)
+        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (w, h)), text=self.text, manager=self.manager, object_id=self.object_ids)
 
     def enable(self):
         self.button.enable()
@@ -58,7 +69,8 @@ class Button:
     def setManager(self, manager):
         self.button.kill()
         self.manager = manager
-        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, self.h)), text=self.text, manager=self.manager)
+        self.object_ids = str(self.x)+str(self.y)+str(self.w)
+        self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.x, self.y), (self.w, self.h)), text=self.text, manager=manager, object_id=self.object_ids)
 
     def event(self, event):
-        return (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.text == self.text) or (event.type == KEYDOWN and event.key == K_ESCAPE)
+        return (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.object_ids == self.button.object_ids) or (event.type == KEYDOWN and event.key == K_ESCAPE)

@@ -8,7 +8,7 @@ from cPlayer import CPlayer
 from cLobby import CLobby
 from network import Network
 from notebook import createNotebook
-from GameTile import GameTile
+# from GameTile import GameTile
 from Button import Button
 
 #what does all this do?
@@ -121,7 +121,7 @@ def hostGame():
     Button(backButtonX, backButtonY, backButtonW, backButtonH, "Back", manager)
     #pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
 
-    Tile1 = GameTile(width/2, height/2, 50, 50, 0)
+    # Tile1 = GameTile(width/2, height/2, 50, 50, 0)
 
     while True:
         time_delta = clock.tick(60)/1000.0
@@ -235,7 +235,7 @@ def startGameList():
             manager.process_events(event)
             manager.update(time_delta)
             windowSurface.blit(background, (0, 0))
-            manager.draw_ui(windowSurface)
+            
         pygame.display.update()
 
 class Player:
@@ -331,11 +331,11 @@ def startLobby(gameName, userId):
                 # netConn.send("lobby.passCards")
                 #change color from red to green and back when button is pushed
                 if readyButton.getText() == "Not Ready":
-                    readyButton.setText("Ready")
                     readyButton.setManager(rdyManager)
+                    readyButton.setText("Ready")
                 else:
-                    readyButton.setText("Not Ready")
                     readyButton.setManager(notRdyManager)
+                    readyButton.setText("Not Ready")
             if backButton.event(event):
                     width = 1000
                     height = 1000
@@ -364,7 +364,7 @@ def gameBoard(gameName, userId):
     manager = pygame_gui.UIManager((width, height), './ourTheme.json')
 
     panelManager = pygame_gui.UIManager((width, height), './panelTheme.json')
-
+    tileManager = pygame_gui.UIManager((width, height), './tileTheme.json')
     #managers used to set color
     rdyManager = pygame_gui.UIManager((width, height), './rdyTheme.json')
 
@@ -373,19 +373,30 @@ def gameBoard(gameName, userId):
     # gameBoard = 
     addImage('./images/board.png', 1, background, width/2, height/2, width, height)
 
+    # Tile buttonnnnnnns
+    # for x in range(60):
+    #     for y in range(30):
+    #         tileButtonX = 15+int((width/60)*(x))
+    #         tileButtonY = int(((height*y)/30))
+    #         tileButtonW = 30
+    #         tileButtonH = 15
+    #         tileButton = []
+    #         tileButton.append(Button(tileButtonX, tileButtonY, tileButtonW, tileButtonH, "", tileManager))
+
+
     #button that opens the hand
     handButtonX = int((width*16)/17-(width/10))
     handButtonY = int(height/2)
     handButtonW = int(width/10)
     handButtonH = int(height/20)
-    handButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((handButtonX, handButtonY), (handButtonW, handButtonH)), text='Hand', manager=manager)
+    handButton = Button(handButtonX, handButtonY, handButtonW, handButtonH, 'Hand', manager)
 
     #button that opens the notebook
     notebookButtonX = int((width*16)/17-(width/10))
     notebookButtonY = int(height/2+height/20)
     notebookButtonW = int(width/10)
     notebookButtonH = int(height/20)
-    notebookButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((notebookButtonX, notebookButtonY), (notebookButtonW, notebookButtonH)), text='Notebook', manager=manager)
+    notebookButton = Button(notebookButtonX, notebookButtonY, notebookButtonW, notebookButtonH, 'Notebook', manager)
 
     #initilization of the notebook panel
     notebookX = int(width)
@@ -404,9 +415,10 @@ def gameBoard(gameName, userId):
     handW = int(width/2)
     handH = int(height/3)
     hand = pygame_gui.elements.UIPanel(relative_rect=pygame.Rect((handX, handY), (handW, handH)), starting_layer_height=1, manager=panelManager)
-
+    pygame_gui.elements.UIImage(relative_rect=pygame.Rect((0, 0), (handW, handH)), image_surface=pygame.image.load('./images/character.png'), manager=panelManager, container=hand.get_container())
+    
     player.game = gameName
-    player.id = id
+    player.id = userId
     print(player.id)
     print(player.game)
 
@@ -419,7 +431,11 @@ def gameBoard(gameName, userId):
                 raise SystemExit
 
             #opens the notebook
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == notebookButton):
+            for butt in tileButton:
+                if butt.event(event):
+                    print(butt.getXY())
+
+            if notebookButton.event(event):
                 if notebookX == width:
                     notebookButton.select()
                     notebookX = (width*3)/8
@@ -439,7 +455,7 @@ def gameBoard(gameName, userId):
                 elif event.ui_element.text == u'\u2713':
                     event.ui_element.set_text(" ")
             
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == handButton):
+            if handButton.event(event):
                 #defines the notebook, image and close button
                 #"closes" the notebook if it is open
                 if handX == width:
@@ -457,11 +473,15 @@ def gameBoard(gameName, userId):
             rdyManager.update(time_delta)
             panelManager.process_events(event)
             panelManager.update(time_delta)
-
+            tileManager.update(time_delta)
+            tileManager.process_events(event)
+            manager.draw_ui(windowSurface)
             windowSurface.blit(background, (0, 0))
             rdyManager.draw_ui(windowSurface)
+            
             manager.draw_ui(windowSurface)
             panelManager.draw_ui(windowSurface)
+            tileManager.draw_ui(windowSurface)
 
         pygame.display.update()
 
