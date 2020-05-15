@@ -29,13 +29,13 @@ class Button:
     def getText(self):
         return self.text
     def getXLocYLoc(self):
-        return "X="+str(self.x)+", Y="+str(self.y)
+        return (self.x, self.y)
     def getXLoc(self):
         return self.x
     def getYLoc(self):
         return self.y
 
-    def setX(self,x):
+    def setXLoc(self,x):
         self.x = x
         self.button.set_relative_position((self.x, self.y))
 

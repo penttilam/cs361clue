@@ -28,7 +28,6 @@ def OpenMainMenu():
     menuLabelH = int(height/10)
     pygame_gui.elements.ui_label.UILabel(pygame.Rect((menuLabelX, menuLabelY), (menuLabelW, menuLabelH)), text="Main Menu", manager=manager)
 
-
     hostButton = Button('Host', manager)
     hostButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
     hostButton.setWidthHeight(int(width/10), int(height/20))
