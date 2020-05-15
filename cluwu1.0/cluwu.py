@@ -8,7 +8,8 @@ from cPlayer import CPlayer
 from cLobby import CLobby
 from network import Network
 from notebook import createNotebook
-
+from GameTile import GameTile
+from Button import Button
 
 #what does all this do?
 KEYDOWN = 2
@@ -39,14 +40,16 @@ def OpenMainMenu():
     hostButtonY = int(height/2-height/10)
     hostButtonW = int(width/10)
     hostButtonH = int(height/20)
-    hostButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((hostButtonX, hostButtonY), (hostButtonW, hostButtonH)), text='Host', manager=manager)
+    # Host button
+    Button(hostButtonX, hostButtonY, hostButtonW, hostButtonH, 'Host', manager)
     #hostButton.fill(manager.ui_theme.get_colour('pinkMF'))
 
     joinButtonX = int(width/2-width/20)
     joinButtonY = int(height/2-height/20)
     joinButtonW = int(width/10)
     joinButtonH = int(height/20)
-    joinButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((joinButtonX, joinButtonY), (joinButtonW, joinButtonH)), text='Join', manager=manager)
+    # Join button
+    Button(joinButtonX, joinButtonY, joinButtonW, joinButtonH, 'Join', manager)
 
     quitButtonX = int(width/2-width/20)
     quitButtonY = int(height/2)
@@ -62,12 +65,12 @@ def OpenMainMenu():
                 netConn.send("quit")
                 raise SystemExit
 
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == hostButton):
+            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.text == "Host"):
                 #when host is pressed starts the game list by calling the function
                 print(event.type)
                 return hostGame()
 
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == joinButton):
+            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.text == "Join"):
                 #when join button is pressed starts the game list by calling the function
                 print(event.type)
                 return startGameList()
@@ -107,13 +110,18 @@ def hostGame():
     startButtonY = int(height/2-height/10)
     startButtonW = int(width/10)
     startButtonH = int(height/20)
-    startButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((startButtonX, startButtonY), (startButtonW, startButtonH)), text='Start Game', manager=manager)
+    # startButton
+    Button(startButtonX, startButtonY, startButtonW, startButtonH, "Start Game", manager)
 
     backButtonX = int(width/2-width/20)
     backButtonY = int(height/2-height/20)
     backButtonW = int(width/10)
     backButtonH = int(height/20)
-    backButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
+    # back button
+    Button(backButtonX, backButtonY, backButtonW, backButtonH, "Back", manager)
+    #pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
+
+    Tile1 = GameTile(width/2, height/2, 50, 50, 0)
 
     while True:
         time_delta = clock.tick(60)/1000.0
@@ -123,10 +131,10 @@ def hostGame():
                 netConn.send("quit")
                 raise SystemExit
 
-            if ((event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == backButton) or (event.type == KEYDOWN and event.key == K_ESCAPE)):
+            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.text == "Back") or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 return OpenMainMenu()
 
-            if (((event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == startButton) or (event.type == KEYDOWN and event.key == K_RETURN)) and gameName.get_text() != ""):
+            if (((event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element.text == "Start Game") or (event.type == KEYDOWN and event.key == K_RETURN)) and gameName.get_text() != ""):
                 print(netConn.send("lobby.new:"+gameName.get_text()))
                 return startLobby(gameName.get_text(), userId)
 
@@ -166,21 +174,24 @@ def startGameList():
     joinButtonY = int(height/2)
     joinButtonW = int(width/10)
     joinButtonH = int(height/20)
-    joinButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((joinButtonX, joinButtonY), (joinButtonW, joinButtonH)), text='Join Game', manager=manager)
+    # Join Game button
+    joinButton = Button(joinButtonX, joinButtonY, joinButtonW, joinButtonH, 'Join Game', manager)
 
     #button location and initilization
     refreshButtonX = int(width/2-width/20)
     refreshButtonY = int(height/2+height/20)
     refreshButtonW = int(width/10)
     refreshButtonH = int(height/20)
-    refreshButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((refreshButtonX, refreshButtonY), (refreshButtonW, refreshButtonH)), text='Refresh', manager=manager)
+    # Refresh button
+    refreshButton = Button(refreshButtonX, refreshButtonY, refreshButtonW, refreshButtonH, 'Refresh', manager)
 
     #button location and initilization
     backButtonX = int(width/2-width/20)
     backButtonY = int(height/2+height/10)
     backButtonW = int(width/10)
     backButtonH = int(height/20)
-    backButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
+    # Back button
+    backButton = Button(backButtonX, backButtonY, backButtonW, backButtonH, 'Back', manager)
 
     while True:
         time_delta = clock.tick(60)/1000.0
@@ -193,7 +204,7 @@ def startGameList():
                 raise SystemExit
 
             #events for join button
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == joinButton):
+            if joinButton.event(event):
                 #send gameSelectList.get_single_selection() to server, make connection to the game lobby
                 #if game list selection isn't valid refresh the list
                 if not gameSelectList.get_single_selection():
@@ -203,24 +214,22 @@ def startGameList():
                     gameName = gameSelectList.get_single_selection().split(' ')[0]
 
                 joinResponse = netConn.send("lobby.join:"+gameName)
-
                 action = joinResponse.split(":")
                 command = action[2].split(".")
 
                 #if success start game
                 if command[1] == "success":
                     startLobby(gameName, userId)
-
                 #otherwise refresh the lobby list
                 else:
                     return startGameList()
 
             #events for refresh button
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == refreshButton):
+            if refreshButton.event(event):
                 return startGameList()
 
             #events for back button
-            if ((event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == backButton) or (event.type == KEYDOWN and event.key == K_ESCAPE)):
+            if backButton.event(event):
                 return OpenMainMenu()
 
             manager.process_events(event)
@@ -240,7 +249,7 @@ class Player:
 
 player = Player()
 
-def startLobby(gameName, id):
+def startLobby(gameName, userId):
     width = 1600
     height = 900
     #pygame surface
@@ -248,6 +257,7 @@ def startLobby(gameName, id):
     manager = pygame_gui.UIManager((width, height), './ourTheme.json')
     #managers used to set color
     rdyManager = pygame_gui.UIManager((width, height), './rdyTheme.json')
+    notRdyManager = pygame_gui.UIManager((width, height), './notRdyTheme.json')
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
     # gameBoard = 
@@ -258,21 +268,24 @@ def startLobby(gameName, id):
     startButtonY = int(height/2-height/20)
     startButtonW = int(width/10)
     startButtonH = int(height/20)
-    startButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((startButtonX, startButtonY), (startButtonW, startButtonH)), text='Start Game', manager=manager)
+    # Start button
+    startButton = Button(startButtonX, startButtonY, startButtonW, startButtonH, 'Start Game', manager)
 
     #button that tells the server wether or not the user is ready and displays visuals to the user
     readyButtonX = int(width/17)
     readyButtonY = int(height/2)
     readyButtonW = int(width/10)
     readyButtonH = int(height/20)
-    readyButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((readyButtonX, readyButtonY), (readyButtonW, readyButtonH)), text='Not Ready', manager=rdyManager)
+    # Ready button
+    readyButton = Button(readyButtonX, readyButtonY, readyButtonW, readyButtonH, 'Not Ready', notRdyManager)
     
     #button that sends the user back to the main menu
     backButtonX = int(width/17)
     backButtonY = int(height/2+height/20)
     backButtonW = int(width/10)
     backButtonH = int(height/20)
-    backButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((backButtonX, backButtonY), (backButtonW, backButtonH)), text='Back', manager=manager)
+    # Back button
+    backButton = Button(backButtonX, backButtonY, backButtonW, backButtonH, 'Back', manager)
     
     
 
@@ -280,10 +293,10 @@ def startLobby(gameName, id):
     playerStatusX = int((width*16)/17-(width/9))
     playerStatusY = int(height/4)
     playerStatusW = int(width/7)
-    playerStatuaH = int(height/20)
+    playerStatusH = int(height/20)
     netConn.send("lobby.update")
     currentLobbyPlayerStatus = netConn.catch()
-    playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+    playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify(), relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
     while True:
         time_delta = clock.tick(60) / 1000.0
@@ -295,11 +308,11 @@ def startLobby(gameName, id):
 
         if not currentLobbyPlayerStatus == tmp:
             playerStatus.kill()
-            playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatuaH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+            playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
         if currentLobbyPlayerStatus.getPList()[0].getId() == netConn.getId():
             startButtonX = int(width/17)
-            startButton.set_relative_position((startButtonX,startButtonY))
+            startButton.setX(startButtonX)
             if currentLobbyPlayerStatus.getLReady():
                 startButton.enable()
             else:
@@ -309,36 +322,41 @@ def startLobby(gameName, id):
             if event.type == QUIT:
                 netConn.send("quit")
                 raise SystemExit
+            if startButton.event(event):
+                gameBoard(gameName, userId)
             #events for ready button
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == readyButton):
+            if readyButton.event(event):
                 #if player presses the ready button
                 netConn.send("lobby.ready")
                 # netConn.send("lobby.passCards")
                 #change color from red to green and back when button is pushed
-                if readyButton.text == "Not Ready":
-                    readyButton.select()
-                    readyButton.set_text("Ready")
+                if readyButton.getText() == "Not Ready":
+                    readyButton.setText("Ready")
+                    readyButton.setManager(rdyManager)
                 else:
-                    readyButton.unselect()
-                    readyButton.set_text("Not Ready")
-            #events for back button
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == backButton) or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                    readyButton.setText("Not Ready")
+                    readyButton.setManager(notRdyManager)
+            if backButton.event(event):
                     width = 1000
                     height = 1000
                     netConn.send("lobby.leave")
                     return OpenMainMenu()
+
             manager.process_events(event)
             manager.update(time_delta)
             rdyManager.process_events(event)
             rdyManager.update(time_delta)
+            notRdyManager.process_events(event)
+            notRdyManager.update(time_delta)
             windowSurface.blit(background, (0, 0))
             rdyManager.draw_ui(windowSurface)
+            notRdyManager.draw_ui(windowSurface)
             manager.draw_ui(windowSurface)
         
         #netConn.send("lobby.update")
         pygame.display.update()
 
-def gameBoard(gameName, id):
+def gameBoard(gameName, userId):
     width = 1600
     height = 900
     #pygame surface
