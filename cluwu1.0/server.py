@@ -1,6 +1,7 @@
 import socket
 import sys
 import pickle
+import _thread
 from _thread import *
 
 
@@ -50,7 +51,7 @@ def listCommand(player, lobbyList):
     cLobbies = []
     for lobby in lobbyList:
         lobbyId = lobby.getId()
-        lobbyId = CLobby(lobby.getId(), lobby.getPNumber(), lobby.getPName())
+        lobbyId = CLobby(lobby.getId(), lobby.getPNumber(), lobby.getPName(), lobby.getLobbyReady())
         cLobbies.append(lobbyId)
     player.sendClientLobby(cLobbies)
 
@@ -158,7 +159,12 @@ def Threaded_Client(player, lobbyList):
                 break
             else:
                 print("Received  --  " + data)
+                ##eventually we will update this with more cores, ports, and threads ;3
+                ##lock aquire
+                ##serverLock.acquire()
                 runThread = clientCommand(data, player, lobbyList)
+                ##lock release
+                ##serverLock.release()
 
         except:
             break
@@ -174,6 +180,7 @@ def Threaded_Client(player, lobbyList):
 ##initialize players id number and the lobby list
 playerNumber = 1
 lobbyList = []
+##serverLock = _thread.allocate_lock()
 
 ##begin a loop to listen for connections from players
 while True:

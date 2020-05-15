@@ -1,6 +1,6 @@
 import pygame
 import pygame_gui
-
+from Button import Button
 def createNotebook(notebook, panelManager, width, height):
     d = 50
     xPos = [((width*2)/12),((width*5)/12),((width*8)/12)]
@@ -12,5 +12,7 @@ def createNotebook(notebook, panelManager, width, height):
                 buttY = y
                 buttW = 20
                 buttH = 20
-                pygame_gui.elements.UIButton(relative_rect=pygame.Rect((buttX, buttY), (buttW, buttH)), text=' ', manager=panelManager, container=notebook, object_id="checkBoxes")
+                button = Button(" ", panelManager, buttX, buttY, buttW, buttH, container=notebook, object_id="checkBoxes")
+
+    return button
     
