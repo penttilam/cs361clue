@@ -430,11 +430,11 @@ def gameBoard(gameName, userId):
                 netConn.send("quit")
                 raise SystemExit
 
+            
+            # for butt in tileButton:
+            #     if butt.event(event):
+            #         print(butt.getXY())
             #opens the notebook
-            for butt in tileButton:
-                if butt.event(event):
-                    print(butt.getXY())
-
             if notebookButton.event(event):
                 if notebookX == width:
                     notebookButton.select()
