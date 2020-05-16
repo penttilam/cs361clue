@@ -4,8 +4,8 @@ import time
 # import sys; sys.path.insert(0, "..")
 from pygame.locals import *
 from pygame import surface
-from cPlayer import CPlayer
-from cLobby import CLobby
+from clientPlayer import ClientPlayer
+from clientLobby import ClientLobby
 from network import Network
 from notebook import createNotebook
 # from GameTile import GameTile
@@ -48,6 +48,7 @@ def OpenMainMenu():
         time_delta = clock.tick(60)/1000.0
         for event in pygame.event.get():
             if event.type == QUIT:
+                print("It's quitting...")
                 netConn.send("quit")
                 raise SystemExit
 
@@ -147,8 +148,11 @@ def startGameList():
     lobbyList = []
 
     print(gameSelectListActiveGamesList)
-    for cLobbies in gameSelectListActiveGamesList:
-        lobbyList.append(str(cLobbies.getId())+" "+str(cLobbies.getPNumber())+ " players")
+    for clientLobby in gameSelectListActiveGamesList:
+        print("looping...")
+        lobbyList.append(str(clientLobby.getId())+" "+str(clientLobby.getNumberOfPlayers())+ " players")
+
+    print("after printing lobbies..........")
 
     gameSelectList = pygame_gui.elements.ui_selection_list.UISelectionList(relative_rect=pygame.Rect((gameSelectListX, gameSelectListY), (gameSelectListW, gameSelectListH)), item_list=lobbyList, manager=manager)
 
@@ -262,6 +266,7 @@ def startLobby(gameName, userId):
     playerStatusW = int(width/7)
     playerStatusH = int(height/20)
     netConn.send("lobby.update")
+
     currentLobbyPlayerStatus = netConn.catch()
     playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify(), relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
@@ -269,18 +274,26 @@ def startLobby(gameName, userId):
         time_delta = clock.tick(60) / 1000.0
         #update the text box to let players know who is ready etc...
         tmp = currentLobbyPlayerStatus
+
+        print("this is the tmp: " + str(tmp))
         netConn.send("lobby.update")
         currentLobbyPlayerStatus = netConn.catch()
+
+        print("this is the currentLobbyPlayerStatus: " + str(currentLobbyPlayerStatus))
         #if player number changes kill the text box and create a new one with updated information.
 
         if not currentLobbyPlayerStatus == tmp:
             playerStatus.kill()
             playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
-        if currentLobbyPlayerStatus.getPList()[0].getId() == netConn.getId():
+        isHost = netConn.send("lobby.host").split(":")
+
+        print("This is host: " + str(isHost))
+
+        if isHost[2] == "True":
             startButtonX = int(width/17)
-            startButton.setX(startButtonX)
-            if currentLobbyPlayerStatus.getLReady():
+            startButton.setXLoc(startButtonX)
+            if currentLobbyPlayerStatus.getLobbyReadyStatus():
                 startButton.enable()
             else:
                 startButton.disable()
@@ -323,7 +336,7 @@ def startLobby(gameName, userId):
             # Redraw the window objects
             for each in managerList:
                 each.draw_ui(windowSurface)
-                print(each)
+
 
         #netConn.send("lobby.update")
         pygame.display.update()
@@ -511,3 +524,5 @@ clock = pygame.time.Clock()
 
 #run the program
 splash()
+
+print("print after splash :D ")
