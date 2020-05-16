@@ -20,3 +20,5 @@ class ClientPlayer:
     
     def getLostGame(self):
         return self.lostGame
+
+    ##
