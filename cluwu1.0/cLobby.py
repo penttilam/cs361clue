@@ -1,5 +1,5 @@
-from player import Player
-from cPlayer import CPlayer
+from serverPlayer import ServerPlayer
+from clientPlayer import ClientPlayer
 
 class CLobby:
     def __init__(self, lobbyId, pNumber, lPlayers, lReady):

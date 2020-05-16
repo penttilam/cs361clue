@@ -1,7 +1,7 @@
 ##
 ## This is a Class for creating a lobby it will hold palyers before directing them into a game
 ##
-
+from serverPlayer import ServerPlayer
 from cLobby import CLobby
 
 
@@ -29,15 +29,10 @@ class Lobby:
             player.sendClient("lobby.join:" + str(self.id) + ".success")
      
     ##this removes a player from the lobby
-    def removePlayer(self, player, lobbyList):
+    def removePlayer(self, player):
         self.players.remove(player)
         self.numberPlayers -= 1
-        player.setLobby(0)
-        if self.numberPlayers == 0:
-            print("  Server  --  " + str(self.id) + ".empty")
-            print("  Server  --  " + str(self.id) + ".removed")
-            lobbyList.remove(self)
-        player.sendClient("lobby.remove:" + str(self.id) + "." + str(player.getId()))
+        player.sendClientAString("lobby.remove:" + str(self.id) + "." + str(player.getId()))
 
     ##this this returns a list of the player names
     def getPName(self):

@@ -8,11 +8,11 @@ class Connection():
         self.conn.send(pickle.dumps(str(self.id) + ":connected"))
 
 
-    def sendClientString(self, message):
+    def sendClientAString(self, message):
         self.conn.send(pickle.dumps(str(self.id) + ":" + str(message)))
         print("    Sent  --  " + str(self.id) + ":" + str(message))
 
-    def sendClientObject(self, clientObject):
+    def sendClientAObject(self, clientObject):
         self.conn.send(pickle.dumps(clientObject))
         print("    Sent -- " + str(self.id) + ".object:" + type(clientObject))
 
