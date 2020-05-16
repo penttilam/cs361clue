@@ -15,7 +15,7 @@ class Connection():
     def sendClientAObject(self, clientObject):
         print("maybe here? " + str(clientObject))
         self.conn.send(pickle.dumps(clientObject))
-        print("    Sent -- " + str(self.id) + ".object:" + type(clientObject))
+        print("    Sent -- " + str(self.id) + ".object:" + str(type(clientObject)))
 
     def getClientMessage(self):
         return pickle.loads(self.conn.recv(2048))

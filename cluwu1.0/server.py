@@ -8,7 +8,7 @@ from _thread import *
 from serverConnection import * 
 from createClientObjects import *
 
-####
+######
 
 from serverPlayer import ServerPlayer
 from serverLobby import *
@@ -68,23 +68,24 @@ def listCommand(player, lobbyList):
 
 
 ##this function revomes a player from their lobby
-def leaveCommand(player):
+def leaveCommand(player, lobbyList):
     for lobby in lobbyList:
         for lobbyPlayer in lobby.getPlayers():
             if lobbyPlayer == player:
-                lobby.removePlayer(player)
+                playerLobby = lobby
 
-                if lobby.getPNumber == 1:
-                    lobbyList.remove(lobby)
-                    print("  Server  --  " + str(lobby.getId()) + ".empty.removed")
-                return
+    playerLobby.removePlayer(player)
+    if playerLobby.getPNumber() == 0:
+        lobbyList.remove(playerLobby)
+        print("FUCKING GUCKING DUCKS2")
+    print("after the If")
+
 
 ##this function initializes the game
 def startCommand(player, lobbyList):
     lobby = player.getLobby()
     nameList = []
     nameList = lobby.getPlayers()
-    ##createDeck(nameList)  
     startInfo = "lobby.start.confirmed"
 
     player.sendClient(startInfo)
@@ -116,6 +117,21 @@ def updateCommand(player, lobbyList):
                 return
 
 
+def hostCommand(player, lobbyList):
+    print("did i make it here?")
+    hostFlag = False
+    print("this is the fucking LobbyList: " + str(lobbyList))
+    for lobby in lobbyList:
+        print("Im in the lobbyList")
+        playerList = lobby.getPlayers()
+        if playerList[0] == player:
+             print("is anything ever true?")
+             hostFlag = True
+         
+    print("nothing is real!")
+    player.sendClientAString("lobby.host:" + str(hostFlag))
+
+
 
 ##This is the subset of lobby actions
 def lobbyCommand(block1, block2, player, lobbyList, gameList):
@@ -129,13 +145,19 @@ def lobbyCommand(block1, block2, player, lobbyList, gameList):
     elif arguements[1] == "join":
         joinCommand(block2, player, lobbyList)
     elif arguements[1] == "leave":
+        print("before teh command?")
         leaveCommand(player, lobbyList)
+        print("after teh command?")
     elif arguements[1] == "ready":
         readyCommand(player)
     elif arguements[1] == "start":
         startCommand(player, lobbyList, gameList)
     elif arguements[1] == "update":
         updateCommand(player, lobbyList)
+    elif arguements[1] == "host":
+        hostCommand(player, lobbyList)
+
+    print("Before I go to Bed")
 
 ##This is the command interperter from the client
 def clientCommand(clientCommand, player, lobbyList, gameList):
@@ -157,6 +179,8 @@ def clientCommand(clientCommand, player, lobbyList, gameList):
         player.sendClientAString("quit")
         runThread = False
 
+    return True
+
 
 
 ##This the individual client thread that sends and recieves data from the client
@@ -175,9 +199,11 @@ def Threaded_Client(player, lobbyList, gameList):
                 runThread = clientCommand(data, player, lobbyList, gameList)
 
         except:
+            print("this is the except: " + str(data))
             break
-
-    leaveCommand(player)
+    
+    leaveCommand(player, lobbyList)
+    print("its running the wrong leave?")
     print("Lost connection to " + player.getConnectionId())
 
 
