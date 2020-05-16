@@ -5,16 +5,17 @@ import _thread
 from _thread import *
 
 
-from serverConnection import Connection
+from serverConnection import * 
+from createClientObjects import *
 
 ####
 
 from serverPlayer import ServerPlayer
-from lobby import Lobby
+from serverLobby import *
 
 
 
-from cLobby import CLobby
+from clientLobby import *
 from sCard import * 
 
 ##Creating the server socket and listening for a connection
@@ -34,8 +35,14 @@ print("Server waiting for a connection :D")
 
 ##This functions creates a new lobby and adds the current Player
 def newCommand(newLobbyName, player, lobbyList):
-    newLobbyName = Lobby(player, newLobbyName)
+    print("fucking here bro")
+    print("newLobbyName: " + newLobbyName)
+    print("player: " + str(player))
+    print("lobbyList: " + str(lobbyList))
+    newLobbyName = ServerLobby(player, newLobbyName)
+    print("No its fucking here bro")
     lobbyList.append(newLobbyName)
+    print("Wait wait wait Its fucking here bro")
 
 
 ##This function adds a user to a given lobby
@@ -67,7 +74,7 @@ def leaveCommand(player):
             if lobbyPlayer == player:
                 lobby.removePlayer(player)
 
-                if lobby.getPNumber <= 0:
+                if lobby.getPNumber == 1:
                     lobbyList.remove(lobby)
                     print("  Server  --  " + str(lobby.getId()) + ".empty.removed")
                 return
@@ -96,17 +103,23 @@ def readyCommand(player):
 
 ##this function updates the current clobby for the client
 def updateCommand(player, lobbyList):
-    player.sendClient("lobby.update:confirmed")
+    player.sendClientAString("lobby.update:confirmed")
     for lobby in lobbyList:
+        print("fuck your lobbies!")
         for lobbyPlayer in lobby.getPlayers():
+            print("no fuck the players!")
             if lobbyPlayer == player:
-                clientLobby = lobby.getCLobby()
-    player.sendClientAObject(clientLobby)
+                print("this is right before clobby")
+                clientLobby = createClientLobby(lobby)
+                print("this is a clobby: " + str(clientLobby))
+                player.sendClientAObject(clientLobby)
+                return
 
 
 
 ##This is the subset of lobby actions
 def lobbyCommand(block1, block2, player, lobbyList, gameList):
+    print("player print 4: " + str(player))
     arguements = block1.split(".")
 
     if arguements[1] == "new":
@@ -126,6 +139,7 @@ def lobbyCommand(block1, block2, player, lobbyList, gameList):
 
 ##This is the command interperter from the client
 def clientCommand(clientCommand, player, lobbyList, gameList):
+    print("player print 3: " + str(player))
     blocks = clientCommand.split(":")
     arguements = blocks[1].split(".")
 
@@ -149,6 +163,7 @@ def clientCommand(clientCommand, player, lobbyList, gameList):
 def Threaded_Client(player, lobbyList, gameList):
     runThread = True
 
+    print("player print 2: " + str(player))
     while runThread:
         try:
             data = player.getClientMessage()
@@ -162,9 +177,8 @@ def Threaded_Client(player, lobbyList, gameList):
         except:
             break
 
-    player.leaveLobby(lobbyList) 
-    print("Lost connection to " + clientConnection.getId())
-    clientConnection.getConn().close()
+    leaveCommand(player)
+    print("Lost connection to " + player.getConnectionId())
 
 
 ##
@@ -182,7 +196,8 @@ while True:
 
     ## Using ServerPlayer class as middle man to Connection class to insolate it from the program
     connectionId = Connection(connectionId, conn)
-    player = ServerPlayer(clientConnection)
+    player = ServerPlayer(connectionId)
+    print("player print 1: " + str(player))
 
     start_new_thread(Threaded_Client, (player, lobbyList, gameList))
     
