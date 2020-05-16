@@ -9,23 +9,15 @@ from cPlayer import CPlayer
 
 class Player():
     def __init__(self, playerId, conn):
-        ##basic info
         self.id = playerId     ## this is the player ID stored as a string
-        self.conn = conn       ## this is the player's conn object
-        ##lobby info
         self.ready = False     ## this is the players status in the lobby
         self.lobbyId = 0       ## this is the players current lobby id
-        ##game info
-
         self.myCards = []
-
         self.char = " "
         self.turn = 0
 
-        ##events
-        self.event_click_create_lobby = False
-
-        ##send a message on initilization
+        ##remove these
+        self.conn = conn       ## this is the player's conn object
         self.conn.send(pickle.dumps(str(self.id) + ":connected"))
 
     ##this returns the players id
@@ -86,15 +78,6 @@ class Player():
             lobby = self.lobbyId
             lobby.removePlayer(self, lobbyList)
 
-    ##send a message to player client
-    def sendClient(self, message):
-        self.conn.send(pickle.dumps(str(self.id) + ":" + str(message)))
-        print("    Sent  --  " + str(self.id) + ":" + str(message))
-
-    ##send a cLobby object to player client
-    def sendClientLobby(self, cLobbyList):
-        self.conn.send(pickle.dumps(cLobbyList))
-        print("     Sent -- object.cLobby")
 
     def getCPlayer(self):
         cplayer = self.id

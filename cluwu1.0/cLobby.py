@@ -16,14 +16,10 @@ class CLobby:
    
     def getPList(self):
         return self.pList
-<<<<<<< HEAD
     
-=======
-
     def getLReady(self):
         return self.lReady
 
->>>>>>> BM-knife
     def htmlStringify(self):
         htmlString = "<b>Lobby name: " + self.id + "<br></b>" 
         for player in self.pList:

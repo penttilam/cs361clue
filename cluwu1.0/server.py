@@ -5,6 +5,10 @@ import _thread
 from _thread import *
 
 
+from serverConnection import Connection
+
+####
+
 from player import Player
 from lobby import Lobby
 
@@ -78,9 +82,9 @@ def startCommand(player, lobbyList):
     lobby = player.getLobby()
     nameList = []
     nameList = lobby.getPlayers()
-    createDeck(nameList)  
-    startInfo = "lobby.start:"
-    startInfo += player.getChar()
+    ##createDeck(nameList)  
+    startInfo = "lobby.start.confirmed"
+
     player.sendClient(startInfo)
 
 
@@ -148,23 +152,18 @@ def clientCommand(clientCommand, player, lobbyList):
 
 
 ##This the individual client thread that sends and recieves data from the client
-def Threaded_Client(player, lobbyList):
+def Threaded_Client(clientConnection, lobbyList, gameList):
     runThread = True
 
     while runThread:
         try:
-            data = pickle.loads(player.getConn().recv(2048))
+            data = clientConnection.getClientMessage()
 
             if not data:
                 break
             else:
                 print("Received  --  " + data)
-                ##eventually we will update this with more cores, ports, and threads ;3
-                ##lock aquire
-                ##serverLock.acquire()
                 runThread = clientCommand(data, player, lobbyList)
-                ##lock release
-                ##serverLock.release()
 
         except:
             break
@@ -178,27 +177,28 @@ def Threaded_Client(player, lobbyList):
 ## this is the server listening for connections initizliaing them as players and passing them to threads
 ##
 ##initialize players id number and the lobby list
-playerNumber = 1
+connectionNumber = 1
 lobbyList = []
+gameList = []
 ##serverLock = _thread.allocate_lock()
 
 ##begin a loop to listen for connections from players
 while True:
 
     ##create a playerId string
-    playerId = "p" + str(playerNumber)
+    connectionId = "connection" + str(connectionNumber)
     ##create a connection and assign the values to conn and addr
     conn, addr = s.accept()
     ##document the connection
-    print(str(addr) + " connected as player " + str(playerId))
+    print(str(addr) + " is connection" + str(connectionNumber))
 
     ##create a player object with current playerId
-    playerId = Player(playerId, conn)
+    connectionId = Connection(connectionId, conn)
 
     ##start a new running thread
-    start_new_thread(Threaded_Client, (playerId, lobbyList))
+    start_new_thread(Threaded_Client, (connectionId, lobbyList, gameList))
     ##increase id for next connection
-    playerNumber += 1
+    connectionNumber += 1
 
 
 

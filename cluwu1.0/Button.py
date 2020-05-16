@@ -96,4 +96,4 @@ class Button:
             if (self.shortcutKey == "None"):
                 return (event.ui_element.object_ids == self.button.object_ids)
             else:
-                return (event.ui_element.object_ids == self.button.object_ids) or (event.type == KEYDOWN and event.key == shortcutKey)
+                return (event.ui_element.object_ids == self.button.object_ids) or (event.type == KEYDOWN and event.key == self.shortcutKey)
