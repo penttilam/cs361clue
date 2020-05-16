@@ -10,6 +10,7 @@ from network import Network
 from notebook import createNotebook
 # from GameTile import GameTile
 from Button import Button
+from GameGrid import GameGrid
 
 #was there a reason clock was here? It's used as a global, probably should be at the top?
 
@@ -75,9 +76,10 @@ def OpenMainMenu():
 #starts new game
 def hostGame():
     #pygame surface
+    
     windowSurface = pygame.display.set_mode((width, height))
     manager = pygame_gui.UIManager((width, height), './ourTheme.json')
-
+    
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
@@ -97,11 +99,9 @@ def hostGame():
     startButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
     startButton.setWidthHeight(int(width/10), int(height/20))
     
-
     backButton = Button("Back", manager, shortcutKey=K_ESCAPE)
     backButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/20))
     backButton.setWidthHeight(int(width/10), int(height/20))
-
 
     # Tile1 = GameTile(width/2, height/2, 50, 50, 0)
 
@@ -157,6 +157,16 @@ def startGameList():
     joinButton.setXLocYLoc(int(width/2-width/20), int(height/2))
     joinButton.setWidthHeight(int(width/10), int(height/20))
 
+
+    joinButtonX = width/2-width/20
+    joinButtonY = height/2-height/20
+    joinButtonW = width/10
+    joinButtonH = height/20
+    joinButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((joinButtonX, joinButtonY), (joinButtonW, joinButtonH)), text='Join', manager=manager)
+    
+
+
+
     # Refresh button
     refreshButton = Button('Refresh', manager)
     refreshButton.setXLocYLoc(int(width/2-width/20), int(height/2+height/20))
@@ -197,6 +207,14 @@ def startGameList():
                 #otherwise refresh the lobby list
                 else:
                     return startGameList()
+
+             #events for refresh button 
+            if ((event.type == pygame.USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == refreshButton)):
+                return startGameList()
+            
+            #events for back button
+            if ((event.type == pygame.USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == backButton) or (event.type == pygame.KEYDOWN and event.key == K_ESCAPE)):
+                return openMainMenu()
 
             #events for refresh button
             if refreshButton.getClickedStatus(event):
@@ -279,7 +297,7 @@ def startLobby(gameName, userId):
 
         if currentLobbyPlayerStatus.getPList()[0].getId() == netConn.getId():
             startButtonX = int(width/17)
-            startButton.setX(startButtonX)
+            startButton.setXLoc(startButtonX)
             if currentLobbyPlayerStatus.getLReady():
                 startButton.enable()
             else:
@@ -341,7 +359,7 @@ def gameBoard(gameName, userId):
     managerList.append(panelManager)
     tileManager = pygame_gui.UIManager((width, height), './tileTheme.json')
     managerList.append(tileManager)
-
+    
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
     addImage('./images/board.png', 1, background, width/2, height/2, width, height)
@@ -473,10 +491,9 @@ def splash():
     while True:
         # Track the mouse movement
         mousePos = pygame.mouse.get_pos()
-
+        
         # Add splash screen
         splash = addImage('images/splashScreen.jpg', 1, windowSurface, width/2, height/2, width, height)
-        
         
         for event in pygame.event.get():
             # Quit when window X button is clicked
