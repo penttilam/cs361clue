@@ -6,7 +6,7 @@ from pygame.locals import *
 from pygame import surface
 from clientPlayer import ClientPlayer
 from clientLobby import ClientLobby
-from network import Network
+from clientNetwork import *
 from notebook import createNotebook
 # from GameTile import GameTile
 from Button import Button
@@ -131,8 +131,9 @@ def hostGame():
 #starts game list selection
 def startGameList():
     #pygame surface
-    # windowSurface = pygame.display.set_mode((width, height))
+    managerList = []
     manager = pygame_gui.UIManager((width, height), './ourTheme.json')
+    managerList.append(manager)
 
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
@@ -210,9 +211,17 @@ def startGameList():
             if backButton.getClickedStatus(event):
                 return OpenMainMenu()
 
-            manager.process_events(event)
-            manager.update(time_delta)
+            # Update events based on clock ticks
+            for each in managerList:
+                each.process_events(event)
+                each.update(time_delta)
+
+            # Redraw the background
             windowSurface.blit(background, (0, 0))
+            
+            # Redraw the window objects
+            for each in managerList:
+                each.draw_ui(windowSurface)
             
         pygame.display.update()
 

@@ -45,4 +45,3 @@ class Cards:
         deck.extend(location)
         deck.extend(people)
 
-#### 

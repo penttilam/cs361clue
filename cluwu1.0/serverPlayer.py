@@ -10,24 +10,18 @@ from clientPlayer import ClientPlayer
 class ServerPlayer():
     def __init__(self, playerConnection):
         self.playerConnection = playerConnection
-
-        ##Lobby Variables
         self.ready = False
-
-        ##Game Variables
         self.myCards = []
         self.gameCharacter = " "
         self.myTurn = False
         self.lostGame = False
 
-    ##Lobby Functions
     def setReady(self, ready):
         self.ready = ready
 
     def getReady(self):
         return self.ready
 
-    ##Game Functions
     def addCard(self, newCard):
         self.myCards.append(newCard) 
 
@@ -53,6 +47,7 @@ class ServerPlayer():
         return self.lostGame
 
 
+     ##private playerConnection functions
     def sendClientAString(self, serverString):
         self.playerConnection.sendClientAString(serverString)
 

@@ -1,3 +1,7 @@
+## Project Cluwu
+## File clientPlayer.py
+## This is the players info for use on the client side
+
 class ClientPlayer:
     def __init__(self, ready, character, cards, turn, lost):
         self.ready = ready
@@ -21,4 +25,3 @@ class ClientPlayer:
     def getLostGame(self):
         return self.lostGame
 
-    ##

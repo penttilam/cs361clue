@@ -1,3 +1,7 @@
+## Project Cluwu
+## File clientLobby.py
+## client side lobby contain client side player information
+
 from clientPlayer import ClientPlayer
 
 class ClientLobby:
@@ -20,14 +24,14 @@ class ClientLobby:
         return self.lobbyReadyStatus
 
     def htmlStringify(self):
+        playerCount = 0
         htmlString = "<b>Lobby name: " + self.id + "<br></b>" 
-        for player in self.pList:
-                htmlString += player.getId() + " - " 
-                if player.getReady():
-                    htmlString +="Ready<br>"
-                else:
-                    htmlString +="Ready up little bitch<br>"
+        for player in self.playerNameList:
+            playerCount += 1
+            htmlString += "Player "+ playerCount + " - " 
+            if player.getReady():
+                htmlString +="Ready<br>"
+            else:
+                htmlString +="Ready up little bitch<br>"
         return htmlString
 
-
-    ##

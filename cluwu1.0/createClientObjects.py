@@ -2,6 +2,10 @@ from serverPlayer import *
 from clientPlayer import *
 from serverLobby import *
 from clientLobby import *
+##from serverGame import *
+##from clientGame import *
+##from serverCard import *
+##from clientCard import *
 
 
 def createClientPlayer(serverPlayer):
@@ -37,8 +41,4 @@ def createClientLobby(serverLobby):
     clientLobby = ClientLobby(serverLobby.getId(), serverLobby.getPNumber(), clientPlayerList, serverLobby.getLobbyReady())
     print("this is the client lobby: " + str(clientLobby))
     return clientLobby
-
-
-
-
 

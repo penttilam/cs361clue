@@ -1,12 +1,15 @@
+## Project Cluwu
+## File serverConnection.py
+## Creates stores a connection between the server and client and transfers data
+
 import sys
 import pickle
 
 class Connection():
     def __init__(self, connectionId, conn):
-        self.id = connectionId     ## this is the player ID stored as a string
-        self.conn = conn       ## this is the player's conn object
+        self.id = connectionId
+        self.conn = conn
         self.conn.send(pickle.dumps(str(self.id) + ":connected"))
-
 
     def sendClientAString(self, message):
         self.conn.send(pickle.dumps(str(self.id) + ":" + str(message)))

@@ -8,13 +8,9 @@ from _thread import *
 from serverConnection import * 
 from createClientObjects import *
 
-######
 
-from serverPlayer import ServerPlayer
+from serverPlayer import *
 from serverLobby import *
-
-
-
 from clientLobby import *
 from sCard import * 
 
@@ -35,14 +31,8 @@ print("Server waiting for a connection :D")
 
 ##This functions creates a new lobby and adds the current Player
 def newCommand(newLobbyName, player, lobbyList):
-    print("fucking here bro")
-    print("newLobbyName: " + newLobbyName)
-    print("player: " + str(player))
-    print("lobbyList: " + str(lobbyList))
     newLobbyName = ServerLobby(player, newLobbyName)
-    print("No its fucking here bro")
     lobbyList.append(newLobbyName)
-    print("Wait wait wait Its fucking here bro")
 
 
 ##This function adds a user to a given lobby
@@ -59,12 +49,13 @@ def joinCommand(lobbyName, player, lobbyList):
 ##This function lists available lobbies
 def listCommand(player, lobbyList):
     player.sendClientAString("lobby.list.confirmed")
-    cLobbies = []
-    for lobby in lobbyList:
-        lobbyId = lobby.getId()
-        lobbyId = CLobby(lobby.getId(), lobby.getPNumber(), lobby.getPName(), lobby.getLobbyReady())
-        cLobbies.append(lobbyId)
-    player.sendClientAObject(cLobbies)
+    clientLobbyList = []
+    for serverLobby in lobbyList:
+        clientLobbyList.append(createClientLobby(serverLobby))
+##         lobbyId = lobby.getId()
+##         lobbyId = ClientLobby(lobby.getId(), lobby.getPNumber(), lobby.getPName(), lobby.getLobbyReady())
+##         cLobbies.append(lobbyId)
+    player.sendClientAObject(clientLobbyList)
 
 
 ##this function revomes a player from their lobby
@@ -73,12 +64,15 @@ def leaveCommand(player, lobbyList):
         for lobbyPlayer in lobby.getPlayers():
             if lobbyPlayer == player:
                 playerLobby = lobby
+    try:
+        playerLobby.removePlayer(player)
+        if playerLobby.getPNumber() == 0:
+            lobbyList.remove(playerLobby)
+            print("FUCKING GUCKING DUCKS2")
+        print("after the If")
 
-    playerLobby.removePlayer(player)
-    if playerLobby.getPNumber() == 0:
-        lobbyList.remove(playerLobby)
-        print("FUCKING GUCKING DUCKS2")
-    print("after the If")
+    except:
+        pass
 
 
 ##this function initializes the game
@@ -157,8 +151,6 @@ def lobbyCommand(block1, block2, player, lobbyList, gameList):
     elif arguements[1] == "host":
         hostCommand(player, lobbyList)
 
-    print("Before I go to Bed")
-
 ##This is the command interperter from the client
 def clientCommand(clientCommand, player, lobbyList, gameList):
     print("player print 3: " + str(player))
@@ -203,7 +195,6 @@ def Threaded_Client(player, lobbyList, gameList):
             break
     
     leaveCommand(player, lobbyList)
-    print("its running the wrong leave?")
     print("Lost connection to " + player.getConnectionId())
 
 
@@ -223,7 +214,6 @@ while True:
     ## Using ServerPlayer class as middle man to Connection class to insolate it from the program
     connectionId = Connection(connectionId, conn)
     player = ServerPlayer(connectionId)
-    print("player print 1: " + str(player))
 
     start_new_thread(Threaded_Client, (player, lobbyList, gameList))
     
