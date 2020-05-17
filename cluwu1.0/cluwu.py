@@ -296,7 +296,7 @@ def startLobby(gameName, userId):
             playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
         isHost = netConn.send("lobby.host").split(":")
-
+        
         print("This is host: " + str(isHost))
 
         if isHost[2] == "True":
