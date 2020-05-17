@@ -37,11 +37,19 @@ def newCommand(newLobbyName, player, lobbyList):
 
 ##This function adds a user to a given lobby
 def joinCommand(lobbyName, player, lobbyList):
+    print("in the join?")
+    print("lobbyName: " + str(lobbyName))
+    print("player: " + str(player))
+    print("lobbyList: " + str(lobbyList))
     joinedLobby = False
-    for lobby in lobbyList:
-        if lobby.getId() == lobbyName:
-            lobby.addPlayer(player)
+    print("is there lobbies in the list?: " + str(lobbyList))
+    for serverLobby in lobbyList:
+        if serverLobby.getId() == lobbyName:
+            print("Do they get to join?")
+            serverLobby.addPlayer(player)
+            print("HOKAY they are joining")
             joinedLobby = True
+            ##player.sendClientAString("lobby.join:" + lobbyName + ".success")
     if joinedLobby == False:
         player.sendClientAString("lobby.join:" + lobbyName + ".failed")
 
@@ -52,9 +60,6 @@ def listCommand(player, lobbyList):
     clientLobbyList = []
     for serverLobby in lobbyList:
         clientLobbyList.append(createClientLobby(serverLobby))
-##         lobbyId = lobby.getId()
-##         lobbyId = ClientLobby(lobby.getId(), lobby.getPNumber(), lobby.getPName(), lobby.getLobbyReady())
-##         cLobbies.append(lobbyId)
     player.sendClientAObject(clientLobbyList)
 
 
@@ -137,11 +142,11 @@ def lobbyCommand(block1, block2, player, lobbyList, gameList):
     elif arguements[1] == "lobbies":
         listCommand(player, lobbyList)
     elif arguements[1] == "join":
-        joinCommand(block2, player, lobbyList)
-    elif arguements[1] == "leave":
         print("before teh command?")
-        leaveCommand(player, lobbyList)
+        joinCommand(block2, player, lobbyList)
         print("after teh command?")
+    elif arguements[1] == "leave":
+        leaveCommand(player, lobbyList)
     elif arguements[1] == "ready":
         readyCommand(player)
     elif arguements[1] == "start":

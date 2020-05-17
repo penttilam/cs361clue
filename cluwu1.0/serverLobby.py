@@ -23,8 +23,7 @@ class ServerLobby:
         else:
             self.players.append(player)
             self.numberPlayers += 1
-            player.setLobby(self)
-            player.sendClient("lobby.join:" + str(self.id) + ".success")
+            player.sendClientAString("lobby.join:" + str(self.id) + ".success")
      
     ##this removes a player from the lobby
     def removePlayer(self, player):
