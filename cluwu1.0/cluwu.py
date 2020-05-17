@@ -119,7 +119,8 @@ def hostGame():
                 return OpenMainMenu()
 
             if startButton.getClickedStatus(event) and gameName.get_text() != "":
-                print(netConn.send("lobby.new:"+gameName.get_text()))
+                gameNameCamel = gameName.get_text().replace(" ", "_")
+                print(netConn.send("lobby.new:"+gameNameCamel))
                 return startLobby(gameName.get_text(), userId)
 
             manager.process_events(event)
