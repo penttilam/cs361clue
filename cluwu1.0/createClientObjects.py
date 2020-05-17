@@ -38,7 +38,8 @@ def createClientLobby(serverLobby):
     print(serverLobby.getPNumber())
     print(clientPlayerList)
     print(serverLobby.getLobbyReady())
-    clientLobby = ClientLobby(serverLobby.getId(), serverLobby.getPNumber(), clientPlayerList, serverLobby.getLobbyReady())
+    print(serverLobby.getStartGame())
+    clientLobby = ClientLobby(serverLobby.getId(), serverLobby.getPNumber(), clientPlayerList, serverLobby.getLobbyReady(), serverLobby.getStartGame())
     print("this is the client lobby: " + str(clientLobby))
     return clientLobby
 

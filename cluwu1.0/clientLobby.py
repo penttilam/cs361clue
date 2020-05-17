@@ -5,11 +5,12 @@
 from clientPlayer import ClientPlayer
 
 class ClientLobby:
-    def __init__(self, lobbyName, playerNumber, playerNames, lobbyReady):
+    def __init__(self, lobbyName, playerNumber, playerNames, lobbyReady, start):
         self.id = lobbyName
         self.numberOfPlayers = playerNumber
         self.playerNameList = playerNames
         self.lobbyReadyStatus = lobbyReady
+        self.startGame = start
         
     def getId(self):
         return self.id
@@ -22,6 +23,9 @@ class ClientLobby:
     
     def getLobbyReadyStatus(self):
         return self.lobbyReadyStatus
+
+    def getStartGame(self):
+        return self.startGame
 
     def htmlStringify(self):
         playerCount = 0

@@ -37,19 +37,11 @@ def newCommand(newLobbyName, player, lobbyList):
 
 ##This function adds a user to a given lobby
 def joinCommand(lobbyName, player, lobbyList):
-    print("in the join?")
-    print("lobbyName: " + str(lobbyName))
-    print("player: " + str(player))
-    print("lobbyList: " + str(lobbyList))
     joinedLobby = False
-    print("is there lobbies in the list?: " + str(lobbyList))
     for serverLobby in lobbyList:
         if serverLobby.getId() == lobbyName:
-            print("Do they get to join?")
             serverLobby.addPlayer(player)
-            print("HOKAY they are joining")
             joinedLobby = True
-            ##player.sendClientAString("lobby.join:" + lobbyName + ".success")
     if joinedLobby == False:
         player.sendClientAString("lobby.join:" + lobbyName + ".failed")
 
@@ -73,21 +65,19 @@ def leaveCommand(player, lobbyList):
         playerLobby.removePlayer(player)
         if playerLobby.getPNumber() == 0:
             lobbyList.remove(playerLobby)
-            print("FUCKING GUCKING DUCKS2")
-        print("after the If")
 
     except:
         pass
 
-
 ##this function initializes the game
 def startCommand(player, lobbyList):
-    lobby = player.getLobby()
-    nameList = []
-    nameList = lobby.getPlayers()
+    for lobby in lobbyList:
+        for lobbyPlayer in lobby.getPlayers():
+            if lobbyPlayer == player:
+                playerLobby = lobby
+    playerLobby.setStartGame()
     startInfo = "lobby.start.confirmed"
-
-    player.sendClient(startInfo)
+    player.sendClientAString(startInfo)
 
 
 ##this function sets the player to ready
@@ -105,36 +95,25 @@ def readyCommand(player):
 def updateCommand(player, lobbyList):
     player.sendClientAString("lobby.update:confirmed")
     for lobby in lobbyList:
-        print("fuck your lobbies!")
         for lobbyPlayer in lobby.getPlayers():
-            print("no fuck the players!")
             if lobbyPlayer == player:
-                print("this is right before clobby")
                 clientLobby = createClientLobby(lobby)
-                print("this is a clobby: " + str(clientLobby))
                 player.sendClientAObject(clientLobby)
                 return
 
 
 def hostCommand(player, lobbyList):
-    print("did i make it here?")
     hostFlag = False
-    print("this is the fucking LobbyList: " + str(lobbyList))
     for lobby in lobbyList:
-        print("Im in the lobbyList")
         playerList = lobby.getPlayers()
         if playerList[0] == player:
-             print("is anything ever true?")
              hostFlag = True
-         
-    print("nothing is real!")
     player.sendClientAString("lobby.host:" + str(hostFlag))
 
 
 
 ##This is the subset of lobby actions
 def lobbyCommand(block1, block2, player, lobbyList, gameList):
-    print("player print 4: " + str(player))
     arguements = block1.split(".")
 
     if arguements[1] == "new":
@@ -142,15 +121,13 @@ def lobbyCommand(block1, block2, player, lobbyList, gameList):
     elif arguements[1] == "lobbies":
         listCommand(player, lobbyList)
     elif arguements[1] == "join":
-        print("before teh command?")
         joinCommand(block2, player, lobbyList)
-        print("after teh command?")
     elif arguements[1] == "leave":
         leaveCommand(player, lobbyList)
     elif arguements[1] == "ready":
         readyCommand(player)
     elif arguements[1] == "start":
-        startCommand(player, lobbyList, gameList)
+        startCommand(player, lobbyList)
     elif arguements[1] == "update":
         updateCommand(player, lobbyList)
     elif arguements[1] == "host":
@@ -158,7 +135,6 @@ def lobbyCommand(block1, block2, player, lobbyList, gameList):
 
 ##This is the command interperter from the client
 def clientCommand(clientCommand, player, lobbyList, gameList):
-    print("player print 3: " + str(player))
     blocks = clientCommand.split(":")
     arguements = blocks[1].split(".")
 
@@ -223,4 +199,5 @@ while True:
     start_new_thread(Threaded_Client, (player, lobbyList, gameList))
     
     connectionNumber += 1
+
 

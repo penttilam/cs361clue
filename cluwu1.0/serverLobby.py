@@ -11,6 +11,7 @@ class ServerLobby:
         self.players.append(host_player)  ## This adds the host directly into the lobby
         self.numberPlayers = 1            ## The lobby starts with the a player in it.. the host
         host_player.sendClientAString("lobby.created:" + str(self.id)) ## Sends a message to the client
+        self.startGame = False
 
     ##this returns the a list of the players
     def getPlayers(self):
@@ -53,4 +54,13 @@ class ServerLobby:
             if not x.getReady():
                 return False
         return True
+
+    def getStartGame(self):
+        return self.startGame
+
+    def setStartGame(self):
+        self.startGame = True
+
+
+
 
