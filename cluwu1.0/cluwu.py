@@ -309,7 +309,7 @@ def startLobby(gameName, userId):
         if isHost[2] == "True":
             startButtonX = int(width/17)
             startButton.setXLoc(startButtonX)
-            if currentLobbyPlayerStatus.getLobbyReadyStatus():
+            if currentLobbyPlayerStatus.getLobbyReadyStatus() and currentLobbyPlayerStatus.getNumberOfPlayers() > 1:
                 startButton.enable()
             else:
                 startButton.disable()
