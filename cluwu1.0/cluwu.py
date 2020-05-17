@@ -10,6 +10,7 @@ from network import Network
 from notebook import createNotebook
 # from GameTile import GameTile
 from Button import Button
+from Image import Image
 from GameGrid import GameGrid
 
 #was there a reason clock was here? It's used as a global, probably should be at the top?
@@ -76,10 +77,26 @@ def OpenMainMenu():
 #starts new game
 def hostGame():
     #pygame surface
-    
+    # width = 1680
+    # height = 900
+    managerList = []
     windowSurface = pygame.display.set_mode((width, height))
     manager = pygame_gui.UIManager((width, height), './ourTheme.json')
+    managerList.append(manager)    
+
+    ############################
     
+    ##############################
+    # tileManager = pygame_gui.UIManager((width, height), './tileTheme.json')
+    # managerList.append(tileManager)    
+    # ##################################
+    # background = pygame.Surface((width, height))
+    # background.fill(manager.ui_theme.get_colour('dark_bg'))
+    # addImage('./images/board.png', 1, background, width/2, height/2, width, height)
+    
+    ###############################
+
+
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
@@ -105,26 +122,39 @@ def hostGame():
 
     # Tile1 = GameTile(width/2, height/2, 50, 50, 0)
 
+    # testGrid = GameGrid(width, height, windowSurface, tileManager)
     while True:
         time_delta = clock.tick(60)/1000.0
+        mousePosition = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
             if event.type == QUIT:
                 netConn.send("quit")
                 raise SystemExit
+            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
+                if backButton.getClickedStatus(event):
+                    print("back clicked")
+                    return OpenMainMenu()
 
-            if backButton.getClickedStatus(event):
-                print("back clicked")
-                return OpenMainMenu()
+                if startButton.getClickedStatus(event) and gameName.get_text() != "":
+                    print(netConn.send("lobby.new:"+gameName.get_text()))
+                    return startLobby(gameName.get_text(), userId)
 
-            if startButton.getClickedStatus(event) and gameName.get_text() != "":
-                print(netConn.send("lobby.new:"+gameName.get_text()))
-                return startLobby(gameName.get_text(), userId)
+                # if testGrid.clickedTile(event):
+                    # print("Clicked")
 
-            manager.process_events(event)
-            manager.update(time_delta)
+
+            # Update events based on clock ticks
+            for each in managerList:
+                each.process_events(event)
+                each.update(time_delta)
+
+            # Redraw the background
             windowSurface.blit(background, (0, 0))
-            manager.draw_ui(windowSurface)
+            
+            # Redraw the window objects
+            for each in managerList:
+                each.draw_ui(windowSurface)
         pygame.display.update()
 
 #starts game list selection
@@ -341,7 +371,6 @@ def startLobby(gameName, userId):
             # Redraw the window objects
             for each in managerList:
                 each.draw_ui(windowSurface)
-                print(each)
 
         #netConn.send("lobby.update")
         pygame.display.update()
@@ -389,7 +418,7 @@ def gameBoard(gameName, userId):
     notebookW = int(width/4)
     notebookH = int((3*height)/4)
     notebook = pygame_gui.elements.UIPanel(relative_rect=pygame.Rect((notebookX, notebookY), (notebookW, notebookH)), starting_layer_height=1, manager=panelManager)
-    pygame_gui.elements.UIImage(relative_rect=pygame.Rect((0, 0), (notebookW, notebookH)), image_surface=pygame.image.load('./images/clueNotepad.png'), manager=panelManager, container=notebook.get_container())
+    Image("clueNotepad.png", panelManager, 0, 0, notebookW, notebookH, container=notebook.get_container())
     
     # Creates a Button object to allow interaction with checkboxe buttons
     checkBoxButton = createNotebook(notebook, panelManager, notebookW, notebookH)
