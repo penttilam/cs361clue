@@ -119,7 +119,9 @@ def hostGame():
                 return OpenMainMenu()
 
             if startButton.getClickedStatus(event) and gameName.get_text() != "":
-                gameNameCamel = gameName.get_text().replace(" ", "_")
+                gameNameCamel = gameName.get_text()
+                if " " in gameName.get_text():
+                    gameNameCamel = gameName.get_text().replace(" ", "_")
                 print(netConn.send("lobby.new:"+gameNameCamel))
                 return startLobby(gameName.get_text(), userId)
 
@@ -314,6 +316,7 @@ def startLobby(gameName, userId):
                 raise SystemExit
 
             if startButton.getClickedStatus(event):
+                netConn.send("lobby.start")
                 gameBoard(gameName, userId)
 
             #events for ready button
