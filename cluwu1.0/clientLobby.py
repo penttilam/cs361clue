@@ -28,7 +28,7 @@ class ClientLobby:
         htmlString = "<b>Lobby name: " + self.id + "<br></b>" 
         for player in self.playerNameList:
             playerCount += 1
-            htmlString += "Player "+ playerCount + " - " 
+            htmlString += "Player "+ str(playerCount) + " - " 
             if player.getReady():
                 htmlString +="Ready<br>"
             else:
