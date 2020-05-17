@@ -291,6 +291,10 @@ def startLobby(gameName, userId):
         netConn.send("lobby.update")
         currentLobbyPlayerStatus = netConn.catch()
 
+        if currentLobbyPlayerStatus.getStartGame():
+            gameBoard(gameName, userId)
+            #note for future us: gameName and userId maybe fake news?
+
         print("this is the currentLobbyPlayerStatus: " + str(currentLobbyPlayerStatus))
         #if player number changes kill the text box and create a new one with updated information.
 
