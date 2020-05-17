@@ -1,18 +1,17 @@
 ##
 ## This is a Class for creating a lobby it will hold palyers before directing them into a game
 ##
+from serverPlayer import *
 
-from cLobby import CLobby
 
-
-class Lobby:
+class ServerLobby:
     def __init__(self, host_player, lobbyId):
         self.id = lobbyId                 ## This is the lobby ID stored as a string
         self.players = []                 ## This is the list holding the players in the lobby 
         self.players.append(host_player)  ## This adds the host directly into the lobby
         self.numberPlayers = 1            ## The lobby starts with the a player in it.. the host
-        host_player.sendClient("lobby.created:" + str(self.id)) ## Sends a message to the client
-        host_player.setLobby(self)        ## Sets the players current lobby
+        host_player.sendClientAString("lobby.created:" + str(self.id)) ## Sends a message to the client
+        self.startGame = False
 
     ##this returns the a list of the players
     def getPlayers(self):
@@ -25,25 +24,20 @@ class Lobby:
         else:
             self.players.append(player)
             self.numberPlayers += 1
-            player.setLobby(self)
-            player.sendClient("lobby.join:" + str(self.id) + ".success")
+            player.sendClientAString("lobby.join:" + str(self.id) + ".success")
      
     ##this removes a player from the lobby
-    def removePlayer(self, player, lobbyList):
+    def removePlayer(self, player):
         self.players.remove(player)
         self.numberPlayers -= 1
-        player.setLobby(0)
-        if self.numberPlayers == 0:
-            print("  Server  --  " + str(self.id) + ".empty")
-            print("  Server  --  " + str(self.id) + ".removed")
-            lobbyList.remove(self)
-        player.sendClient("lobby.remove:" + str(self.id) + "." + str(player.getId()))
+        player.sendClientAString("lobby.remove:" + str(self.id))
 
     ##this this returns a list of the player names
     def getPName(self):
+        print("Am i in the PNAME?")
         names = []
         for x in self.players:
-            names.append(x.getId())
+            names.append(x.getConnectionId())
         return names
 
     ##this returns the number of players
@@ -61,15 +55,11 @@ class Lobby:
                 return False
         return True
 
-    def getCLobby(self):
-        cPlayerList = []
-        for players in self.players:
-            cPlayerList.append(players.getCPlayer())
-        clobby = self.id
-        readyCheck = self.getLobbyReady()
-        clobby = CLobby(self.id, self.numberPlayers, cPlayerList, readyCheck)
-        return clobby
+    def getStartGame(self):
+        return self.startGame
 
+    def setStartGame(self):
+        self.startGame = True
 
 
 

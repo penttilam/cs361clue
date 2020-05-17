@@ -3,7 +3,8 @@
 ##
 import socket
 import pickle
-from player import Player
+from clientLobby import *
+from clientPlayer import *
 
 ## class defines the network conenciton for the client
 class Network:
@@ -49,6 +50,7 @@ class Network:
     
 ## this catches the objects list 
     def catch(self):
+         print("printing before data!!!!!!")
          data = pickle.loads(self.client.recv(2048))
          print("object received")
          return data

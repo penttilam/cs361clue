@@ -1,5 +1,5 @@
 import random
-from player import *
+from serverPlayer import *
 
 class sCards:
 

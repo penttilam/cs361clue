@@ -5,12 +5,13 @@ import _thread
 from _thread import *
 
 
-from player import Player
-from lobby import Lobby
+from serverConnection import * 
+from createClientObjects import *
 
 
-
-from cLobby import CLobby
+from serverPlayer import *
+from serverLobby import *
+from clientLobby import *
 from sCard import * 
 
 ##Creating the server socket and listening for a connection
@@ -30,83 +31,89 @@ print("Server waiting for a connection :D")
 
 ##This functions creates a new lobby and adds the current Player
 def newCommand(newLobbyName, player, lobbyList):
-    newLobbyName = Lobby(player, newLobbyName)
+    newLobbyName = ServerLobby(player, newLobbyName)
     lobbyList.append(newLobbyName)
 
 
 ##This function adds a user to a given lobby
 def joinCommand(lobbyName, player, lobbyList):
     joinedLobby = False
-    for lobby in lobbyList:
-        if lobby.getId() == lobbyName:
-            lobby.addPlayer(player)
+    for serverLobby in lobbyList:
+        if serverLobby.getId() == lobbyName:
+            serverLobby.addPlayer(player)
             joinedLobby = True
     if joinedLobby == False:
-        player.sendClient("lobby.join:" + lobbyName + ".failed")
+        player.sendClientAString("lobby.join:" + lobbyName + ".failed")
 
 
 ##This function lists available lobbies
 def listCommand(player, lobbyList):
-    player.sendClient("lobby.list.confirmed")
-    cLobbies = []
-    for lobby in lobbyList:
-        lobbyId = lobby.getId()
-        lobbyId = CLobby(lobby.getId(), lobby.getPNumber(), lobby.getPName(), lobby.getLobbyReady())
-        cLobbies.append(lobbyId)
-    player.sendClientLobby(cLobbies)
-
-
-##This function lists all the players in the lobby
-def playerCommand(player, lobbyList):
-    lobby = player.getLobby()
-    namelist = []
-    namelist = lobby.getPName()
-    lobbyInfo = "lobby.players:"
-    for playerName in namelist:
-        lobbyInfo += playerName
-        lobbyInfo += "."
-    player.sendClient(lobbyInfo)
+    player.sendClientAString("lobby.list.confirmed")
+    clientLobbyList = []
+    for serverLobby in lobbyList:
+        clientLobbyList.append(createClientLobby(serverLobby))
+    player.sendClientAObject(clientLobbyList)
 
 
 ##this function revomes a player from their lobby
 def leaveCommand(player, lobbyList):
-    player.leaveLobby(lobbyList) 
+    for lobby in lobbyList:
+        for lobbyPlayer in lobby.getPlayers():
+            if lobbyPlayer == player:
+                playerLobby = lobby
+    try:
+        playerLobby.removePlayer(player)
+        if playerLobby.getPNumber() == 0:
+            lobbyList.remove(playerLobby)
 
+    except:
+        pass
 
 ##this function initializes the game
 def startCommand(player, lobbyList):
-    lobby = player.getLobby()
-    nameList = []
-    nameList = lobby.getPlayers()
-    createDeck(nameList)  
-    startInfo = "lobby.start:"
-    startInfo += player.getChar()
-    player.sendClient(startInfo)
+    for lobby in lobbyList:
+        for lobbyPlayer in lobby.getPlayers():
+            if lobbyPlayer == player:
+                playerLobby = lobby
+    playerLobby.setStartGame()
+    startInfo = "lobby.start.confirmed"
+    player.sendClientAString(startInfo)
 
 
 ##this function sets the player to ready
 def readyCommand(player):
     if player.getReady() == False:
         player.setReady(True)
-        player.sendClient("lobby.ready:" + str(player.getReady()))
+        player.sendClientAString("lobby.ready:" + str(player.getReady()))
     elif player.getReady() == True:
         player.setReady(False)
-        player.sendClient("lobby.ready:" + str(player.getReady()))
+        player.sendClientAString("lobby.ready:" + str(player.getReady()))
     else:
-        player.sendClient("lobby.ready:SeriouslyHowDidYouFuckItUpThisBad?")
+        player.sendClientAString("lobby.ready:SeriouslyHowDidYouFuckItUpThisBad?")
 
 ##this function updates the current clobby for the client
 def updateCommand(player, lobbyList):
-    player.sendClient("lobby.update:confirmed")
+    player.sendClientAString("lobby.update:confirmed")
     for lobby in lobbyList:
-        if lobby.getId() == player.getLobby().getId():
-            clientLobby = lobby.getCLobby()
-    player.sendClientLobby(clientLobby)
+        for lobbyPlayer in lobby.getPlayers():
+            if lobbyPlayer == player:
+                clientLobby = createClientLobby(lobby)
+                player.sendClientAObject(clientLobby)
+                return
+
+
+def hostCommand(player, lobbyList):
+    hostFlag = False
+    for lobby in lobbyList:
+        playerList = lobby.getPlayers()
+        if playerList[0] == player:
+             hostFlag = True
+    player.sendClientAString("lobby.host:" + str(hostFlag))
 
 
 
 ##This is the subset of lobby actions
-def lobbyCommand(block1, block2, player, lobbyList):
+def lobbyCommand(block1, block2, player, lobbyList, gameList):
     arguements = block1.split(".")
 
     if arguements[1] == "new":
@@ -115,8 +122,6 @@ def lobbyCommand(block1, block2, player, lobbyList):
         listCommand(player, lobbyList)
     elif arguements[1] == "join":
         joinCommand(block2, player, lobbyList)
-    elif arguements[1] == "players":
-        playerCommand(player, lobbyList)
     elif arguements[1] == "leave":
         leaveCommand(player, lobbyList)
     elif arguements[1] == "ready":
@@ -125,86 +130,74 @@ def lobbyCommand(block1, block2, player, lobbyList):
         startCommand(player, lobbyList)
     elif arguements[1] == "update":
         updateCommand(player, lobbyList)
+    elif arguements[1] == "host":
+        hostCommand(player, lobbyList)
 
 ##This is the command interperter from the client
-def clientCommand(clientCommand, player, lobbyList):
+def clientCommand(clientCommand, player, lobbyList, gameList):
     blocks = clientCommand.split(":")
     arguements = blocks[1].split(".")
 
     if arguements[0] == "lobby":
         if len(blocks) == 3:
-            lobbyCommand(blocks[1], blocks[2], player, lobbyList)
+            lobbyCommand(blocks[1], blocks[2], player, lobbyList, gameList)
             return True
         else:
-            lobbyCommand(blocks[1], None, player, lobbyList)
+            lobbyCommand(blocks[1], None, player, lobbyList, gameList)
             return True
     elif arguements[0] == "game":
         pass
 
     elif arguements[0] == "quit":
-        player.sendClient("quit")
+        player.sendClientAString("quit")
         runThread = False
+
+    return True
 
 
 
 ##This the individual client thread that sends and recieves data from the client
-def Threaded_Client(player, lobbyList):
+def Threaded_Client(player, lobbyList, gameList):
     runThread = True
 
+    print("player print 2: " + str(player))
     while runThread:
         try:
-            data = pickle.loads(player.getConn().recv(2048))
+            data = player.getClientMessage()
 
             if not data:
                 break
             else:
                 print("Received  --  " + data)
-                ##eventually we will update this with more cores, ports, and threads ;3
-                ##lock aquire
-                ##serverLock.acquire()
-                runThread = clientCommand(data, player, lobbyList)
-                ##lock release
-                ##serverLock.release()
+                runThread = clientCommand(data, player, lobbyList, gameList)
 
         except:
+            print("this is the except: " + str(data))
             break
-
-    player.leaveLobby(lobbyList) 
-    print("Lost connection to " + player.getId())
-    player.getConn().close()
+    
+    leaveCommand(player, lobbyList)
+    print("Lost connection to " + player.getConnectionId())
 
 
 ##
 ## this is the server listening for connections initizliaing them as players and passing them to threads
 ##
-##initialize players id number and the lobby list
-playerNumber = 1
+connectionNumber = 1
 lobbyList = []
-##serverLock = _thread.allocate_lock()
+gameList = []
 
-##begin a loop to listen for connections from players
 while True:
 
-    ##create a playerId string
-    playerId = "p" + str(playerNumber)
-    ##create a connection and assign the values to conn and addr
+    connectionId = "connection" + str(connectionNumber)
     conn, addr = s.accept()
-    ##document the connection
-    print(str(addr) + " connected as player " + str(playerId))
+    print(str(addr) + " is connection" + str(connectionNumber))
 
-    ##create a player object with current playerId
-    playerId = Player(playerId, conn)
+    ## Using ServerPlayer class as middle man to Connection class to insolate it from the program
+    connectionId = Connection(connectionId, conn)
+    player = ServerPlayer(connectionId)
 
-    ##start a new running thread
-    start_new_thread(Threaded_Client, (playerId, lobbyList))
-    ##increase id for next connection
-    playerNumber += 1
-
-
-
-
-
-
-
+    start_new_thread(Threaded_Client, (player, lobbyList, gameList))
+    
+    connectionNumber += 1
 
 
