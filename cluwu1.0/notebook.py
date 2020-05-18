@@ -12,5 +12,5 @@ def createNotebook(notebook, panelManager, width, height):
                 buttY = y
                 buttW = 20
                 buttH = 20
-                button = Button(" ", panelManager, buttX, buttY, buttW, buttH, container=notebook, object_id="checkBoxes")
+                button = Button(" ", panelManager, buttX, buttY, buttW, buttH, container=notebook.getPanel(), object_id="checkBoxes")
     return button

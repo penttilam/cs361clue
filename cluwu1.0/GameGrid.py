@@ -32,25 +32,16 @@ class GameGrid:
         self.grid = []
         self.windowHeight = windowWidth
         self.windowWidth = windowWidth
+        
         badMove = []
-        buttonNumber = -1
-        for row in range(25):
-            self.grid.append([])
-            for column in range(24):
-                buttonNumber = buttonNumber + 1
-                xLocation = 15*30-3+column*32
-                yLocation = 55 + row*31
-                buttonId = str(row) + "," + str(column)
-                # self.grid[row].append(Button("", manager, 17*30+column*30, 150 + row*30, 35, 35, object_id=str(buttonNumber)))
-                self.grid[row].append(Button(str(buttonNumber), manager, xLocation, yLocation, 30, 30, object_id=str(buttonId)))
-        #### SHRINE
+                #### SHRINE
         for x in range(7):
             badMove.append(str(x))            
         for x in range(25, 31):
             badMove.append(str(x))
         for x in range(49, 55):
             badMove.append(str(x))
-        for x in range(74, 79):
+        for x in range(75, 78):
             badMove.append(str(x))
         
         ### SCHOOL
@@ -64,9 +55,11 @@ class GameGrid:
             badMove.append(str(x))
         for x in range(105, 111):
             badMove.append(str(x))
-        for x in range(129, 135):
+        for x in range(130, 135):
             badMove.append(str(x))
-        for x in range(153, 159):
+        for x in range(153, 155):
+            badMove.append(str(x))
+        for x in range(157, 159):
             badMove.append(str(x))
         
         ###### CENTER
@@ -88,13 +81,15 @@ class GameGrid:
         ###### LOVE HOTEL
         for x in range(215, 216):
             badMove.append(str(x))
-        for x in range(232, 240):
+        for x in range(232, 233):
+            badMove.append(str(x))
+        for x in range(234, 240):
             badMove.append(str(x))        
         for x in range(256, 264):
             badMove.append(str(x))
         for x in range(280, 288):
             badMove.append(str(x))
-        for x in range(304, 312):
+        for x in range(305, 312):
             badMove.append(str(x))
         for x in range(328, 336):
             badMove.append(str(x))
@@ -116,7 +111,7 @@ class GameGrid:
             badMove.append(str(x))
         for x in range(113, 120):
             badMove.append(str(x))
-        for x in range(137, 144):
+        for x in range(138, 143):
             badMove.append(str(x))
         for x in range(167, 168):
             badMove.append(str(x))
@@ -126,21 +121,27 @@ class GameGrid:
             badMove.append(str(x))
         for x in range(168, 175):
             badMove.append(str(x))
-        for x in range(192, 199):
+        for x in range(192, 198):
             badMove.append(str(x))
         for x in range(216, 223):
             badMove.append(str(x))
-        for x in range(240, 246):
+        for x in range(240, 243):
+            badMove.append(str(x))
+        for x in range(244, 246):
             badMove.append(str(x))
         for x in range(264, 265):
             badMove.append(str(x))
 
-        ##############
-        for x in range(416, 424):
+        ############## TEA SHOP
+        for x in range(416, 417):
+            badMove.append(str(x))
+        for x in range(418, 422):
+            badMove.append(str(x))
+        for x in range(423, 424):
             badMove.append(str(x))
         for x in range(440, 448):
             badMove.append(str(x))
-        for x in range(464, 472):
+        for x in range(465, 471):
             badMove.append(str(x))
         for x in range(488, 496):
             badMove.append(str(x))
@@ -154,7 +155,9 @@ class GameGrid:
             badMove.append(str(x))
 
         ####  MANGA SHOP
-        for x in range(456, 461):
+        for x in range(456, 457):
+            badMove.append(str(x))
+        for x in range(458, 460):
             badMove.append(str(x))
         for x in range(480, 486):
             badMove.append(str(x))
@@ -169,22 +172,25 @@ class GameGrid:
 
 
         ########### 
-        for x in range(288, 294):
+        for x in range(288, 289):
+            badMove.append(str(x))
+        for x in range(290, 294):
             badMove.append(str(x))
         for x in range(312, 318):
             badMove.append(str(x))
         for x in range(336, 342):
             badMove.append(str(x))
-        for x in range(360, 366):
+        for x in range(360, 365):
             badMove.append(str(x))
         for x in range(384, 390):
             badMove.append(str(x))
         for x in range(408, 409):
             badMove.append(str(x))
 
-
         ########## BEACH        
-        for x in range(450, 456):
+        for x in range(450, 451):
+            badMove.append(str(x))
+        for x in range(452, 456):
             badMove.append(str(x))
         for x in range(474, 480):
             badMove.append(str(x))
@@ -194,13 +200,48 @@ class GameGrid:
             badMove.append(str(x))
         for x in range(546, 552):
             badMove.append(str(x))
-        for x in range(569, 577):
+        for x in range(569, 570):
+            badMove.append(str(x))
+        for x in range(571, 577):
             badMove.append(str(x))
         for x in range(591, 600):
             badMove.append(str(x))
+        buttonNumber = -1
+        secretDoors = [74, 144, 457, 570]
+        doors = [78,129,137,155,156,198,233,243,289, 304, 365, 417, 422, 451, 464, 471]
+        for row in range(25):
+            self.grid.append([])
+            for column in range(24):
+                buttonNumber = buttonNumber + 1
+                xLocation = 15*30-15+column*32
+                yLocation = 60 + row*30
+                buttonId = str(row) + "," + str(column)
+                self.grid[row].append(Button(str(buttonNumber), manager, xLocation, yLocation, 30, 30, object_id=str(buttonId)))
+                if (int(self.grid[row][column].text) in doors):
+                    print("Found a door")
+                    self.grid[row][column].select()
+                if (int(self.grid[row][column].text) in secretDoors):
+                    print("Found a secret door")
+                    self.grid[row][column].disable()
+
+                if (self.grid[row][column].text in badMove):
+                    self.grid[row][column].setWidthHeight(0,0)
+                    self.grid[row][column].disable()
+
+        #  "images":
+        #  {
+        #     "disabled_image":
+        #     {
+        #         "path": "images/disabled_button.png"
+        #     }
+         # "normal_image":
+            # {
+            #     "path": "images/tile.png"
+            # },
         
-        for remove in badMove:
-            for row in range(25):
-                for column in range(24):
-                    if self.grid[row][column].text == remove:
-                        self.grid[row][column].setXLocYLoc(windowWidth, windowHeight)
+        #  },
+            
+        # for remove in badMove:
+        #     for row in range(25):
+        #         for column in range(24):
+        #             if self.grid[row][column].text == remove:

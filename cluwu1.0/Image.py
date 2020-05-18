@@ -7,9 +7,9 @@ class Image:
         self.xLoc = xLoc
         self.yLoc = yLoc
         self.width = width
+        self.height = height
         self.imageFile = imageFile
         self.imagePath = imagePath
-        self.height = height
         self.manager = manager
         self.container = container
         self.object_ids = object_id
@@ -37,7 +37,12 @@ class Image:
         return self.xLoc
     def getYLoc(self):
         return self.yLoc
-
+    def getWidth(self):
+        return self.width
+    def getHeight(self):
+        return self.height
+    def getContainer(self):
+        return self.image.get_container()
     def setXLoc(self,xLoc):
         self.xLoc = xLoc
         self.image.set_relative_position((self.xLoc, self.yLoc))
@@ -88,7 +93,7 @@ class Image:
         self.manager = newManager
         self.newImage()
 
-    def setManager(self, newContainer):
+    def setContainer(self, newContainer):
         self.image.kill()
         self.manager = newContainer
         self.newImage()

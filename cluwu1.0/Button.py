@@ -37,6 +37,10 @@ class Button:
         return self.xLoc
     def getYLoc(self):
         return self.yLoc
+    def getWidth(self):
+        return self.width
+    def getHeight(self):
+        return self.height
 
     def setXLoc(self,xLoc):
         self.xLoc = xLoc

@@ -52,9 +52,9 @@
     {
          "colours":
          {
-            "normal_bg": "#FFFFFF",
-            "hovered_bg": "#F207A1",
-            "disabled_bg": "#25292e",
+            "normal_bg": "#FFFFFF00",
+            "hovered_bg": "#F207A100",
+            "disabled_bg": "#25292e80",
             "selected_bg": "#365880",
             "active_bg": "#365880",
             "dark_bg": "#21282d",
@@ -63,9 +63,9 @@
             "disabled_text": "#808080",
             "selected_text": "#bbbbbb",
             "active_text": "#bbbbbb",
-            "normal_border": "#5c6062",
+            "normal_border": "#5c606200",
             "hovered_border": "#73787b",
-            "disabled_border": "#35393e",
+            "disabled_border": "#35393e00",
             "selected_border": "#466890",
             "active_border": "#466890",
             "link_text": "#6897bb",
@@ -78,13 +78,9 @@
          },
          "images":
          {
-            "normal_image":
+            "disabled_image":
             {
-                "path": "images/tile.png"
-            },
-            "selected_image":
-            {
-                "path": "images/tile.png"
+                "path": "images/disabled_button.png"
             }
          },
          "prototype": "#default_shape_style"
