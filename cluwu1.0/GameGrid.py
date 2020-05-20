@@ -41,7 +41,9 @@ class GameGrid:
             badMove.append(str(x))
         for x in range(49, 55):
             badMove.append(str(x))
-        for x in range(75, 78):
+        for x in range(73, 78):
+            badMove.append(str(x))
+        for x in range(96, 97):
             badMove.append(str(x))
         
         ### SCHOOL
@@ -53,9 +55,9 @@ class GameGrid:
             badMove.append(str(x))
         for x in range(81, 87):
             badMove.append(str(x))
-        for x in range(105, 111):
+        for x in range(106, 111):
             badMove.append(str(x))
-        for x in range(130, 135):
+        for x in range(129, 135):
             badMove.append(str(x))
         for x in range(153, 155):
             badMove.append(str(x))
@@ -105,9 +107,9 @@ class GameGrid:
             badMove.append(str(x))
         for x in range(41, 49):
             badMove.append(str(x))
-        for x in range(65, 74):
+        for x in range(65, 72):
             badMove.append(str(x))
-        for x in range(89, 97):
+        for x in range(89, 96):
             badMove.append(str(x))
         for x in range(113, 120):
             badMove.append(str(x))
@@ -155,9 +157,7 @@ class GameGrid:
             badMove.append(str(x))
 
         ####  MANGA SHOP
-        for x in range(456, 457):
-            badMove.append(str(x))
-        for x in range(458, 460):
+        for x in range(457, 460):
             badMove.append(str(x))
         for x in range(480, 486):
             badMove.append(str(x))
@@ -207,8 +207,8 @@ class GameGrid:
         for x in range(591, 600):
             badMove.append(str(x))
         buttonNumber = -1
-        secretDoors = [74, 144, 457, 570]
-        doors = [78,129,137,155,156,198,233,243,289, 304, 365, 417, 422, 451, 464, 471]
+        secretDoors = [72, 143, 456, 570]
+        doors = [78,105,137,155,156,198,233,243,289, 304, 365, 417, 422, 451, 460, 464, 471]
         for row in range(25):
             self.grid.append([])
             for column in range(24):
@@ -222,7 +222,7 @@ class GameGrid:
                     self.grid[row][column].select()
                 if (int(self.grid[row][column].text) in secretDoors):
                     print("Found a secret door")
-                    self.grid[row][column].disable()
+                    self.grid[row][column].select()
 
                 if (self.grid[row][column].text in badMove):
                     self.grid[row][column].setWidthHeight(0,0)

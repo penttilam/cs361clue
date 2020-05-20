@@ -509,7 +509,7 @@ def splash():
         mousePos = pygame.mouse.get_pos()
         
         # Add splash screen
-        splash = addImage('images/splashScreen.jpg', 1, windowSurface, width/2, height/2, width, height)
+        splash = addImage('images/splashScreen.png', 1, windowSurface, width/2, height/2, width, height)
         
         for event in pygame.event.get():
             # Quit when window X button is clicked
@@ -535,8 +535,8 @@ netConn = Network()
 userId = netConn.getId()
 
 #screen set up
-width = 1000
-height = 1000
+width = 1600
+height = 900
 
 #create pygame area to add splash image to
 windowSurface = pygame.display.set_mode((width, height))
