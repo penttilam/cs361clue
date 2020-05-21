@@ -1,31 +1,49 @@
 from serverPlayer import *
+from serverCard import *
+from serverToken import *
+import random
 
-characterChoices = ["Ms Scarlet", "Mrs White", "Colonel Mustard", "Mr Green", "Professor Plum", "Ms Peacock"]
 
 class serverGame:
     def __init__(self, playerList):
+        print("do we make it here")
         self.playerTurnOrder = playerList
         self.numberPlayers = len(playerList)
-        assignChar()
-    
-    #for x in self.playerTurnOrder: 
-    #    print(x.getId() ,"'s turn is ", x.getTurn()) 
-    
-    def assignChar(self):
-        random.shuffle(self.playersList)
-        for x in range(self.numberPlayers):
-            self.playerTurnOrder[x].setChar(characterChoices[x])
-        
+        self.guiltyCards = []
+        print("if we made it there we'll make it here")
+        print(self.playerTurnOrder)
+        assignTokens(self.playerTurnOrder)
+        print("but can we make it here?")
+        self.assignCards()
+        print("with Jesus we can")
 
-    def createClientGame(self):
-        pass
+    def getPlayerTurnOrder(self):
+        return self.playerTurnOrder
+
+    def getNumberPlayers(self):
+        return self.numberPlayers
+
+    def getGuiltyCards(self):
+        return self.guiltyCards
+
+    def getTokens(self):
+        tokenList = []
+        for player in self.playerTurnOrder:
+            tokenList.append(player.getToken())
+        return tokenList
+
+    def rollDie():
+        return random.randint(1,6)
 
 
-
-    
-
-
-
+    def assignCards(self):
+        print("b4 create")
+        serverCards = createDecks()
+        print("after create")
+        self.guiltyCards = serverCards[0]
+        print("guilty?")
+        dealCards(serverCards[1], self.playerTurnOrder)
+        print("after deal")
 
 
 

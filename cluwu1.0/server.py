@@ -4,15 +4,17 @@ import pickle
 import _thread
 from _thread import *
 
-
 from serverConnection import * 
 from createClientObjects import *
-
 
 from serverPlayer import *
 from serverLobby import *
 from clientLobby import *
-from sCard import * 
+from serverCard import * 
+from serverGame import * 
+
+####
+##sys.stdout = open("/dev/null", "w")
 
 ##Creating the server socket and listening for a connection
 server = "45.132.241.193"
@@ -70,14 +72,16 @@ def leaveCommand(player, lobbyList):
         pass
 
 ##this function initializes the game
-def startCommand(player, lobbyList):
+def startCommand(player, lobbyList, gameList):
     for lobby in lobbyList:
         for lobbyPlayer in lobby.getPlayers():
             if lobbyPlayer == player:
                 playerLobby = lobby
+    print("is it here")
     playerLobby.setStartGame()
     startInfo = "lobby.start.confirmed"
     player.sendClientAString(startInfo)
+    serverGame(playerLobby.getPlayers())
 
 
 ##this function sets the player to ready
@@ -114,46 +118,62 @@ def hostCommand(player, lobbyList):
 
 ##This is the subset of lobby actions
 def lobbyCommand(block1, block2, player, lobbyList, gameList):
-    arguements = block1.split(".")
+    arguments = block1.split(".")
 
-    if arguements[1] == "new":
+    if arguments[1] == "new":
         newCommand(block2, player, lobbyList)
-    elif arguements[1] == "lobbies":
+    elif arguments[1] == "lobbies":
         listCommand(player, lobbyList)
-    elif arguements[1] == "join":
+    elif arguments[1] == "join":
         joinCommand(block2, player, lobbyList)
-    elif arguements[1] == "leave":
+    elif arguments[1] == "leave":
         leaveCommand(player, lobbyList)
-    elif arguements[1] == "ready":
+    elif arguments[1] == "ready":
         readyCommand(player)
-    elif arguements[1] == "start":
-        startCommand(player, lobbyList)
-    elif arguements[1] == "update":
+    elif arguments[1] == "start":
+        startCommand(player, lobbyList, gameList)
+    elif arguments[1] == "update":
         updateCommand(player, lobbyList)
-    elif arguements[1] == "host":
+    elif arguments[1] == "host":
         hostCommand(player, lobbyList)
+
+
+def createCommand(player, lobbyList, gameList):
+#    create a clientGame object
+#    we need remove player from lobby
+#   player.sendAObject(clienGameobject of some kind) 
+    pass
+
+def gameCommand(block1, block2, player, lobbyList, gameList):
+    arguments = block1.split(".")
+
+    if arguments[1] == "create":
+        createCommand(player, lobbyList, gameList)
+
+
 
 ##This is the command interperter from the client
 def clientCommand(clientCommand, player, lobbyList, gameList):
     blocks = clientCommand.split(":")
-    arguements = blocks[1].split(".")
+    arguments = blocks[1].split(".")
 
-    if arguements[0] == "lobby":
+    if arguments[0] == "lobby":
         if len(blocks) == 3:
+            print("before?")
             lobbyCommand(blocks[1], blocks[2], player, lobbyList, gameList)
             return True
         else:
+            print("before?")
             lobbyCommand(blocks[1], None, player, lobbyList, gameList)
             return True
-    elif arguements[0] == "game":
+    elif arguments[0] == "game":
         pass
 
-    elif arguements[0] == "quit":
+    elif arguments[0] == "quit":
         player.sendClientAString("quit")
         runThread = False
 
     return True
-
 
 
 ##This the individual client thread that sends and recieves data from the client
@@ -177,7 +197,6 @@ def Threaded_Client(player, lobbyList, gameList):
     
     leaveCommand(player, lobbyList)
     print("Lost connection to " + player.getConnectionId())
-
 
 ##
 ## this is the server listening for connections initizliaing them as players and passing them to threads

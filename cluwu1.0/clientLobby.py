@@ -1,6 +1,7 @@
 ## Project Cluwu
 ## File clientLobby.py
 ## client side lobby contain client side player information
+##
 
 from clientPlayer import ClientPlayer
 

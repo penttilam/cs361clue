@@ -3,9 +3,9 @@
 ## This is the players info for use on the client side
 
 class ClientPlayer:
-    def __init__(self, ready, character, cards, turn, lost):
+    def __init__(self, ready, token, cards, turn, lost):
         self.ready = ready
-        self.gameCharacter = character
+        self.myToken = token 
         self.myCards = cards
         self.myTurn = turn
         self.lostGame = lost
@@ -13,8 +13,8 @@ class ClientPlayer:
     def getReady(self):
         return self.ready
     
-    def getGameCharacter(self):
-        return self.gameCharacter
+    def getGameToken(self):
+        return self.myToken
 
     def getMyCards(self):
         return self.myCards
