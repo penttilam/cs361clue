@@ -43,6 +43,10 @@ class Image:
         return self.height
     def getContainer(self):
         return self.image.get_container()
+    def getObjectId(self):
+        return self.object_ids
+
+
     def setXLoc(self,xLoc):
         self.xLoc = xLoc
         self.image.set_relative_position((self.xLoc, self.yLoc))
@@ -73,6 +77,11 @@ class Image:
         self.height = height
         self.setObjectId()
 
+    def setImage(self, imageFile, imagePath="./images/"):
+        self.imageFile = imageFile
+        self.imagePath = imagePath
+        self.newImage()
+
     def enable(self):
         self.image.enable()
 
@@ -97,7 +106,6 @@ class Image:
         self.image.kill()
         self.manager = newContainer
         self.newImage()
-
 
     def getClickedStatus(self, event):
         if (event.type == MOUSEBUTTONDOWN):

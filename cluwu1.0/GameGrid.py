@@ -19,13 +19,12 @@ from Button import Button
 
 
 class GameGrid:
-    def clickedTile(self, event):
+    def clickedTile(self, event, token):
 
         if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED):
             xLocYLoc = str(event.ui_element.object_ids[0]).split(",")
-            print("Button is Row:" + xLocYLoc[0] + ", column: " + xLocYLoc[1])
-            print("is at pixels: " + str(self.grid[int(xLocYLoc[0])][int(xLocYLoc[1])].getXLoc())  + ", " + str(self.grid[int(xLocYLoc[0])][int(xLocYLoc[1])].getYLoc()))
-
+            if (self.grid[int(xLocYLoc[0])][int(xLocYLoc[1])].getClickedStatus(event)):
+                token.setXLocYLoc(self.grid[int(xLocYLoc[0])][int(xLocYLoc[1])].getXLoc(), self.grid[int(xLocYLoc[0])][int(xLocYLoc[1])].getYLoc())
             return self.grid[int(xLocYLoc[0])][int(xLocYLoc[1])].getClickedStatus(event)
 
     def __init__(self, windowWidth, windowHeight, screen, manager):
