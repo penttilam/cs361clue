@@ -509,7 +509,7 @@ def splash():
         mousePos = pygame.mouse.get_pos()
         
         # Add splash screen
-        splash = addImage('images/splashScreen.png', 1, windowSurface, width/2, height/2, width, height)
+        splash = addImage('images/cluwusplash.png', 1, windowSurface, width/2, height/2, width, height)
         
         for event in pygame.event.get():
             # Quit when window X button is clicked

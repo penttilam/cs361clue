@@ -12,7 +12,7 @@ class ServerPlayer():
         self.playerConnection = playerConnection
         self.ready = False
         self.myCards = []
-        self.gameCharacter = " "
+        self.myToken = ("", 0, 0)
         self.myTurn = False
         self.lostGame = False
 
@@ -22,17 +22,11 @@ class ServerPlayer():
     def getReady(self):
         return self.ready
 
-    def addCard(self, newCard):
-        self.myCards.append(newCard) 
+    def setHand(self, handList):
+        self.myCards = handList
 
     def getMyCards(self):
         return self.myCards
-
-    def setMyCharacter(self, char):
-        self.gameCharacter = char
-
-    def getMyCharacter(self):
-        return self.gameCharacter
 
     def setMyTurn(self, turn):
         self.myTurn = turn 
@@ -45,6 +39,12 @@ class ServerPlayer():
 
     def getLostGame(self):
         return self.lostGame
+
+    def getMyToken(self):
+        return self.myToken
+
+    def setMyToken(self, newToken):
+        self.myToken = newToken
 
 
      ##private playerConnection functions
