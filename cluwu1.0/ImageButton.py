@@ -5,123 +5,87 @@ from Image import Image
 from pygame.locals import *
 
 class ImageButton:
-    def __init__(self, imageFile, manager, xLoc=0, yLoc=0, width=0, height=0, buttonText="", imagePath="./images/", container="", object_id="", button=""):
-        self.xLoc = xLoc
-        self.yLoc = yLoc
-        self.width = width
-        self.height = height
-        self.imageFile = imageFile
-        self.imagePath = imagePath
-        self.manager = manager
-        self.container = container
-        self.object_ids = object_id
-        self.buttonText = buttonText
+    def __init__(self, manager, xLoc=0, yLoc=0, width=0, height=0, imageFile="tile.png", buttonText="", imagePath="./images/", container="", object_id="", button=""):
+        self.image = Image(imageFile, manager, xLoc, yLoc, width, height, imagePath, container, object_id)
         if button == "":
-            self.button = Button(self.buttonText, manager, self.xLoc, self.yLoc, self.width,self.height, self.container)
+            self.button = Button(buttonText, manager, xLoc, yLoc, width, height, container, object_id)
         else:
             self.button = button
-
-        self.newImage()
-        
-    def newImage(self):
-        if (self.container == ""):
-            self.image = pygame_gui.elements.UIImage(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), image_surface=pygame.image.load(self.imagePath+self.imageFile), manager=self.manager)
+        if object_id == "":
+            self.objectId = "IB" + self.button.getObjectId()
         else:
-            self.image = pygame_gui.elements.UIImage(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), image_surface=pygame.image.load(self.imagePath+self.imageFile), manager=self.manager, container=self.container)
-
-    def setObjectId(self, objectId=""):
-        self.image.kill()
-        if self.object_ids == "" and objectId == "":
-            self.object_ids = str(self.xLoc)+str(self.yLoc)+str(self.width)
-        elif objectId != "":
-            self.object_ids = objectId
-        self.newImage()
+            self.objectId = object_id
 
     def getText(self):
-        return self.text
+        return self.button.getText()
     def getXLocYLoc(self):
-        return (self.xLoc, self.yLoc)
+        return (self.button.xLoc, self.button.yLoc)
     def getXLoc(self):
-        return self.xLoc
+        return self.button.xLoc
     def getYLoc(self):
-        return self.yLoc
+        return self.button.yLoc
     def getWidth(self):
-        return self.width
+        return self.button.width
     def getHeight(self):
-        return self.height
+        return self.button.height
     def getContainer(self):
-        return self.image.get_container()
+        return self.image.getContainer()
     def getObjectId(self):
-        return self.object_ids
+        return self.objectId
 
     def setXLoc(self,xLoc):
         self.button.setXLoc(xLoc)
-        self.xLoc = xLoc
-        self.image.set_relative_position((self.xLoc, self.yLoc))
+        self.image.setXLoc(xLoc)
         
     def setYLoc(self,yLoc):
         self.button.setYLoc(yLoc)
-        self.yLoc = yLoc
-        self.image.set_relative_position((self.xLoc, self.yLoc))
+        self.image.setYLoc(yLoc)
     
     def setXLocYLoc(self, xLoc, yLoc):
         self.button.setXLocYLoc(xLoc, yLoc)
-        self.xLoc = xLoc
-        self.yLoc = yLoc
-        self.image.set_relative_position((self.xLoc, self.yLoc))
+        self.image.setXLocYLoc(xLoc, yLoc)
 
     def setText(self, text):
-        self.text = text
-        self.image.set_text(self.text)
+        self.button.setText(text)
 
     def setWidth(self, width):
         self.button.setWidth(width)
-        self.width = width
-        self.setObjectId()
+        self.image.setWidth(width)
  
     def setHeight(self, height):
         self.button.setHeight(height)
-        self.height = height
-        self.setObjectId()
+        self.image.setHeight(height)
 
     def setWidthHeight(self, width, height):
         self.button.setWidthHeight(width, height)
-        self.width = width
-        self.height = height
-        self.setObjectId()
+        self.image.setWidthHeight(width, height)
 
     def setImage(self, imageFile, imagePath="./images/"):
-        self.imageFile = imageFile
-        self.imagePath = imagePath
-        self.newImage()
+        self.image.setImage(imageFile, imagePath)
 
     def enable(self):
-        self.image.enable()
+        self.button.enable()
 
     def disable(self):
-        self.image.disable()
+        self.button.disable()
 
     def select(self):
-        self.image.select()
+        self.button.select()
     
-    def update(self, time_delta):
-        self.image.update(time_delta)
-
     def unselect(self):
-        self.image.unselect()
+        self.button.unselect()
 
     def setManager(self, newManager):
-        self.image.kill()
-        self.manager = newManager
-        self.newImage()
+        self.button.setManager(newManager)
+        self.image.setManager(newManager)
 
     def setContainer(self, newContainer):
-        self.image.kill()
-        self.manager = newContainer
-        self.newImage()
+        self.button.setContainer(newContainer)
+        self.image.setContainer(newContainer)
 
     def getClickedStatus(self, event):
-             return self.button.getClickedStatus(event)
+        return self.button.getClickedStatus(event)
 
     def kill(self):
+        self.button.kill()
         self.image.kill()

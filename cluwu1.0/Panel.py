@@ -3,7 +3,7 @@ import pygame_gui
 from pygame.locals import *
 
 class Panel:
-    def __init__(self, manager, xLoc=0, yLoc=0, width=0, height=0, layerHeight=1, container="", object_id=""):
+    def __init__(self, manager, xLoc=0, yLoc=0, width=0, height=0, layerHeight=1, container="", object_id="", handSize=6):
         self.xLoc = xLoc
         self.yLoc = yLoc
         self.width = width
@@ -13,14 +13,19 @@ class Panel:
         self.manager = manager
         self.object_ids = object_id
         self.images = []
+        self.buttons = []
+        self.imageButtons = []
         self.newPanel()
+        self.handSize = handSize
+        self.visibleLocation = 0
+        self.hiddenLocation = 0
                 
     def newPanel(self):
         if (self.container == ""):
             self.panel = pygame_gui.elements.UIPanel(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), starting_layer_height=self.layerHeight, manager=self.manager)
         else:
             self.panel = pygame_gui.elements.UIPanel(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), starting_layer_height=self.layerHeight, manager=self.manager, container=self.container)
- 
+    
     def setObjectId(self, objectId=""):
         self.panel.kill()
         if self.object_ids == "" and objectId == "":
@@ -32,6 +37,26 @@ class Panel:
     def addImage(self, imageObject):
         self.images.append(imageObject)
 
+    def addButton(self, buttonObject):
+        self.buttons.append(buttonObject)
+
+    def addImageButton(self, imageButtonObject):
+        self.imageButtons.append(imageButtonObject)
+
+    def getHiddenLocation(self):
+        return self.hiddenLocation
+    def getVisibleLocation(self):
+        return self.visibleLocation
+    def getHandSize(self):
+        return self.handSize
+    def getImage(self, index):
+        return self.images[index]
+    def getButton(self, index):
+        return self.buttons[index]        
+    def getImageButton(self, index):
+        return self.imageButtons[index]
+    def getManager(self):
+        return self.manager
     def getText(self):
         return self.text
     def getXLocYLoc(self):
@@ -48,6 +73,12 @@ class Panel:
         return self.width
     def getHeight(self):
         return self.height
+
+    def setHiddenLocation(self, hiddenLocation):
+        self.hiddenLocation = hiddenLocation
+
+    def setVisibleLocation(self, visibleLocation):
+        self.visibleLocation = visibleLocation
 
     def setXLoc(self,xLoc):
         self.xLoc = xLoc
@@ -79,6 +110,11 @@ class Panel:
         self.height = height
         self.setObjectId()
 
+    def setManager(self, newManager):
+        self.panel.kill()
+        self.manager = newManager
+        self.newPanel()
+
     def enable(self):
         self.panel.enable()
 
@@ -93,15 +129,6 @@ class Panel:
 
     def unselect(self):
         self.panel.unselect()
-
-    def setManager(self, newManager):
-        self.panel.kill()
-        self.manager = newManager
-        self.newPanel()
-
-    # def getClickedStatus(self, event):
-    #     if (event.type == MOUSEBUTTONDOWN):
-    #         return event.ui_element.object_ids == self.panel.object_ids
 
     def kill(self):
         self.panel.kill()

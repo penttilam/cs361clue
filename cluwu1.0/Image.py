@@ -13,6 +13,9 @@ class Image:
         self.manager = manager
         self.container = container
         self.object_ids = object_id
+        self.column = 0
+        self.row = 0
+        self.location = "outside"
         self.newImage()
         
     def newImage(self):
@@ -29,6 +32,8 @@ class Image:
             self.object_ids = objectId
         self.newImage()
 
+    def getLocation(self):
+        return self.location
     def getText(self):
         return self.text
     def getXLocYLoc(self):
@@ -45,7 +50,23 @@ class Image:
         return self.image.get_container()
     def getObjectId(self):
         return self.object_ids
+    def getRow(self):
+        return self.row
+    def getColumn(self):
+        return self.column
 
+    def setLocation(self, location):
+        self.location = location
+
+    def setRow(self, row):
+        self.row = row
+    
+    def setColumn(self, column):
+        self.column = column
+
+    def setRowColumn(self, row, column):
+        self.row = row
+        self.column = column
 
     def setXLoc(self,xLoc):
         self.xLoc = xLoc
@@ -106,10 +127,6 @@ class Image:
         self.image.kill()
         self.manager = newContainer
         self.newImage()
-
-    def getClickedStatus(self, event):
-        if (event.type == MOUSEBUTTONDOWN):
-            return event.ui_element.object_ids == self.image.object_ids
 
     def kill(self):
         self.image.kill()
