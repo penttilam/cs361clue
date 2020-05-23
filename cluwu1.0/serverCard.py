@@ -41,12 +41,12 @@ def createDecks():
 
     location = [shrine, library, tearoom, karaoke, lovehotel, mangastore, school, hotsprings, beach]
 
-    colonelmustard = serverCards("colonelmustard", "people")
-    mrgreen = serverCards("mrgreen", "people")
-    mrswhite = serverCards("mrswhite", "people")
-    mspeacock = serverCards("mspeacock", "people")
-    msscarlet = serverCards("msscarlet", "people")
-    professorplum = serverCards("professorplum", "people")
+    colonelmustard = serverCards("mustard", "people")
+    mrgreen = serverCards("green", "people")
+    mrswhite = serverCards("white", "people")
+    mspeacock = serverCards("peacock", "people")
+    msscarlet = serverCards("scarlet", "people")
+    professorplum = serverCards("plum", "people")
 
     character = [colonelmustard, mrgreen, mrswhite, mspeacock, msscarlet, professorplum]
 

@@ -6,16 +6,14 @@ import random
 
 class serverGame:
     def __init__(self, playerList):
-        print("do we make it here")
-        self.playerTurnOrder = playerList
+        self.playerTurnOrder = []
+        for player in playerList:
+            self.playerTurnOrder.append(player)
+
         self.numberPlayers = len(playerList)
         self.guiltyCards = []
-        print("if we made it there we'll make it here")
-        print(self.playerTurnOrder)
         assignTokens(self.playerTurnOrder)
-        print("but can we make it here?")
         self.assignCards()
-        print("with Jesus we can")
 
     def getPlayerTurnOrder(self):
         return self.playerTurnOrder
@@ -37,13 +35,16 @@ class serverGame:
 
 
     def assignCards(self):
-        print("b4 create")
         serverCards = createDecks()
-        print("after create")
         self.guiltyCards = serverCards[0]
-        print("guilty?")
         dealCards(serverCards[1], self.playerTurnOrder)
-        print("after deal")
+
+    def changeTurn(self, player):
+        if self.playerTurnOrder[0] is player:
+            playerTurnOrder.remove(player)
+            playerTurnOrder.append(player)
+
+
 
 
 

@@ -1,8 +1,9 @@
 import random
 from serverPlayer import *
+##
 
 #characterChoices = [("Ms Scarlet", 16), ("Mrs White", 191), ("Colonel Mustard", 590), ("Mr Green", 585), ("Professor Plum", 432), ("Ms Peacock", 120)]
-characterChoices = [("Ms Scarlet", 0, 16), ("Mrs White", 7, 23), ("Colonel Mustard", 24, 14), ("Mr Green", 24, 9), ("Professor Plum", 18, 0), ("Ms Peacock", 5, 0)]
+characterChoices = [("scarlet", 0, 16), ("white", 7, 23), ("mustard", 24, 14), ("green", 24, 9), ("plum", 18, 0), ("peacock", 5, 0)]
 
 class ServerToken:
     def __init__(self, characterName, tokenLocationX, tokenLocationY):
@@ -19,6 +20,9 @@ class ServerToken:
     def getTokenYLoc(self):
         return self.tokenYLoc
 
+    def setTokenXLocYLoc(self, newX, newY):
+        self.tokenXLoc = newX
+        self.tokenYLoc = newY
 
 
 def assignTokens(playerList):

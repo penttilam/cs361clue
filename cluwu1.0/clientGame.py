@@ -22,7 +22,10 @@ class ClientGameInit:
         else:
             return False
 
-
+class updateClientGame:
+    def __init__(self, turnIn):
+        self.turnOrder = turnIn
+    
 
 
 

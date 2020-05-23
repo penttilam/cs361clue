@@ -81,6 +81,7 @@ def startCommand(player, lobbyList, gameList):
     playerLobby.setStartGame()
     startInfo = "lobby.start.confirmed"
     player.sendClientAString(startInfo)
+    print("BIG ASS FUCKING" + str(playerLobby.getPlayers()))
     gameList.append(serverGame(playerLobby.getPlayers()))
 
 
@@ -139,26 +140,51 @@ def lobbyCommand(block1, block2, player, lobbyList, gameList):
 
 
 def createCommand(player, lobbyList, gameList):
-    print(gameList)
-    print("before the init")
     player.sendClientAString("game.create:confirmed")
     for game in gameList:
         for gamePlayer in game.getPlayerTurnOrder():
             if gamePlayer is player:
-               player.sendClientAObject(createClientGameInit(game, player))
-            
-    print("After the init")
-##
-#    create a clientGame object
-#    we need remove player from lobby
-#   player.sendAObject(clienGameobject of some kind) 
+                player.sendClientAObject(createClientGameInit(game, player))
+                leaveCommand(player, lobbyList)
+
+def updateGameCommand(player, gameList):
+    player.sendClientAString("game.update:confirmed")
+    for game in gameList:
+        for gamePlayer in game.getPlayerTurnOrder():
+            if gamePlayer is player:
+                player.sendClientAObject(updateClientGame(game.getPlayerTurnOrder()))
+
+def moveTokenCommand(player, gameList, block2):
+    arguments = block2.split(".")
+    player.getMyToken().setTokenXLocYLoc(arguments[0], arguments[1])
+    player.sendClientAString("game.update:confirmed")
+
+
+def turnCommand(player, gameList):
+    for game in gameList:
+        if changeTurn(player):
+           player.sendClientAString("game.turn:success")
+           return
+    player.sendClientAString("game.turn:failure")
+
+
+def rollCommand(player, gameList):
+    pass
+
 
 def gameCommand(block1, block2, player, lobbyList, gameList):
     arguments = block1.split(".")
 
     if arguments[1] == "create":
-        print("this is before the command")
         createCommand(player, lobbyList, gameList)
+    elif arguments[1] == "update":
+        updateGameCommand(player, gameList)
+    elif arguments[1] == "move":
+        moveTokenCommand(player, gameList, block2)
+    elif arguments[1] == "turn":
+        turnCommand(player, gameList)
+    elif arguments[1] == "roll":
+        rollCommand(player, gameList)
 
 
 

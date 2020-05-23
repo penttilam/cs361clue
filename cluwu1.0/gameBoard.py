@@ -25,6 +25,9 @@ def gameBoard(gameName, userId):
     # gameInfo = netConn.catch()
     # characterList = 
 
+    netConn.send("game.create")
+    clientInitGame = netConn.catch()
+
     layer0 = pygame_gui.UIManager((width, height), './ourTheme.json')
     managerList.append(layer0)
     layer1 = pygame_gui.UIManager((width, height), './tileTheme.json')

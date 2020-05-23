@@ -5,14 +5,15 @@
 import sys
 
 from serverConnection import *
-from clientPlayer import ClientPlayer
+from serverToken import *
+
 
 class ServerPlayer():
     def __init__(self, playerConnection):
         self.playerConnection = playerConnection
         self.ready = False
         self.myCards = []
-        self.myToken = ("", 0, 0)
+        self.myToken = None
         self.myTurn = False
         self.lostGame = False
 
