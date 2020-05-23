@@ -66,7 +66,7 @@ def createClientGameInit(serverGame, player):
     clientTurnOrder = []
     for players in serverGame.getPlayerTurnOrder():
         print("in the for")
-        clientTurnOrder.append(createClientToken(player.getMyToken()))
+        clientTurnOrder.append(createClientToken(players.getMyToken()))
     print("before clienttoken")
     clientPlayerToken = createClientToken(player.getMyToken())
     print("before clientcards")
