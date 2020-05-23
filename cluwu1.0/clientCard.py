@@ -53,5 +53,6 @@ class ClientCards:
                         return card[2]
 
          
-
+    def getCardName(self):
+        return self.cardName
 
