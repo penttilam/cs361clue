@@ -1,12 +1,14 @@
 
 class ClientCards:
-
     def __init__(self, cardName, cardCategory):
+        print("in init")
         self.cardName = cardName
         self.cardCategory = cardCategory
-        self.cardImg = getCardImage(cardName, cardCategory)
+        print("before get image")
+        self.cardImg = self.getCardImage(cardName, cardCategory)
 
-    def getCardImage(cardName, cardCategory):
+    def getCardImage(self, cardName, cardCategory):
+        print("in get card")
 
         deck = []
 
@@ -45,9 +47,9 @@ class ClientCards:
         deck.append(people)
 
         for cardType in deck:
-            if cardType == cardCategory[0].[1]:
+            if cardType[0][1] == cardCategory:
                 for card in cardType:
-                    if cardName == card[0]:
+                    if card[0] == cardName:
                         return card[2]
 
          

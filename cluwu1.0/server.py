@@ -81,7 +81,7 @@ def startCommand(player, lobbyList, gameList):
     playerLobby.setStartGame()
     startInfo = "lobby.start.confirmed"
     player.sendClientAString(startInfo)
-    serverGame(playerLobby.getPlayers())
+    gameList.append(serverGame(playerLobby.getPlayers()))
 
 
 ##this function sets the player to ready
@@ -139,15 +139,25 @@ def lobbyCommand(block1, block2, player, lobbyList, gameList):
 
 
 def createCommand(player, lobbyList, gameList):
+    print(gameList)
+    print("before the init")
+    player.sendClientAString("game.create:confirmed")
+    for game in gameList:
+        for gamePlayer in game.getPlayerTurnOrder():
+            if gamePlayer is player:
+               player.sendClientAObject(createClientGameInit(game, player))
+            
+    print("After the init")
+##
 #    create a clientGame object
 #    we need remove player from lobby
 #   player.sendAObject(clienGameobject of some kind) 
-    pass
 
 def gameCommand(block1, block2, player, lobbyList, gameList):
     arguments = block1.split(".")
 
     if arguments[1] == "create":
+        print("this is before the command")
         createCommand(player, lobbyList, gameList)
 
 
@@ -166,8 +176,16 @@ def clientCommand(clientCommand, player, lobbyList, gameList):
             print("before?")
             lobbyCommand(blocks[1], None, player, lobbyList, gameList)
             return True
+
     elif arguments[0] == "game":
-        pass
+        if len(blocks) == 3:
+            print("before?")
+            gameCommand(blocks[1], blocks[2], player, lobbyList, gameList)
+            return True
+        else:
+            print("before?")
+            gameCommand(blocks[1], None, player, lobbyList, gameList)
+            return True
 
     elif arguments[0] == "quit":
         player.sendClientAString("quit")

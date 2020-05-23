@@ -4,10 +4,10 @@ from serverLobby import *
 from clientLobby import *
 from serverToken import *
 from clientToken import *
-##from serverGame import *
-##from clientGame import *
-##from serverCard import *
-##from clientCard import *
+from serverGame import *
+from clientGame import *
+from serverCard import *
+from clientCard import *
 
 
 def createClientPlayer(serverPlayer):
@@ -50,20 +50,30 @@ def createClientToken(serverToken):
     return clientToken
 
 def createClientCards(serverCards):
+    print(serverCards)
     clientHand = []
     for cards in serverCards:
-        clientCard = ClientCard(cards.getCardName(), cards.getCardCategory())
+        print("in the loop")
+        clientCard = ClientCards(cards.getCardName(), cards.getCardCategory())
+        print("in the toop")
         clientHand.append(clientCard)
+        print("in the poop")
     return clientHand
 
 
 def createClientGameInit(serverGame, player):
+    print("the Start of init")
     clientTurnOrder = []
-    for tokens in serverGame.getPlayerTurnOrder():
-        clientTurnOrder.append(createClientToken(tokens))
+    for players in serverGame.getPlayerTurnOrder():
+        print("in the for")
+        clientTurnOrder.append(createClientToken(player.getMyToken()))
+    print("before clienttoken")
     clientPlayerToken = createClientToken(player.getMyToken())
+    print("before clientcards")
     clientCards = createClientCards(player.getMyCards())
+    print("before clientGameINIt")
     clientGameInit = ClientGameInit(clientTurnOrder, clientPlayerToken, clientCards)
+    print("after clientGameINIt")
     return clientGameInit
 
 
