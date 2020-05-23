@@ -54,34 +54,27 @@
          {
             "normal_bg": "#FFFFFF00",
             "hovered_bg": "#F207A100",
-            "disabled_bg": "#25292e80",
+            "disabled_bg": "#25292e00",
             "selected_bg": "#365880",
             "active_bg": "#365880",
-            "dark_bg": "#21282d",
+            "dark_bg": "#21282d00",
             "normal_text": "#000000",
             "hovered_text": "#bbbbbb",
             "disabled_text": "#808080",
             "selected_text": "#bbbbbb",
             "active_text": "#bbbbbb",
             "normal_border": "#5c606200",
-            "hovered_border": "#73787b",
-            "disabled_border": "#35393e00",
+            "hovered_border": "#73787b00",
+            "disabled_border": "#25292e00",
             "selected_border": "#466890",
             "active_border": "#466890",
             "link_text": "#6897bb",
             "link_hover": "#84bfed",
             "link_selected": "#84bfed",
             "text_shadow": "#777777",
-            "border": "#5e6060",
+            "border": "#5e606000",
             "filled_bar": "#f4251b",
             "unfilled_bar": "#CCCCCC"
-         },
-         "images":
-         {
-            "disabled_image":
-            {
-                "path": "images/disabled_button.png"
-            }
          },
          "prototype": "#default_shape_style"
      },

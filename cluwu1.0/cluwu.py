@@ -10,9 +10,11 @@ from clientNetwork import *
 from notebook import createNotebook
 # from GameTile import GameTile
 from Button import Button
+from ImageButton import ImageButton
 from Image import Image
 from Panel import Panel
 from GameGrid import GameGrid
+from gameBoard import gameBoard
 
 #was there a reason clock was here? It's used as a global, probably should be at the top?
 
@@ -51,22 +53,18 @@ def OpenMainMenu():
         time_delta = clock.tick(60)/1000.0
         for event in pygame.event.get():
             if event.type == QUIT:
-                print("It's quitting...")
                 netConn.send("quit")
                 raise SystemExit
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
                 if hostButton.getClickedStatus(event):
-                    print("host clicked")
                     #when host is pressed starts the game list by calling the function
                     return hostGame()
 
                 if joinButton.getClickedStatus(event):
-                    print("join clicked")
                     #when join button is pressed starts the game list by calling the function
                     return startGameList()
 
                 if quitButton.getClickedStatus(event):
-                    print("quit clicked")
                     netConn.send("quit")
                     raise SystemExit
 
@@ -101,7 +99,7 @@ def hostGame():
     gameNameTextBoxW = int(width/5)
     gameNameTextBoxH = int(height/20)
     gameName = pygame_gui.elements.ui_text_entry_line.UITextEntryLine(relative_rect=pygame.Rect((gameNameTextBoxX, gameNameTextBoxY), (gameNameTextBoxW, gameNameTextBoxH)), manager=manager)
-
+   
     startButton = Button("Start Game", manager, shortcutKey=K_RETURN)
     startButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
     startButton.setWidthHeight(int(width/10), int(height/20))
@@ -109,13 +107,9 @@ def hostGame():
     backButton = Button("Back", manager, shortcutKey=K_ESCAPE)
     backButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/20))
     backButton.setWidthHeight(int(width/10), int(height/20))
-
-    # Tile1 = GameTile(width/2, height/2, 50, 50, 0)
-
     
     while True:
         time_delta = clock.tick(60)/1000.0
-        # mousePosition = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -147,7 +141,10 @@ def hostGame():
             # Redraw the window objects
             for each in managerList:
                 each.draw_ui(windowSurface)
+
         pygame.display.update()
+        
+
 
 #starts game list selection
 def startGameList():
@@ -261,10 +258,6 @@ player = Player()
 def startLobby(gameName, userId):
     width = 1680
     height = 900
- 
-
-
-    
     
     # List of managers used to set themes
     managerList = []
@@ -380,125 +373,6 @@ def startLobby(gameName, userId):
 
         pygame.display.update()
 
-def gameBoard(gameName, userId):
-    # width = 1600
-    # height = 900
-    
-    width = 1680
-    height = 900
-
-    netConn.send("game.create")
-    clientGame = netConn.catch()
-
-
-    print("GET MY TURN ORDER:")
-    for turnOrder in clientGame.getTurnOrder():
-        print (turnOrder.getTokenCharacter())
-
-    print("GET MY TOKEN: " + str(clientGame.getMyToken().getTokenCharacter()))
-    print("GET MY CARDS: ")
-    for myCards in clientGame.getMyCards():
-        print(myCards.getCardName())
-    print("GET MY TURN?")
-    print(str(clientGame.getMyTurn()))
-
-
-    # List of managers used to set themes
-    managerList = []
-    windowSurface = pygame.display.set_mode((width, height))
-
-    manager = pygame_gui.UIManager((width, height), './ourTheme.json')
-    managerList.append(manager)
-    tileManager = pygame_gui.UIManager((width, height), './tileTheme.json')
-    managerList.append(tileManager)
-    panelManager = pygame_gui.UIManager((width, height), './panelTheme.json')
-    managerList.append(panelManager)
-
-    testGrid = GameGrid(width, height, windowSurface, tileManager)
-
-    Image('board.png', manager, 0, 0, width, height)
-
-    # Button to display player's hand of cards
-    handButton = Button('Hand', manager)
-    handButton.setXLocYLoc(int((width*16)/17-(width/10)), int(height/2))
-    handButton.setWidthHeight(int(width/10), int(height/20))
-
-    # Button to display the player's notebook
-    notebookButton = Button('Notebook', manager)
-    notebookButton.setXLocYLoc(int((width*16)/17-(width/10)), int(height/2+height/20))
-    notebookButton.setWidthHeight(int(width/10), int(height/20))
-
-    #initilization of the notebook panel
-    notebook = Panel(panelManager, layerHeight=2)
-    notebook.setXLocYLoc(int(width), int(height/8))
-    notebook.setWidthHeight(int(width/4), int(3*height/4))
-    notebook.addImage(Image("clueNotepad.png", panelManager, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
-    
-    # Creates a Button object to allow interaction with checkboxe buttons
-    checkBoxButton = createNotebook(notebook, panelManager, notebook.getWidth(), notebook.getHeight())
-
-    #initilization of the hand panel
-    hand = Panel(panelManager, layerHeight=2)
-    hand.setXLocYLoc(int(width), int(height/3))
-    hand.setWidthHeight(int(width/2), int(height/3))
-    hand.addImage(Image("character.png", panelManager, 0, 0, hand.getWidth(), hand.getHeight(), container=hand.getContainer()))
-    
-    player.game = gameName
-    player.id = userId
-    print(player.id)
-    print(player.game)
-
-    while True:
-        time_delta = clock.tick(60) / 1000.0
-
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                netConn.send("quit")
-                raise SystemExit
-
-            if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
-                # Open the Notebook
-                if notebookButton.getClickedStatus(event):
-                    # Shows Notebook, hides Hand if it is open
-                    if notebook.getXLoc() == width:
-                        notebookButton.select()
-                        notebook.setXLoc(int((width*3)/8))
-                        hand.setXLoc(width)
-                        handButton.unselect()
-                    else: # Hides Notebook
-                        notebook.setXLoc(width)
-
-                # Cycles Notebook checkboxes between blank, X, and checked
-                elif (checkBoxButton.getClickedStatus(event)): 
-                    if event.ui_element.text == " ":
-                        event.ui_element.set_text("X")
-                    elif event.ui_element.text == "X":
-                        event.ui_element.set_text(u'\u2713')
-                    elif event.ui_element.text == u'\u2713':
-                        event.ui_element.set_text(" ")
-
-                # Open the Hand
-                elif handButton.getClickedStatus(event):
-                    # Shows Hand, hides Notebook if it is open
-                    if hand.getXLoc() == width:
-                        handButton.select()
-                        hand.setXLoc(int(width/4))
-                        notebook.setXLoc(width)
-                        notebookButton.unselect()
-                    else: # Hides the hand
-                        hand.setXLoc(width)
-                    
-                elif testGrid.clickedTile(event):
-                    print("Clicked")
-
-            # Update events based on clock ticks
-            for each in managerList:
-                each.process_events(event)
-                each.update(time_delta)
-                each.draw_ui(windowSurface)
-
-        pygame.display.update()
-
 #function takes
 #text as a string
 #font is the font defined
@@ -536,6 +410,11 @@ def splash():
                     OpenMainMenu()
         pygame.display.update()
 
+def testingFunction():
+    netConn.send("lobby.new:TRASH")
+    netConn.send("lobby.start")
+    gameBoard("TRASH", userId)
+
 #initialize game screen
 pygame.init()
 
@@ -549,13 +428,15 @@ netConn = Network()
 userId = netConn.getId()
 
 #screen set up
-width = 1600
+width = 1680
 height = 900
 
 #create pygame area to add splash image to
 windowSurface = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
+# TESTING 
+# testingFunction()
 #run the program
 splash()
 

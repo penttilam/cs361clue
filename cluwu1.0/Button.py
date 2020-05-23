@@ -13,7 +13,11 @@ class Button:
         self.container = container
         self.shortcutKey = shortcutKey
         self.object_ids = object_id
+        self.location = ""
+        self.column = 0
+        self.row = 0
         self.newButton()
+        self.occupied = 0
         
     def newButton(self):
         if (self.container == ""):
@@ -28,7 +32,10 @@ class Button:
         elif objectId != "":
             self.object_ids = objectId
         self.newButton()
-
+    def getLocation(self):
+        return self.location
+    def getOccupied(self):
+        return self.occupied
     def getText(self):
         return self.text
     def getXLocYLoc(self):
@@ -41,6 +48,30 @@ class Button:
         return self.width
     def getHeight(self):
         return self.height
+    def getObjectId(self):
+        return self.object_ids
+    def getRow(self):
+        return self.row
+    def getColumn(self):
+        return self.column
+    def getButton(self):
+        return self.button
+
+    def setRow(self, row):
+        self.row = row
+    
+    def setColumn(self, column):
+        self.column = column
+    
+    def setRowColumn(self, row, column):
+        self.row = row
+        self.column = column
+
+    def setLocation(self, location):
+        self.location = location
+
+    def setOccupied(self, occupied):
+        self.occupied = occupied
 
     def setXLoc(self,xLoc):
         self.xLoc = xLoc
