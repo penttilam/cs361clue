@@ -10,6 +10,7 @@ from notebook import createNotebook
 from clientPlayer import ClientPlayer
 from clientLobby import ClientLobby
 from clientNetwork import *
+from clientCard import *
 
 width = 1680
 height = 900
@@ -79,7 +80,9 @@ def gameBoard(netConn):
 
     characterList = ["scarlet", "white", "mustard", "green", "peacock", "plum"]
     characterTokens = []
-    playerCards = [("scarlet", "Card"),("white", "Card"),("mustard", "Card"),("green", "Card"),("peacock", "Card"),("plum", "Card")]
+    playerCards = []
+    # playerCards = [("scarlet", "Card"),("white", "Card"),("mustard", "Card"),("green", "Card"),("peacock", "Card"),("plum", "Card")]
+    playerCards = clientGame.getMyCards()
     #initilization of the hand panel
     hand = Panel(layer3, layerHeight=2)
     hand.setXLocYLoc(int(width), int(height/3))
@@ -91,8 +94,8 @@ def gameBoard(netConn):
     buffer = 10
     i=0
     for card in playerCards:
-        hand.addImageButton(ImageButton(hand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=hand.getContainer(), object_id="HandIB"+card[0]))
-        hand.getImageButton(i).setImage(card[0] + card[1] + ".jpg")
+        hand.addImageButton(ImageButton(hand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=hand.getContainer(), object_id="HandIB"+card.getCardName()))
+        hand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + ".jpg")
         cardXLoc += 142 + buffer
         i+=1
     
@@ -159,7 +162,6 @@ def gameBoard(netConn):
                     else:
                         for clicked in range(int(hand.getHandSize()/2)):
                             if (hand.getImageButton(clicked).getClickedStatus(event)):
-                                print("Clicked on "+ hand.getImageButton(clicked).getObjectId())
                                 break
                 else:
                     # Open the Notebook
@@ -202,25 +204,19 @@ def showPanel(panel):
     panel.setXLoc(panel.getVisibleLocation())
 
 def checkHidden(panel):
-    if (panel.getXLoc() == panel.getHiddenLocation()):
-        return True
-    else:
-        return False
+    return (panel.getXLoc() == panel.getHiddenLocation())
 
 def displayTurnOrder(turnOrder, manager):
     yLoc = 0
     for character in reversed(turnOrder):
-        Image(character.getTokenCharacter() + "Card.jpg", manager, 90, yLoc + 90, 142, 190)
+        Image(character.getTokenCharacter() + "people.jpg", manager, 90, yLoc + 90, 142, 190)
         yLoc += 60
 
 def updatePlayerPositions(playerList, tokenUpdates, gameGrid):
     for player in playerList:
         for updatePlayer in tokenUpdates:
             if (player.getObjectId() == updatePlayer.getTokenCharacter()):
-                print(player.getObjectId() + " is " + updatePlayer.getTokenCharacter())
-                print("player is here: " + str(player.getRow()) + " " + str(player.getColumn()) + "update is here: " + str(updatePlayer.getTokenXLoc()) + " " + str(updatePlayer.getTokenYLoc()))
                 gameGrid.grid[player.getRow()][player.getColumn()].setOccupied(0)
                 player.setXLocYLoc(gameGrid.grid[int(updatePlayer.getTokenXLoc())][int(updatePlayer.getTokenYLoc())].getXLoc(), gameGrid.grid[int(updatePlayer.getTokenXLoc())][int(updatePlayer.getTokenYLoc())].getYLoc())
                 player.setRowColumn(int(updatePlayer.getTokenXLoc()), int(updatePlayer.getTokenYLoc()))
-                # player.setRowColumn(int(updatePlayer.getTokenXLoc()), int(updatePlayer.getTokenYLoc()))
                 gameGrid.grid[player.getRow()][player.getColumn()].setOccupied(1)
