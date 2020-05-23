@@ -130,6 +130,8 @@ def hostGame():
                     gameNameCamel = gameName.get_text()
                     if " " in gameName.get_text():
                         gameNameCamel = gameName.get_text().replace(" ", "_")
+                    if "." in gameNameCamel:
+                        gameNameCamel = gameNameCamel.replace(".", "*")
                     print(netConn.send("lobby.new:"+gameNameCamel))
                     return startLobby(gameName.get_text(), userId)
 
@@ -388,8 +390,18 @@ def gameBoard(gameName, userId):
     netConn.send("game.create")
     clientGame = netConn.catch()
 
-    print(clientGame)
-    print(str(clientGame.getTurnOrder()) + " " + str(clientGame.getMyToken()) + " " + str(clientGame.getMyCards()) + " " + str(clientGame.getMyTurn()))
+
+    print("GET MY TURN ORDER:")
+    for turnOrder in clientGame.getTurnOrder():
+        print (turnOrder.getTokenCharacter())
+
+    print("GET MY TOKEN: " + str(clientGame.getMyToken().getTokenCharacter()))
+    print("GET MY CARDS: ")
+    for myCards in clientGame.getMyCards():
+        print(myCards.getCardName())
+    print("GET MY TURN?")
+    print(str(clientGame.getMyTurn()))
+
 
     # List of managers used to set themes
     managerList = []
