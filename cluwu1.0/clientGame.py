@@ -17,7 +17,7 @@ class ClientGameInit:
         return self.myCards
 
     def getMyTurn(self):
-        if(self.turnOrder[0] == self.myToken):
+        if(str(self.turnOrder[0].getTokenCharacter()) == str(self.myToken.getTokenCharacter())):
             return True
         else:
             return False
