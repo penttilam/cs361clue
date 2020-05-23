@@ -127,15 +127,11 @@ def hostGame():
                     return OpenMainMenu()
 
                 if startButton.getClickedStatus(event) and gameName.get_text() != "":
-                    print(netConn.send("lobby.new:"+gameName.get_text()))
+                    gameNameCamel = gameName.get_text()
+                    if " " in gameName.get_text():
+                        gameNameCamel = gameName.get_text().replace(" ", "_")
+                    print(netConn.send("lobby.new:"+gameNameCamel))
                     return startLobby(gameName.get_text(), userId)
-
-            if startButton.getClickedStatus(event) and gameName.get_text() != "":
-                gameNameCamel = gameName.get_text()
-                if " " in gameName.get_text():
-                    gameNameCamel = gameName.get_text().replace(" ", "_")
-                print(netConn.send("lobby.new:"+gameNameCamel))
-                return startLobby(gameName.get_text(), userId)
 
 
             # Update events based on clock ticks
@@ -388,6 +384,12 @@ def gameBoard(gameName, userId):
     
     width = 1680
     height = 900
+
+    netConn.send("game.create")
+    clientGame = netConn.catch()
+
+    print(clientGame)
+    print(str(clientGame.getTurnOrder()) + " " + str(clientGame.getMyToken()) + " " + str(clientGame.getMyCards()) + " " + str(clientGame.getMyTurn()))
 
     # List of managers used to set themes
     managerList = []
