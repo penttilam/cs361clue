@@ -15,15 +15,30 @@ width = 1680
 height = 900
 hiddenPanelLocation = width
 
-def gameBoard(gameName, userId):
+def gameBoard(netConn):
     clock = pygame.time.Clock()
-    netConn = userId
     # List of managers used to set themes
     managerList = []
+    print(netConn)
     windowSurface = pygame.display.set_mode((width, height))
     # Catch the game data and populate list of objects
     # gameInfo = netConn.catch()
     # characterList = 
+    netConn.send("game.create")
+    clientGame = netConn.catch()
+
+
+    # print("GET MY TURN ORDER:")
+    # for turnOrder in clientGame.getTurnOrder():
+        # print (turnOrder.getTokenCharacter())
+
+    # print("GET MY TOKEN: " + str(clientGame.getMyToken().getTokenCharacter()))
+    # print("GET MY CARDS: ")
+    # for myCards in clientGame.getMyCards():
+    #     print(myCards.getCardName())
+    # print("GET MY TURN?")
+    # print(str(clientGame.getMyTurn()))
+
 
     layer0 = pygame_gui.UIManager((width, height), './ourTheme.json')
     managerList.append(layer0)
@@ -33,6 +48,9 @@ def gameBoard(gameName, userId):
     managerList.append(layer2)
     layer3 = pygame_gui.UIManager((width, height), './panelTheme.json')
     managerList.append(layer3)
+    
+    displayTurnOrder(clientGame.getTurnOrder(), layer1)
+
 
     gameGrid = GameGrid(width, height, windowSurface, layer1)
 
@@ -59,6 +77,7 @@ def gameBoard(gameName, userId):
     # Creates a Button object to allow interaction with checkboxe buttons
     checkBoxButton = createNotebook(notebook)
 
+    
 
     characterList = ["scarlet", "white", "mustard", "green", "peacock", "plum"]
     characterTokens = []
@@ -101,7 +120,11 @@ def gameBoard(gameName, userId):
     characterTokens[5].setRowColumn(5, 0)
     gameGrid.grid[5][0].setOccupied(1)
 
-    myToken = characterTokens[5]
+    for x in range(6):
+        print(clientGame.getMyToken().getTokenCharacter())
+        if (clientGame.getMyToken().getTokenCharacter() == characterTokens[x].getObjectId()):
+            myToken = characterTokens[x]
+            break
 
     while True:
         time_delta = clock.tick(60) / 1000.0
@@ -161,15 +184,16 @@ def gameBoard(gameName, userId):
                     
                     # Moves token
                     elif checkHidden(notebook) and checkHidden(hand) and gameGrid.clickedTile(event, myToken):
-                        pass
-
+                        netConn("game.move:("+str(myToken.getRow())+"."+str(myToken.getColumn()))
             # Update events based on clock ticks
             for each in managerList:
                 each.process_events(event)
                 each.update(time_delta)
                 each.draw_ui(windowSurface)
-
+       
         pygame.display.update()
+        netConn.send("game.update")
+        tokenUpdates = netConn.catch()
 
 def hidePanel(panel):
     panel.setXLoc(panel.getHiddenLocation())
@@ -182,3 +206,12 @@ def checkHidden(panel):
         return True
     else:
         return False
+
+def displayTurnOrder(turnOrder, manager):
+    yLoc = 0
+    for character in reversed(turnOrder):
+        Image(character.getTokenCharacter() + "Card.jpg", manager, 90, yLoc + 90, 142, 190)
+        yLoc += 60
+
+def updatePlayerPositions(playerList):
+    for player in playerList:

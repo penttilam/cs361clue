@@ -20,6 +20,7 @@ from Button import Button
 
 class GameGrid:
     def clickedTile(self, event, token):
+        moved = False
         if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED):
             xLocYLoc = event.ui_element.object_ids[0].split(",")
             row = int(xLocYLoc[0])
@@ -38,11 +39,13 @@ class GameGrid:
                             if not button.getOccupied():
                                 token.setXLocYLoc(button.getXLoc(), button.getYLoc())
                                 token.setRowColumn(button.getRow(), button.getColumn())
+                                moved = True
                                 break
                     else:                            
                         token.setXLocYLoc(gridLocation.getXLoc(), gridLocation.getYLoc())
                         token.setRowColumn(row, column)
                         self.grid[row][column].setOccupied(1)
+                        moved = True
                 else:
                     for room in self.roomExits:
                         if(token.getLocation() == room[0]):
@@ -52,16 +55,17 @@ class GameGrid:
                                     token.setLocation("shrine")
                                 elif(room[0] == "shrine"):
                                     token.setLocation("beach")
-                                elif(room[0] == "mangashop"):
+                                elif(room[0] == "mangastore"):
                                     token.setLocation("library")
                                 elif(room[0] == "library"):
-                                    token.setLocation("mangashop")
+                                    token.setLocation("mangastore")
                                 possiblePositions = self.findButtonByLocation(token.getLocation())
                                 for button in possiblePositions:
                                     if not button.getOccupied():
                                         token.setXLocYLoc(button.getXLoc(), button.getYLoc())
                                         token.setRowColumn(button.getRow(), button.getColumn())
                                         button.setOccupied(1)
+                                        moved = True
                                         break
                             elif (int(self.grid[row][column].text) in room[1]):
                                 self.grid[token.getRow()][token.getColumn()].setOccupied(0)
@@ -70,8 +74,8 @@ class GameGrid:
                                 token.setXLocYLoc(self.grid[row][column].getXLoc(), self.grid[row][column].getYLoc())
                                 token.setRowColumn(self.grid[row][column].getRow(), self.grid[row][column].getColumn())
                                 self.grid[row][column].setOccupied(1)
-
-            return self.grid[row][column].getClickedStatus(event)
+                                moved = True
+        return moved
 
     def __init__(self, windowWidth, windowHeight, screen, manager):
         self.grid = []
@@ -99,7 +103,7 @@ class GameGrid:
         mangaRooms = fileIn.read().split(" ") 
         fileIn.close()
         fileIn = open('./rooms/teashoprooms.txt', 'r')
-        teashopRooms = fileIn.read().split(" ") 
+        tearoomRooms = fileIn.read().split(" ") 
         fileIn.close()
         fileIn = open('./rooms/shrinerooms.txt', 'r')
         shrineRooms = fileIn.read().split(" ") 
@@ -111,18 +115,18 @@ class GameGrid:
         hotspringRooms = fileIn.read().split(" ") 
         fileIn.close()
 
-        self.rooms = [("school", schoolRooms),("library", libraryRooms), ("hotel", hotelRooms), ("beach", beachRooms), ("karaoke", karaokeRooms), ("mangashop", mangaRooms), ("teashop", teashopRooms), ("hotspring", hotspringRooms), ("shrine", shrineRooms)]
+        self.rooms = [("school", schoolRooms),("library", libraryRooms), ("lovehotel", hotelRooms), ("beach", beachRooms), ("karaoke", karaokeRooms), ("mangastore", mangaRooms), ("tearoom", tearoomRooms), ("hotspring", hotspringRooms), ("shrine", shrineRooms)]
         schoolExits = [104, 179, 180]
         libraryExits = [161, "secret143"]
         hotelExits = [209,303]
         beachExits = [427, "secret570"]
         karaokeExits = [439, 393, 398, 472]
-        mangashopExits = [461, "secret456"]
-        teashopExits = [265, 366]
+        mangastoreExits = [461, "secret456"]
+        tearoomExits = [265, 366]
         hotspringExits = [199, 267]
         shrineExits = [102, "secret72"]
 
-        self.roomExits = [("school", schoolExits), ("library", libraryExits), ("hotel", hotelExits), ("beach", beachExits), ("karaoke", karaokeExits), ("mangashop", mangashopExits), ("teashop", teashopExits), ("hotspring", hotspringExits), ("shrine", shrineExits)]
+        self.roomExits = [("school", schoolExits), ("library", libraryExits), ("lovehotel", hotelExits), ("beach", beachExits), ("karaoke", karaokeExits), ("mangastore", mangastoreExits), ("tearoom", tearoomExits), ("hotspring", hotspringExits), ("shrine", shrineExits)]
         print(hotelRooms)
         buttonNumber = -1
         secretDoors = [72, 143, 456, 570]
