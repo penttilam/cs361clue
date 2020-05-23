@@ -25,7 +25,9 @@ class ClientGameInit:
 class updateClientGame:
     def __init__(self, turnIn):
         self.turnOrder = turnIn
-    
+
+    def getTurnOrder(self):
+        return self.turnOrder
 
 
 
