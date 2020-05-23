@@ -434,7 +434,7 @@ windowSurface = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
 # TESTING 
-testingFunction()
+# testingFunction()
 #run the program
 splash()
 
