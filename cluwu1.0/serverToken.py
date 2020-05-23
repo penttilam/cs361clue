@@ -22,17 +22,12 @@ class ServerToken:
 
 
 def assignTokens(playerList):
-    print("did we make it in assign?")
+    random.shuffle(playerList)
     tokenList = []
     for characters in characterChoices:
-        print("in characters")
         objectName = characters[0]
         objectName = ServerToken(characters[0], characters[1], characters[2])
         tokenList.append(objectName)
-    print("after the first for loop")
     for x in range(len(playerList)):
-        print("is blain right?")
         playerList[x].setMyToken(tokenList[x])
-        print(playerList[x].getMyToken())
-    print("after the second for loop")
 
