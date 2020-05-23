@@ -120,7 +120,7 @@ class GameGrid:
         libraryExits = [161, "secret143"]
         hotelExits = [209,303]
         beachExits = [427, "secret570"]
-        karaokeExits = [439, 393, 398, 472]
+        karaokeExits = [463, 393, 398, 472]
         mangastoreExits = [461, "secret456"]
         tearoomExits = [265, 366]
         hotspringExits = [199, 267]

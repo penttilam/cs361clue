@@ -312,7 +312,7 @@ def startLobby(gameName, userId):
         currentLobbyPlayerStatus = netConn.catch()
 
         if currentLobbyPlayerStatus.getStartGame():
-            gameBoard(gameName, userId)
+            gameBoard(netConn)
             #note for future us: gameName and userId maybe fake news?
 
         print("this is the currentLobbyPlayerStatus: " + str(currentLobbyPlayerStatus))
@@ -342,7 +342,7 @@ def startLobby(gameName, userId):
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
                 if startButton.getClickedStatus(event):
                     netConn.send("lobby.start")
-                    gameBoard(gameName, userId)
+                    gameBoard(netConn)
 
                 #events for ready button
                 elif readyButton.getClickedStatus(event):
@@ -411,7 +411,7 @@ def splash():
 def testingFunction():
     netConn.send("lobby.new:TRASH")
     netConn.send("lobby.start")
-    gameBoard("TRASH", userId)
+    gameBoard(netConn)
 
 #initialize game screen
 pygame.init()

@@ -71,13 +71,11 @@ def gameBoard(netConn):
     notebook = Panel(layer3, layerHeight=2)
     notebook.setXLocYLoc(int(width), int(height/8))
     notebook.setWidthHeight(int(width/4), int(3*height/4))
-    notebook.addImage(Image("clueNotepad.PNG", layer3, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
+    notebook.addImage(Image("clueNotepad.png", layer3, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
     notebook.setVisibleLocation(int((width*3)/8))
     notebook.setHiddenLocation(width)
     # Creates a Button object to allow interaction with checkboxe buttons
     checkBoxButton = createNotebook(notebook)
-
-    
 
     characterList = ["scarlet", "white", "mustard", "green", "peacock", "plum"]
     characterTokens = []
@@ -104,18 +102,18 @@ def gameBoard(netConn):
     characterTokens[0].setXLocYLoc(947, 60)
     characterTokens[0].setRowColumn(0, 16)
     gameGrid.grid[0][16].setOccupied(1)
-    characterTokens[1].setXLocYLoc(435, 600)
+    characterTokens[1].setXLocYLoc(1171, 270)
     characterTokens[1].setRowColumn(7, 23)
-    gameGrid.grid[7][23].setOccupied(1)
+    gameGrid.grid[18][0].setOccupied(1)
     characterTokens[2].setXLocYLoc(883, 780)
     characterTokens[2].setRowColumn(24, 14)
     gameGrid.grid[24][14].setOccupied(1)
     characterTokens[3].setXLocYLoc(723, 780)
     characterTokens[3].setRowColumn(24, 9)
     gameGrid.grid[24][9].setOccupied(1)
-    characterTokens[4].setXLocYLoc(1171, 270)
+    characterTokens[4].setXLocYLoc(435, 600)
     characterTokens[4].setRowColumn(18, 0)
-    gameGrid.grid[18][0].setOccupied(1)
+    gameGrid.grid[7][23].setOccupied(1)
     characterTokens[5].setXLocYLoc(435, 210)
     characterTokens[5].setRowColumn(5, 0)
     gameGrid.grid[5][0].setOccupied(1)
@@ -184,16 +182,18 @@ def gameBoard(netConn):
                     
                     # Moves token
                     elif checkHidden(notebook) and checkHidden(hand) and gameGrid.clickedTile(event, myToken):
-                        netConn("game.move:("+str(myToken.getRow())+"."+str(myToken.getColumn()))
+                        netConn.send("game.move:"+str(myToken.getRow())+"."+str(myToken.getColumn()))
+
             # Update events based on clock ticks
             for each in managerList:
                 each.process_events(event)
                 each.update(time_delta)
                 each.draw_ui(windowSurface)
-       
+
         pygame.display.update()
         netConn.send("game.update")
         tokenUpdates = netConn.catch()
+        updatePlayerPositions(characterTokens, tokenUpdates, gameGrid)
 
 def hidePanel(panel):
     panel.setXLoc(panel.getHiddenLocation())
@@ -213,5 +213,14 @@ def displayTurnOrder(turnOrder, manager):
         Image(character.getTokenCharacter() + "Card.jpg", manager, 90, yLoc + 90, 142, 190)
         yLoc += 60
 
-def updatePlayerPositions(playerList):
+def updatePlayerPositions(playerList, tokenUpdates, gameGrid):
     for player in playerList:
+        for updatePlayer in tokenUpdates:
+            if (player.getObjectId() == updatePlayer.getTokenCharacter()):
+                print(player.getObjectId() + " is " + updatePlayer.getTokenCharacter())
+                print("player is here: " + str(player.getRow()) + " " + str(player.getColumn()) + "update is here: " + str(updatePlayer.getTokenXLoc()) + " " + str(updatePlayer.getTokenYLoc()))
+                gameGrid.grid[player.getRow()][player.getColumn()].setOccupied(0)
+                player.setXLocYLoc(gameGrid.grid[int(updatePlayer.getTokenXLoc())][int(updatePlayer.getTokenYLoc())].getXLoc(), gameGrid.grid[int(updatePlayer.getTokenXLoc())][int(updatePlayer.getTokenYLoc())].getYLoc())
+                player.setRowColumn(int(updatePlayer.getTokenXLoc()), int(updatePlayer.getTokenYLoc()))
+                # player.setRowColumn(int(updatePlayer.getTokenXLoc()), int(updatePlayer.getTokenYLoc()))
+                gameGrid.grid[player.getRow()][player.getColumn()].setOccupied(1)
