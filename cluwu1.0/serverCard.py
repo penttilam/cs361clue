@@ -15,7 +15,6 @@ class serverCards:
 
 
 def createDecks():
-    print("the start of create")
 
     serverCardSet = []
     serverDeck = []
@@ -71,10 +70,6 @@ def createDecks():
     return serverCardSet
 
 def dealCards(deckList, playerList):
-    print("this a deal of a lifetime")
-    for card in deckList:
-        print(card.cardName)
-
     remCards = 18 % len(playerList)
     divCards = (18 - remCards)/len(playerList)
 
@@ -83,14 +78,10 @@ def dealCards(deckList, playerList):
         tempHand = []
         while numberPlayerCards < divCards:
             numberPlayerCards += 1 
-            print("is it pop")
             tempHand.append(deckList.pop(0))
-            print("after the pop")
         if not remCards is 0:
-            print("we shouldn't see this...")
             tempHand.append(deckList.pop(0))
             remCards -= 1
-        print("before the hand set")
         player.setHand(tempHand)
         
 

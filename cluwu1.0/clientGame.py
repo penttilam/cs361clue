@@ -17,7 +17,7 @@ class ClientGameInit:
         return self.myCards
 
     def getMyTurn(self):
-        if(str(self.turnOrder[0].getTokenCharacter()) == str(self.myToken.getTokenCharacter())):
+        if(self.turnOrder[0].getTokenCharacter() == self.myToken.getTokenCharacter()):
             return True
         else:
             return False
@@ -26,15 +26,14 @@ class ClientGameInit:
         self.turnOrder = turnOrder
 
 class updateClientGame:
-    def __init__(self, turnIn, chatText):
+    def __init__(self, turnIn, chatLineIn):
         self.turnOrder = turnIn
-        self.chatText = chatText
+        self.chat = chatLineIn
 
-    def getTurnOrder(self):
+    def getTurnOrder(self, turnOrder):
         return self.turnOrder
 
-    def getChatUpdate(self):
-        return self.chatText
-
+    def getChatUpdate(self, chatLineIn):
+        return self.chat
 
 

@@ -1,6 +1,7 @@
 from serverPlayer import *
 from serverCard import *
 from serverToken import *
+from serverChat import *
 import random
 
 
@@ -14,6 +15,7 @@ class serverGame:
         self.guiltyCards = []
         assignTokens(self.playerTurnOrder)
         self.assignCards()
+        self.chat = ServerChat()
 
     def getPlayerTurnOrder(self):
         return self.playerTurnOrder
@@ -41,15 +43,16 @@ class serverGame:
 
     def changeTurn(self, player):
         if self.playerTurnOrder[0] is player:
-            playerTurnOrder.remove(player)
-            playerTurnOrder.append(player)
+            self.playerTurnOrder.remove(player)
+            self.playerTurnOrder.append(player)
+            player.sendClientAString("game.turn:success")
 
 
+    def getChat(self):
+        return self.chat
 
 
-
-
-
+     
 
 
 
