@@ -105,7 +105,7 @@ def gameBoard(netConn):
     i=0
     for card in playerCards:
         hand.addImageButton(ImageButton(hand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=hand.getContainer(), object_id="HandIB"+card.getCardName()))
-        hand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + ".jpg")
+        hand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + ".png")
         cardXLoc += 142 + buffer
         i+=1
     
@@ -219,7 +219,8 @@ def gameBoard(netConn):
                     elif myTurn and checkHidden(notebook) and checkHidden(hand) and gameGrid.clickedTile(event, myToken):
                         netConn.send("game.move:"+str(myToken.getRow())+"."+str(myToken.getColumn()))
 
-        if not myTurn and loopCounter >= 50:
+        # if not myTurn and loopCounter >= 50:
+        if loopCounter >= 50:
             netConn.send("game.update")
             clientUpdate = netConn.catch()
             tokenUpdates = clientUpdate.getTurnOrder()

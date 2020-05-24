@@ -179,8 +179,6 @@ def startGameList():
 
     while True:
         time_delta = clock.tick(60)/1000.0
-        # Track the mouse movement
-        # mousePos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -217,30 +215,15 @@ def startGameList():
                 elif backButton.getClickedStatus(event):
                     return OpenMainMenu()
 
+            # Redraw the background
+            windowSurface.blit(background, (0, 0))
+
             # Update events based on clock ticks
             for each in managerList:
                 each.process_events(event)
                 each.update(time_delta)
-
-            # Redraw the background
-            windowSurface.blit(background, (0, 0))
-            
-            # Redraw the window objects
-            for each in managerList:
                 each.draw_ui(windowSurface)
-            
         pygame.display.update()
-
-class Player:
-    def __init__(self):
-        self.id = "newPlayer"
-        self.character = ""
-        self.active = 0
-        self.rolled = 0
-        self.cards = ["", "", ""]
-        self.game = ""
-
-player = Player()
 
 def startLobby(gameName, userId):
     width = 1680
@@ -255,11 +238,8 @@ def startLobby(gameName, userId):
     notRdyManager = pygame_gui.UIManager((width, height), './notRdyTheme.json')
     managerList.append(notRdyManager)
 
-
     #pygame surface
     windowSurface = pygame.display.set_mode((width, height))
-    # background = pygame.Surface((width, height))
-    # background.fill(manager.ui_theme.get_colour('dark_bg'))
     Image('board.png', manager, 0, 0, width, height)
     
     # Button that starts the game when all players are ready, NOT visible to peons
@@ -303,7 +283,7 @@ def startLobby(gameName, userId):
         #if player number changes kill the text box and create a new one with updated information.
         if not currentLobbyPlayerStatus == tmp:
             playerStatus.kill()
-            playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
+            playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify(),relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
         isHost = netConn.send("lobby.host").split(":")
         
@@ -415,7 +395,7 @@ windowSurface = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
 # TESTING 
-# testingFunction()
+testingFunction()
 #run the program
 splash()
 

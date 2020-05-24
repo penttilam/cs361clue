@@ -4,35 +4,37 @@ from pygame.locals import *
 
 
 class InputBox:
-        def __init__(self, xLoc=0, yLoc=0, width=120, height=15, manager):
-            self.xLoc = xLoc
-            self.yLoc = yLoc
-            self.width = width
-            self.height = height
-            self.manager = manager
-            self.inputBox = pygame_gui.elements.ui_text_entry_line.UITextEntryLine(relative_rect=pygame.Rect((self.chatTextBoxX, self.chatTextBoxY), (self.chatTextBoxW, self.chatTextBoxH)), manager=self.manager)
-            self.lastTextInput = self.chatInput.get_text()
+    def __init__(self, manager, xLoc=15, yLoc=700, width=343, height=30, container="", object_id="", text=""):
+        self.xLoc = xLoc
+        self.yLoc = yLoc
+        self.width = width
+        self.height = height
+        self.manager = manager
+        self.container = container
+        self.object_id = object_id
+        self.text = text
+        self.newInputBox()
+        
+        
 
     def newInputBox(self):
         if (self.container == ""):
-            self.inputBox = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), text=self.text, manager=self.manager, object_id=self.object_ids)
+            self.inputBox = pygame_gui.elements.ui_text_entry_line.UITextEntryLine(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, object_id=self.object_id, )
         else:
-            self.inputBox = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), text=self.text, manager=self.manager, container=self.container, object_id=self.object_ids)
+            self.inputBox = pygame_gui.elements.ui_text_entry_line.UITextEntryLine(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, container=self.container, object_id=self.object_id)
+        self.inputBox.set_forbidden_characters(":")
+        self.inputBox.set_text_length_limit(32)
 
     def setObjectId(self, objectId=""):
         self.inputBox.kill()
-        if self.object_ids == "" and objectId == "":
-            self.object_ids = str(self.xLoc)+str(self.yLoc)+str(self.width)
+        if self.object_id == "" and objectId == "":
+            self.object_id = str(self.xLoc)+str(self.yLoc)+str(self.width)
         elif objectId != "":
             self.object_ids = objectId
         self.newInputBox()
-        
-    def getLocation(self):
-        return self.location
-    def getOccupied(self):
-        return self.occupied
+
     def getText(self):
-        return self.text
+        return self.inputBox.get_text()
     def getXLocYLoc(self):
         return (self.xLoc, self.yLoc)
     def getXLoc(self):
@@ -45,12 +47,8 @@ class InputBox:
         return self.height
     def getObjectId(self):
         return self.object_ids
-    def getRow(self):
-        return self.row
-    def getColumn(self):
-        return self.column
-    def getButton(self):
-        return self.button
+    def getInputBox(self):
+        return self.inputBox
 
     def setRow(self, row):
         self.row = row
@@ -108,18 +106,12 @@ class InputBox:
         self.inputBox.unfocus()
 
     def setManager(self, newManager):
-        self.button.kill()
+        self.inputBox.kill()
         self.manager = newManager
-        self.newButton()
-
-    def getClickedStatus(self, event):
-        if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED):
-            return event.ui_element.object_ids == self.button.object_ids
-        elif (event.type == KEYDOWN):
-            return event.key == self.shortcutKey
+        self.newInputBox()
 
     def kill(self):
-        self.button.kill()
+        self.inputBox.kill()
 
         
 

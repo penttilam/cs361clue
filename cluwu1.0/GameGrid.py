@@ -103,6 +103,8 @@ class GameGrid:
     def clickedTile(self, event, token):
         moved = False
         if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED):
+            if(event.ui_element.object_ids[0]=="chatlog"):
+                return moved
             # Take the object ID of the element clicked and split it out (grid tile IDs are "row,column")
             xLocYLoc = event.ui_element.object_ids[0].split(",")
             row = int(xLocYLoc[0])
