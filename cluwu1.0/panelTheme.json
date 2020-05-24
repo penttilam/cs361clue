@@ -52,13 +52,13 @@
     {
          "colours":
          {
-            "normal_bg": "#FF69B4",
+            "normal_bg": "#FFFFFF",
             "hovered_bg": "#F207A1",
             "disabled_bg": "#25292e",
             "selected_bg": "#365880",
             "active_bg": "#365880",
             "dark_bg": "#21282d",
-            "normal_text": "#bbbbbb",
+            "normal_text": "#000000",
             "hovered_text": "#bbbbbb",
             "disabled_text": "#808080",
             "selected_text": "#bbbbbb",
@@ -75,7 +75,7 @@
             "border": "#5e6060",
             "filled_bar": "#f4251b",
             "unfilled_bar": "#CCCCCC"
-         },
+        },
          "prototype": "#default_shape_style"
      },
     "drop_down_menu":
