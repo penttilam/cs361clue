@@ -12,6 +12,8 @@ from clientLobby import ClientLobby
 from clientNetwork import *
 from clientCard import *
 from clientGame import *
+from TextBox import *
+from InputBox import *
 
 width = 1680
 height = 900
@@ -42,6 +44,9 @@ def gameBoard(netConn):
     # print(str(clientGame.getMyTurn()))
 
 
+    netConn.send("game.create")
+    clientInitGame = netConn.catch()
+
     layer0 = pygame_gui.UIManager((width, height), './ourTheme.json')
     managerList.append(layer0)
     layer1 = pygame_gui.UIManager((width, height), './tileTheme.json')
@@ -52,7 +57,8 @@ def gameBoard(netConn):
     managerList.append(layer3)
     
     turnOrderImages = displayTurnOrder(clientGame.getTurnOrder(), layer1, initial=1)
-
+    chatLog = TextBox(layer1)
+    chatInput = InputBox(layer1)
 
     gameGrid = GameGrid(width, height, layer1)
 
@@ -146,9 +152,12 @@ def gameBoard(netConn):
             if event.type == QUIT:
                 netConn.send("quit")
                 raise SystemExit
-
+                                   
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
-                if (not checkHidden(notebook)):
+                
+                if chatInput.getText() != "" and event.type == KEYDOWN and event.key == K_RETURN:
+                    netConn.send("game.chat.add:" + chatInput.getText())
+                elif (not checkHidden(notebook)):
                     notebook.panel.process_event(event)
                     # Cycles Notebook checkboxes between blank, X, and checked
                     if event.type == KEYDOWN and event.key == K_ESCAPE or notebookButton.getClickedStatus(event):
@@ -213,10 +222,12 @@ def gameBoard(netConn):
         if not myTurn and loopCounter >= 50:
             netConn.send("game.update")
             clientUpdate = netConn.catch()
-            updatePlayerPositions(characterTokens, clientUpdate, gameGrid)
+            tokenUpdates = clientUpdate.getTurnOrder()
+            chatLog.addText(clientUpdate.getChatUpdate())
+            updatePlayerPositions(characterTokens, tokenUpdates, gameGrid)
             loopCounter = 0
-            if clientUpdate[0].getTokenCharacter() != clientGame.getTurnOrder()[0].getTokenCharacter():
-                clientGame.setTurnOrder(clientUpdate)
+            if tokenUpdates[0].getTokenCharacter() != clientGame.getTurnOrder()[0].getTokenCharacter():
+                clientGame.setTurnOrder(tokenUpdates)
                 turnOrderImages = displayTurnOrder(clientGame.getTurnOrder(), layer1, turnOrderImages)
 
 
@@ -245,21 +256,17 @@ def displayTurnOrder(turnOrder, manager, turnOrderImages=[], initial=0):
     if initial:
         for character in reversed(turnOrder):
             name = character.getTokenCharacter()
-            turnOrderImages.append(Image(name + "people.jpg", manager, 90, yLoc + 90, 142, 190, object_id="turn"+name))
+            turnOrderImages.append(Image(name + "Head.png", manager, 90, yLoc + 90, 142, 190, object_id="turn"+name))
             yLoc += 60
     else:
         for image in turnOrderImages:
             image.kill()
         for character in reversed(turnOrder):
             name = character.getTokenCharacter()
-            turnOrderImages[i] = Image(name + "people.jpg", manager, 90, yLoc + 90, 142, 190, object_id="turn"+name)
+            turnOrderImages[i] = Image(name + "Head.png", manager, 90, yLoc + 90, 142, 190, object_id="turn"+name)
             yLoc += 60
             i += 1
     return turnOrderImages
-
-    
-
-
 
 def updatePlayerPositions(playerList, tokenUpdates, gameGrid):
     for player in playerList:

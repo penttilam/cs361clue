@@ -120,6 +120,8 @@ def hostGame():
                     gameNameCamel = gameName.get_text()
                     if " " in gameName.get_text():
                         gameNameCamel = gameName.get_text().replace(" ", "_")
+                    if "." in gameNameCamel:
+                        gameNameCamel = gameNameCamel.replace(".", "*")
                     print(netConn.send("lobby.new:"+gameNameCamel))
                     return startLobby(gameName.get_text(), userId)
 

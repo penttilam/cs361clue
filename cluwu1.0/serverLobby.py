@@ -34,7 +34,6 @@ class ServerLobby:
 
     ##this this returns a list of the player names
     def getPName(self):
-        print("Am i in the PNAME?")
         names = []
         for x in self.players:
             names.append(x.getConnectionId())

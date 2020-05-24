@@ -4,6 +4,7 @@ class ClientCards:
         self.cardName = cardName
         self.cardCategory = cardCategory
 
+         
     def getCardName(self):
         return self.cardName
 
