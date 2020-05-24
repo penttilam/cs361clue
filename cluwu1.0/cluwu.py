@@ -96,7 +96,8 @@ def hostGame():
     gameNameTextBoxW = int(width/5)
     gameNameTextBoxH = int(height/20)
     gameName = pygame_gui.elements.ui_text_entry_line.UITextEntryLine(relative_rect=pygame.Rect((gameNameTextBoxX, gameNameTextBoxY), (gameNameTextBoxW, gameNameTextBoxH)), manager=manager)
-   
+    gameName.focus()
+
     startButton = Button("Start Game", manager, shortcutKey=K_RETURN)
     startButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
     startButton.setWidthHeight(int(width/10), int(height/20))
@@ -104,17 +105,15 @@ def hostGame():
     backButton = Button("Back", manager, shortcutKey=K_ESCAPE)
     backButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/20))
     backButton.setWidthHeight(int(width/10), int(height/20))
-    
+
     while True:
         time_delta = clock.tick(60)/1000.0
-
         for event in pygame.event.get():
             if event.type == QUIT:
                 netConn.send("quit")
                 raise SystemExit
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
                 if backButton.getClickedStatus(event):
-                    print("back clicked")
                     return OpenMainMenu()
 
                 if startButton.getClickedStatus(event) and gameName.get_text() != "":
@@ -124,19 +123,13 @@ def hostGame():
                     print(netConn.send("lobby.new:"+gameNameCamel))
                     return startLobby(gameName.get_text(), userId)
 
-
-            # Update events based on clock ticks
-            for each in managerList:
-                each.process_events(event)
-                each.update(time_delta)
-
-            # Redraw the background
-            windowSurface.blit(background, (0, 0))
-            
-            # Redraw the window objects
-            for each in managerList:
-                each.draw_ui(windowSurface)
-
+        # Redraw the background
+        windowSurface.blit(background, (0, 0))
+        # Update events based on clock ticks
+        for each in managerList:
+            each.process_events(event)
+            each.update(time_delta)
+            each.draw_ui(windowSurface)
         pygame.display.update()
         
 
@@ -163,10 +156,7 @@ def startGameList():
 
     print(gameSelectListActiveGamesList)
     for clientLobby in gameSelectListActiveGamesList:
-        print("looping...")
         lobbyList.append(str(clientLobby.getId())+" "+str(clientLobby.getNumberOfPlayers())+ " players")
-
-    print("after printing lobbies..........")
 
     gameSelectList = pygame_gui.elements.ui_selection_list.UISelectionList(relative_rect=pygame.Rect((gameSelectListX, gameSelectListY), (gameSelectListW, gameSelectListH)), item_list=lobbyList, manager=manager)
 
@@ -291,8 +281,6 @@ def startLobby(gameName, userId):
     playerStatusH = int(height/20)
     netConn.send("lobby.update")
     
-    
-
     currentLobbyPlayerStatus = netConn.catch()
     playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify(), relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
@@ -304,25 +292,19 @@ def startLobby(gameName, userId):
         #update the text box to let players know who is ready etc...
         tmp = currentLobbyPlayerStatus
 
-        print("this is the tmp: " + str(tmp))
         netConn.send("lobby.update")
         currentLobbyPlayerStatus = netConn.catch()
 
         if currentLobbyPlayerStatus.getStartGame():
             gameBoard(netConn)
-            #note for future us: gameName and userId maybe fake news?
 
-        print("this is the currentLobbyPlayerStatus: " + str(currentLobbyPlayerStatus))
         #if player number changes kill the text box and create a new one with updated information.
-
         if not currentLobbyPlayerStatus == tmp:
             playerStatus.kill()
             playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify() ,relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
         isHost = netConn.send("lobby.host").split(":")
         
-        print("This is host: " + str(isHost))
-
         if isHost[2] == "True":
             startButtonX = int(width/17)
             startButton.setXLoc(startButtonX)
@@ -431,7 +413,7 @@ windowSurface = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
 # TESTING 
-testingFunction()
+# testingFunction()
 #run the program
 splash()
 

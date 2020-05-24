@@ -19,6 +19,87 @@ from Button import Button
 
 
 class GameGrid:
+    def __init__(self, windowWidth, windowHeight, manager):
+        self.grid = []
+        self.windowHeight = windowWidth
+        self.windowWidth = windowWidth
+        
+        badMove = []
+           
+        fileIn = open('./rooms/rooms', 'r')
+        badMove = fileIn.read().split(" ") 
+        fileIn.close()
+        fileIn = open('./rooms/hotelrooms.txt', 'r')
+        hotelRooms = fileIn.read().split(" ") 
+        fileIn.close()
+        fileIn = open('./rooms/beachrooms.txt', 'r')
+        beachRooms = fileIn.read().split(" ") 
+        fileIn.close()
+        fileIn = open('./rooms/libraryrooms.txt', 'r')
+        libraryRooms = fileIn.read().split(" ") 
+        fileIn.close()
+        fileIn = open('./rooms/schoolrooms.txt', 'r')
+        schoolRooms = fileIn.read().split(" ") 
+        fileIn.close()
+        fileIn = open('./rooms/mangarooms.txt', 'r')
+        mangaRooms = fileIn.read().split(" ") 
+        fileIn.close()
+        fileIn = open('./rooms/teashoprooms.txt', 'r')
+        tearoomRooms = fileIn.read().split(" ") 
+        fileIn.close()
+        fileIn = open('./rooms/shrinerooms.txt', 'r')
+        shrineRooms = fileIn.read().split(" ") 
+        fileIn.close()
+        fileIn = open('./rooms/karaokerooms.txt', 'r')
+        karaokeRooms = fileIn.read().split(" ") 
+        fileIn.close()
+        fileIn = open('./rooms/hotspringrooms.txt', 'r')
+        hotspringRooms = fileIn.read().split(" ") 
+        fileIn.close()
+
+        self.rooms = [("school", schoolRooms),("library", libraryRooms), ("lovehotel", hotelRooms), ("beach", beachRooms), ("karaoke", karaokeRooms), ("mangastore", mangaRooms), ("tearoom", tearoomRooms), ("hotspring", hotspringRooms), ("shrine", shrineRooms)]
+        schoolExits = [104, 179, 180]
+        libraryExits = [161, "secret143"]
+        hotelExits = [209,303]
+        beachExits = [427, "secret570"]
+        karaokeExits = [463, 393, 398, 472]
+        mangastoreExits = [461, "secret456"]
+        tearoomExits = [265, 366]
+        hotspringExits = [199, 267]
+        shrineExits = [102, "secret72"]
+
+        self.roomExits = [("school", schoolExits), ("library", libraryExits), ("lovehotel", hotelExits), ("beach", beachExits), ("karaoke", karaokeExits), ("mangastore", mangastoreExits), ("tearoom", tearoomExits), ("hotspring", hotspringExits), ("shrine", shrineExits)]
+        print(hotelRooms)
+        buttonNumber = -1
+        secretDoors = [72, 143, 456, 570]
+        doors = [78,105,137,155,156,198,233,243,289, 304, 365, 417, 422, 471, 451, 460, 464]
+        for row in range(25):
+            self.grid.append([])
+            for column in range(24):
+                buttonNumber = buttonNumber + 1
+                xLocation = 15*30-15+column*32
+                yLocation = 60 + row*30
+                buttonId = str(row) + "," + str(column)
+                self.grid[row].append(Button(str(buttonNumber), manager, xLocation, yLocation, 30, 30, object_id=str(buttonId)))
+                self.grid[row][column].setRowColumn(row, column)
+                self.grid[row][column].setLocation("outside")
+                if (int(self.grid[row][column].text) in doors):
+                    for room in self.rooms:
+                        if (self.grid[row][column].text in room[1]):
+                            self.grid[row][column].setLocation(room[0])
+                if (self.grid[row][column].text in secretDoors):
+                    for room in self.rooms:
+                        if (self.grid[row][column].text in room[1]):
+                            self.grid[row][column].setLocation(room[0])
+                if (self.grid[row][column].text in badMove):
+                    for room in self.rooms:
+                        if (self.grid[row][column].text in room[1]):
+                            self.grid[row][column].setLocation(room[0])
+                            
+                    # self.grid[row][column].setWidthHeight(0, 0)
+                    # self.grid[row][column].setText("")
+                    self.grid[row][column].disable()
+
     def clickedTile(self, event, token):
         moved = False
         if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED):
@@ -101,86 +182,7 @@ class GameGrid:
             
         return moved
 
-    def __init__(self, windowWidth, windowHeight, screen, manager):
-        self.grid = []
-        self.windowHeight = windowWidth
-        self.windowWidth = windowWidth
-        
-        badMove = []
-           
-        fileIn = open('./rooms/rooms', 'r')
-        badMove = fileIn.read().split(" ") 
-        fileIn.close()
-        fileIn = open('./rooms/hotelrooms.txt', 'r')
-        hotelRooms = fileIn.read().split(" ") 
-        fileIn.close()
-        fileIn = open('./rooms/beachrooms.txt', 'r')
-        beachRooms = fileIn.read().split(" ") 
-        fileIn.close()
-        fileIn = open('./rooms/libraryrooms.txt', 'r')
-        libraryRooms = fileIn.read().split(" ") 
-        fileIn.close()
-        fileIn = open('./rooms/schoolrooms.txt', 'r')
-        schoolRooms = fileIn.read().split(" ") 
-        fileIn.close()
-        fileIn = open('./rooms/mangarooms.txt', 'r')
-        mangaRooms = fileIn.read().split(" ") 
-        fileIn.close()
-        fileIn = open('./rooms/teashoprooms.txt', 'r')
-        tearoomRooms = fileIn.read().split(" ") 
-        fileIn.close()
-        fileIn = open('./rooms/shrinerooms.txt', 'r')
-        shrineRooms = fileIn.read().split(" ") 
-        fileIn.close()
-        fileIn = open('./rooms/karaokerooms.txt', 'r')
-        karaokeRooms = fileIn.read().split(" ") 
-        fileIn.close()
-        fileIn = open('./rooms/hotspringrooms.txt', 'r')
-        hotspringRooms = fileIn.read().split(" ") 
-        fileIn.close()
-
-        self.rooms = [("school", schoolRooms),("library", libraryRooms), ("lovehotel", hotelRooms), ("beach", beachRooms), ("karaoke", karaokeRooms), ("mangastore", mangaRooms), ("tearoom", tearoomRooms), ("hotspring", hotspringRooms), ("shrine", shrineRooms)]
-        schoolExits = [104, 179, 180]
-        libraryExits = [161, "secret143"]
-        hotelExits = [209,303]
-        beachExits = [427, "secret570"]
-        karaokeExits = [463, 393, 398, 472]
-        mangastoreExits = [461, "secret456"]
-        tearoomExits = [265, 366]
-        hotspringExits = [199, 267]
-        shrineExits = [102, "secret72"]
-
-        self.roomExits = [("school", schoolExits), ("library", libraryExits), ("lovehotel", hotelExits), ("beach", beachExits), ("karaoke", karaokeExits), ("mangastore", mangastoreExits), ("tearoom", tearoomExits), ("hotspring", hotspringExits), ("shrine", shrineExits)]
-        print(hotelRooms)
-        buttonNumber = -1
-        secretDoors = [72, 143, 456, 570]
-        doors = [78,105,137,155,156,198,233,243,289, 304, 365, 417, 422, 471, 451, 460, 464]
-        for row in range(25):
-            self.grid.append([])
-            for column in range(24):
-                buttonNumber = buttonNumber + 1
-                xLocation = 15*30-15+column*32
-                yLocation = 60 + row*30
-                buttonId = str(row) + "," + str(column)
-                self.grid[row].append(Button(str(buttonNumber), manager, xLocation, yLocation, 30, 30, object_id=str(buttonId)))
-                self.grid[row][column].setRowColumn(row, column)
-                self.grid[row][column].setLocation("outside")
-                if (int(self.grid[row][column].text) in doors):
-                    for room in self.rooms:
-                        if (self.grid[row][column].text in room[1]):
-                            self.grid[row][column].setLocation(room[0])
-                if (self.grid[row][column].text in secretDoors):
-                    for room in self.rooms:
-                        if (self.grid[row][column].text in room[1]):
-                            self.grid[row][column].setLocation(room[0])
-                if (self.grid[row][column].text in badMove):
-                    for room in self.rooms:
-                        if (self.grid[row][column].text in room[1]):
-                            self.grid[row][column].setLocation(room[0])
-                            
-                    # self.grid[row][column].setWidthHeight(0, 0)
-                    # self.grid[row][column].setText("")
-                    self.grid[row][column].disable()
+    
 
     def findButtonByNumber(self, number):
         for row in range(25):

@@ -54,7 +54,7 @@ def gameBoard(netConn):
     turnOrderImages = displayTurnOrder(clientGame.getTurnOrder(), layer1, initial=1)
 
 
-    gameGrid = GameGrid(width, height, windowSurface, layer1)
+    gameGrid = GameGrid(width, height, layer1)
 
     Image('board.png', layer0, 0, 0, width, height)
 
@@ -76,7 +76,7 @@ def gameBoard(netConn):
     notebook = Panel(layer3, layerHeight=2)
     notebook.setXLocYLoc(int(width), int(height/8))
     notebook.setWidthHeight(int(width/4), int(3*height/4))
-    notebook.addImage(Image("clueNotepad.jpg", layer3, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
+    notebook.addImage(Image("clueNotepad.png", layer3, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
     notebook.setVisibleLocation(int((width*3)/8))
     notebook.setHiddenLocation(width)
     # Creates a Button object to allow interaction with checkboxe buttons
