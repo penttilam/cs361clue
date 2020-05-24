@@ -50,8 +50,6 @@ class Network:
     
 ## this catches the objects list 
     def catch(self):
-         print("printing before data!!!!!!")
          data = pickle.loads(self.client.recv(2048))
-         print("object received")
          return data
 

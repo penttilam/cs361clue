@@ -22,10 +22,14 @@ class ClientGameInit:
             return False
 
 class updateClientGame:
-    def __init__(self, turnIn):
+    def __init__(self, turnIn, chatLineIn):
         self.turnOrder = turnIn
+        self.chat = chatLineIn
 
-    def setTurnOrder(self, turnOrder):
-        self.turnOrder = turnOrder
+    def getTurnOrder(self, turnOrder):
+        return self.turnOrder
+
+    def getChatUpdate(self, chatLineIn):
+        return self.chat
 
 

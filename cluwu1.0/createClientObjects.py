@@ -30,7 +30,6 @@ def createClientToken(serverToken):
     return clientToken
 
 def createClientCards(serverCards):
-    print(serverCards)
     clientHand = []
     for cards in serverCards:
         clientCard = ClientCards(cards.getCardName(), cards.getCardCategory())
@@ -47,11 +46,15 @@ def createClientGameInit(serverGame, player):
     clientGameInit = ClientGameInit(clientTurnOrder, clientPlayerToken, clientCards)
     return clientGameInit
 
-def updateClientGame(playerList):
+def updateClientGame(serverGame):
     clientTurnOrder = []
-    for players in playerList:
+    htmlChatLine = ""
+    for players in serverGame.getPlayerTurnOrder():
         clientTurnOrder.append(createClientToken(players.getMyToken()))
-    return clientTurnOrder
+    for chatlines in serverGame.getChatlog():
+        htmlChatLine + "<b>" +  str(chatlines[0].getMyToken().getTokeCharacter()) + "</b> " + str(chatlines[1]) + "<br>"
+    updateClientGame = UpdateClientGame(clientTurnOrder, htmlChatLine)
+    return updateClientGame
     
 
 

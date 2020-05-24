@@ -61,5 +61,3 @@ class ServerLobby:
         self.startGame = True
 
 
-
-

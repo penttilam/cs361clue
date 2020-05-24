@@ -1,8 +1,11 @@
 import socket
 import sys
+import logging
 import pickle
 import _thread
 from _thread import *
+
+from datetime import datetime
 
 from serverConnection import * 
 from createClientObjects import *
@@ -13,10 +16,12 @@ from clientLobby import *
 from serverCard import * 
 from serverGame import * 
 
-####
+
+
 ##sys.stdout = open("/dev/null", "w")
 
 ##Creating the server socket and listening for a connection
+
 server = "45.132.241.193"
 port = 42069
 
@@ -77,11 +82,9 @@ def startCommand(player, lobbyList, gameList):
         for lobbyPlayer in lobby.getPlayers():
             if lobbyPlayer == player:
                 playerLobby = lobby
-    print("is it here")
     playerLobby.setStartGame()
     startInfo = "lobby.start.confirmed"
     player.sendClientAString(startInfo)
-    print("BIG ASS FUCKING" + str(playerLobby.getPlayers()))
     gameList.append(serverGame(playerLobby.getPlayers()))
 
 
@@ -152,7 +155,7 @@ def updateGameCommand(player, gameList):
     for game in gameList:
         for gamePlayer in game.getPlayerTurnOrder():
             if gamePlayer is player:
-                player.sendClientAObject(updateClientGame(game.getPlayerTurnOrder()))
+                player.sendClientAObject(updateClientGame(game))
 
 def moveTokenCommand(player, gameList, block2):
     arguments = block2.split(".")
@@ -161,9 +164,7 @@ def moveTokenCommand(player, gameList, block2):
 
 
 def turnCommand(player, gameList):
-    print("this is game list: " + str(gameList))
     for game in gameList:
-        print("before changeTurn")
         try:
            game.changeTurn(player)
         except:
@@ -186,6 +187,8 @@ def gameCommand(block1, block2, player, lobbyList, gameList):
         turnCommand(player, gameList)
     elif arguments[1] == "roll":
         rollCommand(player, gameList)
+#    elif arguments[1] == "chat":
+#        charCommand(player, gameList, argument[2])
 
 
 
@@ -196,36 +199,31 @@ def clientCommand(clientCommand, player, lobbyList, gameList):
 
     if arguments[0] == "lobby":
         if len(blocks) == 3:
-            print("before?")
             lobbyCommand(blocks[1], blocks[2], player, lobbyList, gameList)
             return True
         else:
-            print("before?")
             lobbyCommand(blocks[1], None, player, lobbyList, gameList)
             return True
 
     elif arguments[0] == "game":
         if len(blocks) == 3:
-            print("before?")
             gameCommand(blocks[1], blocks[2], player, lobbyList, gameList)
             return True
         else:
-            print("before?")
             gameCommand(blocks[1], None, player, lobbyList, gameList)
             return True
 
     elif arguments[0] == "quit":
         player.sendClientAString("quit")
-        runThread = False
+        return False
 
-    return True
 
 
 ##This the individual client thread that sends and recieves data from the client
 def Threaded_Client(player, lobbyList, gameList):
     runThread = True
+    data = str("test")
 
-    print("player print 2: " + str(player))
     while runThread:
         try:
             data = player.getClientMessage()
@@ -237,7 +235,8 @@ def Threaded_Client(player, lobbyList, gameList):
                 runThread = clientCommand(data, player, lobbyList, gameList)
 
         except:
-            print("this is the except: " + str(data))
+            error_string = str(datetime.now()) + " -- error -- " + str(data)
+            logging.debug(error_string)
             break
     
     leaveCommand(player, lobbyList)
@@ -249,6 +248,7 @@ def Threaded_Client(player, lobbyList, gameList):
 connectionNumber = 1
 lobbyList = []
 gameList = []
+logging.basicConfig(filename='Epic_Server_Fails', level=logging.DEBUG)
 
 while True:
 

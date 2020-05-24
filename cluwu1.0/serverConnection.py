@@ -16,7 +16,6 @@ class Connection():
         print("    Sent  --  " + str(self.id) + ":" + str(message))
 
     def sendClientAObject(self, clientObject):
-        print("maybe here? " + str(clientObject))
         self.conn.send(pickle.dumps(clientObject))
         print("    Sent -- " + str(self.id) + ".object:" + str(type(clientObject)))
 

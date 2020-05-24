@@ -53,7 +53,6 @@ class ServerPlayer():
         self.playerConnection.sendClientAString(serverString)
 
     def sendClientAObject(self, serverObject):
-        print("here" + str(serverObject))
         self.playerConnection.sendClientAObject(serverObject)
 
     def getClientMessage(self):
