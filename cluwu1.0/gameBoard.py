@@ -76,7 +76,7 @@ def gameBoard(netConn):
     notebook = Panel(layer3, layerHeight=2)
     notebook.setXLocYLoc(int(width), int(height/8))
     notebook.setWidthHeight(int(width/4), int(3*height/4))
-    notebook.addImage(Image("clueNotepad.png", layer3, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
+    notebook.addImage(Image("clueNotepad.jpg", layer3, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
     notebook.setVisibleLocation(int((width*3)/8))
     notebook.setHiddenLocation(width)
     # Creates a Button object to allow interaction with checkboxe buttons
@@ -136,10 +136,10 @@ def gameBoard(netConn):
         myTurn = clientGame.getMyTurn()
         if myTurn:
             endTurnButton.setXLoc(90)
-            # time_delta = clock.tick(60) / 1000.0
+            time_delta = clock.tick(60) / 1000.0
         else:
             endTurnButton.setXLoc(width)
-            # time_delta = clock.tick(60) / 1000.0
+            time_delta = clock.tick(60) / 1000.0
         
 
         for event in pygame.event.get():
@@ -224,7 +224,7 @@ def gameBoard(netConn):
         # Update events based on clock ticks
         for each in managerList:
             each.process_events(event)
-            # each.update(time_delta)
+            each.update(time_delta)
             each.draw_ui(windowSurface)
 
         pygame.display.update()
