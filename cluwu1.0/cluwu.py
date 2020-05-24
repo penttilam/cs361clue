@@ -82,9 +82,6 @@ def hostGame():
     manager = pygame_gui.UIManager((width, height), './ourTheme.json')
     managerList.append(manager)    
 
-
-
-
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
@@ -314,7 +311,7 @@ def startLobby(gameName, userId):
         currentLobbyPlayerStatus = netConn.catch()
 
         if currentLobbyPlayerStatus.getStartGame():
-            gameBoard(gameName, userId)
+            gameBoard(netConn)
             #note for future us: gameName and userId maybe fake news?
 
         print("this is the currentLobbyPlayerStatus: " + str(currentLobbyPlayerStatus))
@@ -331,7 +328,7 @@ def startLobby(gameName, userId):
         if isHost[2] == "True":
             startButtonX = int(width/17)
             startButton.setXLoc(startButtonX)
-            if currentLobbyPlayerStatus.getLobbyReadyStatus() and currentLobbyPlayerStatus.getNumberOfPlayers() > 1:
+            if currentLobbyPlayerStatus.getLobbyReadyStatus() and currentLobbyPlayerStatus.getNumberOfPlayers() > 0:
                 startButton.enable()
             else:
                 startButton.disable()
@@ -344,7 +341,7 @@ def startLobby(gameName, userId):
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
                 if startButton.getClickedStatus(event):
                     netConn.send("lobby.start")
-                    gameBoard(gameName, userId)
+                    gameBoard(netConn)
 
                 #events for ready button
                 elif readyButton.getClickedStatus(event):
@@ -397,7 +394,7 @@ def splash():
         mousePos = pygame.mouse.get_pos()
         
         # Add splash screen
-        splash = addImage('images/cluwusplash.png', 1, windowSurface, width/2, height/2, width, height)
+        splash = addImage('images/splashScreen.jpg', 1, windowSurface, width/2, height/2, width, height)
         
         for event in pygame.event.get():
             # Quit when window X button is clicked
@@ -413,7 +410,7 @@ def splash():
 def testingFunction():
     netConn.send("lobby.new:TRASH")
     netConn.send("lobby.start")
-    gameBoard("TRASH", userId)
+    gameBoard(netConn)
 
 #initialize game screen
 pygame.init()
@@ -436,7 +433,7 @@ windowSurface = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
 # TESTING 
-# testingFunction()
+testingFunction()
 #run the program
 splash()
 
