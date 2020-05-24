@@ -2,7 +2,6 @@ import pygame
 import pygame_gui
 from pygame.locals import *
 
-
 class InputBox:
     def __init__(self, manager, xLoc=15, yLoc=700, width=343, height=30, container="", object_id="", text=""):
         self.xLoc = xLoc
@@ -14,8 +13,6 @@ class InputBox:
         self.object_id = object_id
         self.text = text
         self.newInputBox()
-        
-        
 
     def newInputBox(self):
         if (self.container == ""):

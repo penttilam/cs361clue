@@ -8,15 +8,12 @@ from clientPlayer import ClientPlayer
 from clientLobby import ClientLobby
 from clientNetwork import *
 from notebook import createNotebook
-# from GameTile import GameTile
 from Button import Button
 from ImageButton import ImageButton
 from Image import Image
 from Panel import Panel
 from GameGrid import GameGrid
 from gameBoard import gameBoard
-
-#was there a reason clock was here? It's used as a global, probably should be at the top?
 
 #runs main menu
 def OpenMainMenu():

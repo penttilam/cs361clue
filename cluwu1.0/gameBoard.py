@@ -14,6 +14,7 @@ from clientCard import *
 from clientGame import *
 from TextBox import *
 from InputBox import *
+from clientChat import *
 
 width = 1680
 height = 900
@@ -23,7 +24,6 @@ def gameBoard(netConn):
     clock = pygame.time.Clock()
     # List of managers used to set themes
     managerList = []
-    print(netConn)
     windowSurface = pygame.display.set_mode((width, height))
     # Catch the game data and populate list of objects
     # gameInfo = netConn.catch()
@@ -46,7 +46,7 @@ def gameBoard(netConn):
 
     netConn.send("game.create")
     clientInitGame = netConn.catch()
-
+    print("Caught the conenctions")
     layer0 = pygame_gui.UIManager((width, height), './ourTheme.json')
     managerList.append(layer0)
     layer1 = pygame_gui.UIManager((width, height), './tileTheme.json')
@@ -105,7 +105,11 @@ def gameBoard(netConn):
     i=0
     for card in playerCards:
         hand.addImageButton(ImageButton(hand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=hand.getContainer(), object_id="HandIB"+card.getCardName()))
-        hand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + ".png")
+        if card.getCardCategory() != "people":
+            imageFormat = ".jpg"
+        else:
+            imageFormat = ".png"
+        hand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
         cardXLoc += 142 + buffer
         i+=1
     
@@ -157,6 +161,7 @@ def gameBoard(netConn):
                 
                 if chatInput.getText() != "" and event.type == KEYDOWN and event.key == K_RETURN:
                     netConn.send("game.chat.add:" + chatInput.getText())
+                    chatInput.setText("")
                 elif (not checkHidden(notebook)):
                     notebook.panel.process_event(event)
                     # Cycles Notebook checkboxes between blank, X, and checked

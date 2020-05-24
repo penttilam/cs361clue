@@ -6,7 +6,6 @@ class ClientGameInit:
         self.myToken = tokenIn
         self.myCards = cardsIn
         
-
     def getTurnOrder(self):
         return self.turnOrder
 
@@ -25,15 +24,15 @@ class ClientGameInit:
     def setTurnOrder(self, turnOrder):
         self.turnOrder = turnOrder
 
-class updateClientGame:
+class UpdateClientGame:
     def __init__(self, turnIn, chatLineIn):
         self.turnOrder = turnIn
         self.chat = chatLineIn
 
-    def getTurnOrder(self, turnOrder):
+    def getTurnOrder(self):
         return self.turnOrder
 
-    def getChatUpdate(self, chatLineIn):
+    def getChatUpdate(self):
         return self.chat
 
 

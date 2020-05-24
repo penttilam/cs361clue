@@ -2,7 +2,6 @@ import pygame
 import pygame_gui
 from pygame.locals import *
 
-
 class TextBox:
     def __init__(self, manager, text="", xLoc=15, yLoc=510, width=343, height=200, container="", layer=1, objectId="chatlog"):
         self.xLoc = xLoc
@@ -100,24 +99,13 @@ class TextBox:
         self.height = height
         self.setObjectId()
 
-    def focus(self):
-        self.textBox.focus()
-        self.focus = 1
-    
     def update(self, time_delta):
         self.textBox.update(time_delta)
-
-    def unfocus(self):
-        self.textBox.unfocus()
-        self.focus = 0
 
     def setManager(self, newManager):
         self.textBox.kill()
         self.manager = newManager
         self.newTextBox()
-
-    def hasFocus():
-        return self.focus
 
     def kill(self):
         self.textBox.kill()

@@ -69,7 +69,6 @@ class GameGrid:
         shrineExits = [102, "secret72"]
 
         self.roomExits = [("school", schoolExits), ("library", libraryExits), ("lovehotel", hotelExits), ("beach", beachExits), ("karaoke", karaokeExits), ("mangastore", mangastoreExits), ("tearoom", tearoomExits), ("hotspring", hotspringExits), ("shrine", shrineExits)]
-        print(hotelRooms)
         buttonNumber = -1
         secretDoors = [72, 143, 456, 570]
         doors = [78,105,137,155,156,198,233,243,289, 304, 365, 417, 422, 471, 451, 460, 464]
