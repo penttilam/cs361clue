@@ -161,12 +161,13 @@ def moveTokenCommand(player, gameList, block2):
 
 
 def turnCommand(player, gameList):
+    print("this is game list: " + str(gameList))
     for game in gameList:
-        if changeTurn(player):
-           player.sendClientAString("game.turn:success")
-           return
-    player.sendClientAString("game.turn:failure")
-
+        print("before changeTurn")
+        try:
+           game.changeTurn(player)
+        except:
+            pass
 
 def rollCommand(player, gameList):
     pass

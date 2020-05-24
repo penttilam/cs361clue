@@ -41,9 +41,9 @@ class serverGame:
 
     def changeTurn(self, player):
         if self.playerTurnOrder[0] is player:
-            playerTurnOrder.remove(player)
-            playerTurnOrder.append(player)
-
+            self.playerTurnOrder.remove(player)
+            self.playerTurnOrder.append(player)
+            player.sendClientAString("game.turn:success")
 
 
 
