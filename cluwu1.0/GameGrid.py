@@ -22,59 +22,83 @@ class GameGrid:
     def clickedTile(self, event, token):
         moved = False
         if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED):
+            # Take the object ID of the element clicked and split it out (grid tile IDs are "row,column")
             xLocYLoc = event.ui_element.object_ids[0].split(",")
             row = int(xLocYLoc[0])
             column = int(xLocYLoc[1])
             gridLocation = self.grid[row][column]
+            # If the button was clicked, call the move function
             if (gridLocation.getClickedStatus(event)):
-                checkXMove = token.getRow() - row
-                checkYMove = token.getColumn() - column
-                if (token.getLocation() == "outside" and (-2 < checkXMove < 2) and (-2 < checkYMove < 2) and (abs(checkXMove) + abs(checkYMove) < 2) and not gridLocation.getOccupied()):
-                    self.grid[token.getRow()][token.getColumn()].setOccupied(0)
-                    if (gridLocation.getLocation() != token.getLocation()):
-                        token.setLocation(gridLocation.getLocation())
-                    if token.getLocation() != "outside":
-                        possiblePositions = self.findButtonByLocation(token.getLocation())
-                        for button in possiblePositions:
+                moved = self.movePlayerToken(token, row, column)
+        return moved
+
+    def enterARoom(self, token, roomName):
+        token.setLocation(roomName)
+        possibleRoomPositions = self.findButtonByLocation(token.getLocation())
+        for button in possibleRoomPositions:
+            # If no one is occupying the square move to it and occupy it
+            if not button.getOccupied():
+                token.setXLocYLoc(button.getXLoc(), button.getYLoc())
+                token.setRowColumn(button.getRow(), button.getColumn())
+                self.grid[button.getRow()][button.getColumn()].setOccupied(1)
+                moved = True
+                break
+        return moved
+
+    def exitARoom(self, token, row, column):
+        moved = False
+        gridLocation = self.grid[row][column]
+        for room in self.roomExits:
+                if(token.getLocation() == room[0]):
+                    if "secret" + str(gridLocation.text) in room[1]:
+                        self.grid[token.getRow()][token.getColumn()].setOccupied(0)
+                        if(room[0] == "beach"):
+                            token.setLocation("shrine")
+                        elif(room[0] == "shrine"):
+                            token.setLocation("beach")
+                        elif(room[0] == "mangastore"):
+                            token.setLocation("library")
+                        elif(room[0] == "library"):
+                            token.setLocation("mangastore")
+                        possibleExits = self.findButtonByLocation(token.getLocation())
+                        for button in possibleExits:
                             if not button.getOccupied():
                                 token.setXLocYLoc(button.getXLoc(), button.getYLoc())
                                 token.setRowColumn(button.getRow(), button.getColumn())
+                                button.setOccupied(1)
                                 moved = True
                                 break
-                    else:                            
+                    elif (int(gridLocation.getText()) in room[1] and not gridLocation.getOccupied()):
+                        self.grid[token.getRow()][token.getColumn()].setOccupied(0)
+                        token.setLocation(gridLocation.getLocation())
                         token.setXLocYLoc(gridLocation.getXLoc(), gridLocation.getYLoc())
-                        token.setRowColumn(row, column)
-                        self.grid[row][column].setOccupied(1)
+                        token.setRowColumn(gridLocation.getRow(), gridLocation.getColumn())
+                        gridLocation.setOccupied(1)
                         moved = True
-                else:
-                    for room in self.roomExits:
-                        if(token.getLocation() == room[0]):
-                            if "secret" + str(self.grid[row][column].text) in room[1]:
-                                self.grid[token.getRow()][token.getColumn()].setOccupied(0)
-                                if(room[0] == "beach"):
-                                    token.setLocation("shrine")
-                                elif(room[0] == "shrine"):
-                                    token.setLocation("beach")
-                                elif(room[0] == "mangastore"):
-                                    token.setLocation("library")
-                                elif(room[0] == "library"):
-                                    token.setLocation("mangastore")
-                                possiblePositions = self.findButtonByLocation(token.getLocation())
-                                for button in possiblePositions:
-                                    if not button.getOccupied():
-                                        token.setXLocYLoc(button.getXLoc(), button.getYLoc())
-                                        token.setRowColumn(button.getRow(), button.getColumn())
-                                        button.setOccupied(1)
-                                        moved = True
-                                        break
-                            elif (int(self.grid[row][column].text) in room[1]):
-                                self.grid[token.getRow()][token.getColumn()].setOccupied(0)
-                                if (gridLocation.getLocation() != token.getLocation()):
-                                    token.setLocation(gridLocation.getLocation())
-                                token.setXLocYLoc(self.grid[row][column].getXLoc(), self.grid[row][column].getYLoc())
-                                token.setRowColumn(self.grid[row][column].getRow(), self.grid[row][column].getColumn())
-                                self.grid[row][column].setOccupied(1)
-                                moved = True
+        return moved
+
+    def movePlayerToken(self, token, row, column):
+        moved = False
+        gridLocation = self.grid[row][column]
+        # check distance away from current location
+        checkXMove = token.getRow() - row
+        checkYMove = token.getColumn() - column
+        # If the player accused or is not inside a room, the move is only 1 square away, the move is not diaganol, and the space is not already occupied
+        if (token.getLocation() == "outside" and (-2 < checkXMove < 2) and (-2 < checkYMove < 2) and (abs(checkXMove) + abs(checkYMove) < 2) and not gridLocation.getOccupied()):
+            # Free the current space that player occupied
+            self.grid[token.getRow()][token.getColumn()].setOccupied(0)
+            # If player is moving along a path and not entering a room, move them and occupy new space
+            if (gridLocation.getLocation() == "outside"):
+                token.setXLocYLoc(gridLocation.getXLoc(), gridLocation.getYLoc())
+                token.setRowColumn(row, column)
+                gridLocation.setOccupied(1)
+                moved = True
+            # If player is moving into a room, find the first non-occupied space in that room and move to it
+            else:
+                moved = self.enterARoom(token, gridLocation.getLocation())
+        else:
+            moved = self.exitARoom(token, row, column)
+            
         return moved
 
     def __init__(self, windowWidth, windowHeight, screen, manager):

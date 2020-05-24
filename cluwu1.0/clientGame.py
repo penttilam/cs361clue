@@ -1,6 +1,5 @@
 from clientToken import *
 
-
 class ClientGameInit:
     def __init__(self, turnIn, tokenIn, cardsIn):
         self.turnOrder = turnIn
@@ -17,12 +16,20 @@ class ClientGameInit:
         return self.myCards
 
     def getMyTurn(self):
-        if(self.turnOrder[0] == self.myToken):
+        if(self.turnOrder[0].getTokenCharacter() == self.myToken.getTokenCharacter()):
             return True
         else:
             return False
 
+    def setTurnOrder(self, turnOrder):
+        self.turnOrder = turnOrder
 
+class updateClientGame:
+    def __init__(self, turnIn):
+        self.turnOrder = turnIn
+    
+    def getTurnOrder(self):
+        return self.turnOrder
 
 
 

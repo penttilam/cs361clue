@@ -11,6 +11,7 @@ from clientPlayer import ClientPlayer
 from clientLobby import ClientLobby
 from clientNetwork import *
 from clientCard import *
+from clientGame import *
 
 width = 1680
 height = 900
@@ -50,12 +51,15 @@ def gameBoard(netConn):
     layer3 = pygame_gui.UIManager((width, height), './panelTheme.json')
     managerList.append(layer3)
     
-    displayTurnOrder(clientGame.getTurnOrder(), layer1)
+    turnOrderImages = displayTurnOrder(clientGame.getTurnOrder(), layer1, initial=1)
 
 
     gameGrid = GameGrid(width, height, windowSurface, layer1)
 
     Image('board.png', layer0, 0, 0, width, height)
+
+    # End turn Button
+    endTurnButton = Button("End turn", layer1, 90, 30, 90, 30)
 
     # Button to display player's hand of cards
     handButton = ImageButton(layer3, imageFile= 'weebcard.png', buttonText=" ")
@@ -119,16 +123,24 @@ def gameBoard(netConn):
     gameGrid.grid[7][23].setOccupied(1)
     characterTokens[5].setXLocYLoc(435, 210)
     characterTokens[5].setRowColumn(5, 0)
+    characterTokens[5].setLocation("outside")
     gameGrid.grid[5][0].setOccupied(1)
 
     for x in range(6):
-        print(clientGame.getMyToken().getTokenCharacter())
         if (clientGame.getMyToken().getTokenCharacter() == characterTokens[x].getObjectId()):
             myToken = characterTokens[x]
             break
-
+    gameGrid.enterARoom(characterTokens[5], "lovehotel")
+    loopCounter = 0
     while True:
-        time_delta = clock.tick(60) / 1000.0
+        myTurn = clientGame.getMyTurn()
+        if myTurn:
+            endTurnButton.setXLoc(90)
+            # time_delta = clock.tick(60) / 1000.0
+        else:
+            endTurnButton.setXLoc(width)
+            # time_delta = clock.tick(60) / 1000.0
+        
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -182,20 +194,41 @@ def gameBoard(netConn):
                         else: # Hides the hand
                             hidePanel(hand)
                     
+                    # End player turn
+                    elif endTurnButton.getClickedStatus(event):
+                        turnEnded = netConn.send("game.turn").split(":")
+                        if turnEnded[2] == "success":
+                            endTurnButton.setXLoc(width)
+                            netConn.send("game.update")
+                            clientUpdate = netConn.catch()
+                            clientGame.setTurnOrder(clientUpdate)
+                            myTurn = clientGame.getMyTurn()
+                            turnOrderImages = displayTurnOrder(clientGame.getTurnOrder(), layer1, turnOrderImages)
+
+
                     # Moves token
-                    elif checkHidden(notebook) and checkHidden(hand) and gameGrid.clickedTile(event, myToken):
+                    elif myTurn and checkHidden(notebook) and checkHidden(hand) and gameGrid.clickedTile(event, myToken):
                         netConn.send("game.move:"+str(myToken.getRow())+"."+str(myToken.getColumn()))
 
-            # Update events based on clock ticks
-            for each in managerList:
-                each.process_events(event)
-                each.update(time_delta)
-                each.draw_ui(windowSurface)
+        if not myTurn and loopCounter >= 50:
+            netConn.send("game.update")
+            clientUpdate = netConn.catch()
+            updatePlayerPositions(characterTokens, clientUpdate, gameGrid)
+            loopCounter = 0
+            if clientUpdate[0].getTokenCharacter() != clientGame.getTurnOrder()[0].getTokenCharacter():
+                clientGame.setTurnOrder(clientUpdate)
+                turnOrderImages = displayTurnOrder(clientGame.getTurnOrder(), layer1, turnOrderImages)
+
+
+            
+        # Update events based on clock ticks
+        for each in managerList:
+            each.process_events(event)
+            # each.update(time_delta)
+            each.draw_ui(windowSurface)
 
         pygame.display.update()
-        netConn.send("game.update")
-        tokenUpdates = netConn.catch()
-        updatePlayerPositions(characterTokens, tokenUpdates, gameGrid)
+        loopCounter+=1
 
 def hidePanel(panel):
     panel.setXLoc(panel.getHiddenLocation())
@@ -206,11 +239,27 @@ def showPanel(panel):
 def checkHidden(panel):
     return (panel.getXLoc() == panel.getHiddenLocation())
 
-def displayTurnOrder(turnOrder, manager):
+def displayTurnOrder(turnOrder, manager, turnOrderImages=[], initial=0):
     yLoc = 0
-    for character in reversed(turnOrder):
-        Image(character.getTokenCharacter() + "people.jpg", manager, 90, yLoc + 90, 142, 190)
-        yLoc += 60
+    i = 0
+    if initial:
+        for character in reversed(turnOrder):
+            name = character.getTokenCharacter()
+            turnOrderImages.append(Image(name + "people.jpg", manager, 90, yLoc + 90, 142, 190, object_id="turn"+name))
+            yLoc += 60
+    else:
+        for image in turnOrderImages:
+            image.kill()
+        for character in reversed(turnOrder):
+            name = character.getTokenCharacter()
+            turnOrderImages[i] = Image(name + "people.jpg", manager, 90, yLoc + 90, 142, 190, object_id="turn"+name)
+            yLoc += 60
+            i += 1
+    return turnOrderImages
+
+    
+
+
 
 def updatePlayerPositions(playerList, tokenUpdates, gameGrid):
     for player in playerList:
