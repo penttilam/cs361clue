@@ -37,14 +37,26 @@ def createClientCards(serverCards):
     return clientHand
 
 
-def createClientGameInit(serverGame, player):
+def createClientChat(serverChat):
+    htmlString = ""
+    for lines in serverChat:
+        htmlString += "<b>" + str(lines[0].getMyToken().getTokenCharacter()) + "</b> " + str(lines[1]) + "<br>"
+    return htmlString
+
+
+
+
+
+def createClientGame(serverThreadInfo):
     clientTurnOrder = []
-    for players in serverGame.getPlayerTurnOrder():
-        clientTurnOrder.append(createClientToken(players.getMyToken()))
-    clientPlayerToken = createClientToken(player.getMyToken())
-    clientCards = createClientCards(player.getMyCards())
-    clientGameInit = ClientGameInit(clientTurnOrder, clientPlayerToken, clientCards)
+    for players in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+        clientTurnOrder.append(createClientPlayer(players))
+    clientPlayerToken = createClientToken(serverThreadInfo.getServerPlayer().getMyToken())
+    clientCards = createClientCards(serverThreadInfo.getServerPlayer().getMyCards())
+    clientChat = createClientChat(serverThreadInfo.getServerPlayer().getGameChat())
+    clientGame = ClientGame(clientTurnOrder, clientPlayerToken, clientCards, clientChat)
     return clientGameInit
+
 
 def updateClientGame(serverGame):
     clientTurnOrder = []

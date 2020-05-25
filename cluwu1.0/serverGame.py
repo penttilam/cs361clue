@@ -15,7 +15,7 @@ class serverGame:
         self.guiltyCards = []
         assignTokens(self.playerTurnOrder)
         self.assignCards()
-        self.chat = ServerChat()
+        self.chat = None
 
     def getPlayerTurnOrder(self):
         return self.playerTurnOrder
@@ -35,7 +35,6 @@ class serverGame:
     def rollDie():
         return random.randint(1,6)
 
-
     def assignCards(self):
         serverCards = createDecks()
         self.guiltyCards = serverCards[0]
@@ -50,8 +49,9 @@ class serverGame:
     def getGameChat(self):
         return self.chat
 
+    def setGameChat(self, chatIn):
+        self.chat = chatIn
 
-     
 
 
 

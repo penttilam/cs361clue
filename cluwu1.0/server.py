@@ -142,119 +142,94 @@ def lobbyCommand(block1, block2, player, lobbyList, gameList):
         hostCommand(player, lobbyList)
 
 
-def createCommand(player, lobbyList, gameList):
-    player.sendClientAString("game.create:confirmed")
-    for game in gameList:
-        for gamePlayer in game.getPlayerTurnOrder():
-            if gamePlayer is player:
-                player.sendClientAObject(createClientGameInit(game, player))
-                leaveCommand(player, lobbyList)
+def createCommand(serverThreadInfo):
+    serverThreadInfo.getServerPlayer().sendClientAObject(creatClientGameInit(serverThreadInfo.getServerGame(), serverThreadInfo.getServerPlayer()))
+    serverThreadInfo.getServerLobby().removePlayer(serverThreadInfo.getServerPlayer())
 
-def updateGameCommand(player, gameList):
-    player.sendClientAString("game.update:confirmed")
-    for game in gameList:
-        for gamePlayer in game.getPlayerTurnOrder():
-            if gamePlayer is player:
-                player.sendClientAObject(updateClientGame(game))
 
-def moveTokenCommand(player, gameList, block2):
+def moveTokenCommand(serverThreadInfo, block2):
     arguments = block2.split(".")
-    player.getMyToken().setTokenXLocYLoc(arguments[0], arguments[1])
-    player.sendClientAString("game.update:confirmed")
-    for games in gameList:
-        for players in games.getPlayerTurnOrder():
-            if players == player:
-                game = games
-                break
-    for players in game.getPlayerTurnOrder():
-        updateGameCommand(players, gameList)
-        
+    serverThreadInfo.getServerPlayer().getMyToken().setTokenXLocYLoc(arguments[0], arguments[1])
+    for player in serverThreadInfo.getServerGame().getPlayerTurnOrder()
+        player.sendClientAObject(ClientGame(serverThreadInfo.getServerGame()))
 
 
-def turnCommand(player, gameList):
-    for game in gameList:
-        try:
-           game.changeTurn(player)
-        except:
-            pass
-
-def rollCommand(player, gameList):
-    pass
+def turnCommand(serverThreadInfo):
+    try:
+        serverThreadInfo.getServerGame().changeTurn(serverThreadInfo.getServerPlayer())
+        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder()
+            player.sendClientAObject(ClientGame(serverThreadInfo.getServerGame()))
+    except:
+        error_string = str(datetime.now()) + " -- error -- game.turn -- " + str(serverThreadInfo.getServerPlayer())
+        logging.debug(error_string)
 
 
 def chatCommand(player, gameList, argumentInput):
-    player.sendClientAString("I got the shit")
+    pass
 
 
-
-def gameCommand(block1, block2, player, lobbyList, gameList):
+def gameCommand(block1, block2, serverThreadInfo, lobbyList, gameList):
     arguments = block1.split(".")
 
     if arguments[1] == "create":
-        createCommand(player, lobbyList, gameList)
-    elif arguments[1] == "update":
-        updateGameCommand(player, gameList)
+        createCommand(serverThreadInfo)
     elif arguments[1] == "move":
-        moveTokenCommand(player, gameList, block2)
+        moveTokenCommand(serverThreadInfo, block2)
     elif arguments[1] == "turn":
-        turnCommand(player, gameList)
-    elif arguments[1] == "roll":
-        rollCommand(player, gameList)
+        turnCommand(serverThreadInfo)
     elif arguments[1] == "chat":
-        chatCommand(player, gameList, arguments[2])
+        chatCommand(serverThreadInfo, gameList, arguments[2])
 
 
 
 ##This is the command interperter from the client
-def clientCommand(clientCommand, player, lobbyList, gameList):
+def clientCommand(clientCommand, serverThreadInfo, lobbyList, gameList):
     blocks = clientCommand.split(":")
     arguments = blocks[1].split(".")
 
     if arguments[0] == "lobby":
         if len(blocks) == 3:
-            lobbyCommand(blocks[1], blocks[2], player, lobbyList, gameList)
+            lobbyCommand(blocks[1], blocks[2], serverThreadInfo, lobbyList, gameList)
             return True
         else:
-            lobbyCommand(blocks[1], None, player, lobbyList, gameList)
+            lobbyCommand(blocks[1], None, serverThreadInfo, lobbyList, gameList)
             return True
 
     elif arguments[0] == "game":
         if len(blocks) == 3:
-            gameCommand(blocks[1], blocks[2], player, lobbyList, gameList)
+            gameCommand(blocks[1], blocks[2], serverThreadInfo, lobbyList, gameList)
             return True
         else:
-            gameCommand(blocks[1], None, player, lobbyList, gameList)
+            gameCommand(blocks[1], None, serverThreadInfo, lobbyList, gameList)
             return True
 
     elif arguments[0] == "quit":
-        player.sendClientAString("quit")
         return False
 
 
 
 ##This the individual client thread that sends and recieves data from the client
-def Threaded_Client(player, lobbyList, gameList):
+def Threaded_Client(serverThreadInfo, lobbyList, gameList):
     runThread = True
-    data = str("test")
 
     while runThread:
         try:
-            data = player.getClientMessage()
+            data = serverThreadInfo.getServerPlayer.getClientMessage()
 
             if not data:
                 break
             else:
                 print("Received  --  " + data)
-                runThread = clientCommand(data, player, lobbyList, gameList)
+                runThread = clientCommand(data, serverThreadInfo, lobbyList, gameList)
 
         except:
             error_string = str(datetime.now()) + " -- error -- " + str(data)
             logging.debug(error_string)
             break
     
-    leaveCommand(player, lobbyList)
-    print("Lost connection to " + player.getConnectionId())
-
+    serverThreadInfo.getServerLobby().removePlayer(serverThreadInfo.getServerPlayer())
+    print("Lost connection to " + serverThreadInfo.getServerPlayer().getConnectionId())
+    serverThreadInfo.getServerPlayer().closeConnection()
 ##
 ## this is the server listening for connections initizliaing them as players and passing them to threads
 ##
@@ -272,8 +247,9 @@ while True:
     ## Using ServerPlayer class as middle man to Connection class to insolate it from the program
     connectionId = Connection(connectionId, conn)
     player = ServerPlayer(connectionId)
+    serverThreadInfo = ServerThread(player)
 
-    start_new_thread(Threaded_Client, (player, lobbyList, gameList))
+    start_new_thread(Threaded_Client, (serverThreadInfo, lobbyList, gameList))
     
     connectionNumber += 1
 
