@@ -3,7 +3,7 @@ import pygame_gui
 from pygame.locals import *
 
 class InputBox:
-    def __init__(self, manager, xLoc=15, yLoc=700, width=343, height=30, container="", object_id="", text=""):
+    def __init__(self, manager, xLoc=15, yLoc=870, width=341, height=30, container="", object_id="", text=""):
         self.xLoc = xLoc
         self.yLoc = yLoc
         self.width = width
@@ -11,6 +11,7 @@ class InputBox:
         self.manager = manager
         self.container = container
         self.object_id = object_id
+        self.focus = 0
         self.text = text
         self.newInputBox()
 
@@ -93,8 +94,9 @@ class InputBox:
         self.height = height
         self.setObjectId()
 
-    def focus(self):
+    def toggleFocus(self):
         self.inputBox.focus()
+        self.focus = not self.focus
     
     def update(self, time_delta):
         self.inputBox.update(time_delta)

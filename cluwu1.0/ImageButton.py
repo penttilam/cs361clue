@@ -19,19 +19,23 @@ class ImageButton:
     def getText(self):
         return self.button.getText()
     def getXLocYLoc(self):
-        return (self.button.xLoc, self.button.yLoc)
+        return (self.button.getXLoc(), self.button.getYLoc())
     def getXLoc(self):
-        return self.button.xLoc
+        return self.button.getXLoc()
     def getYLoc(self):
-        return self.button.yLoc
+        return self.button.getYLoc()
     def getWidth(self):
-        return self.button.width
+        return self.button.getWidth()
     def getHeight(self):
-        return self.button.height
+        return self.button.getHeight()
     def getContainer(self):
         return self.image.getContainer()
     def getObjectId(self):
         return self.objectId
+    def getButton(self):
+        return self.button
+    def getImage(self):
+        return self.image
 
     def setXLoc(self,xLoc):
         self.button.setXLoc(xLoc)
@@ -75,8 +79,10 @@ class ImageButton:
     def unselect(self):
         self.button.unselect()
 
-    def setManager(self, newManager):
+    def setButtonManager(self, newManager):
         self.button.setManager(newManager)
+    
+    def setImageManager(self, newManager):
         self.image.setManager(newManager)
 
     def setContainer(self, newContainer):

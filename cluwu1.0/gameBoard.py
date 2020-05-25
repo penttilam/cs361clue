@@ -1,5 +1,6 @@
 import pygame
 import pygame_gui
+import random
 from pygame.locals import *
 from Button import Button
 from ImageButton import ImageButton
@@ -15,42 +16,44 @@ from clientGame import *
 from TextBox import *
 from InputBox import *
 from clientChat import *
+from Label import Label
+import threading
+from UpdateThread import *
+import time
+from multiprocessing.pool import ThreadPool
 
+random.seed()
 width = 1680
 height = 900
 hiddenPanelLocation = width
 
+def getUpdates(netConn, updates):
+    clientUpdate = netConn.catch()
+    print("catch 1: " + str(clientUpdate))
+    clientUpdate = netConn.catch()
+    print("catch 2: " + str(clientUpdate))
+    return clientUpdate
+
 def gameBoard(netConn):
     clock = pygame.time.Clock()
+    updates = 0
+    windowSurface = pygame.display.set_mode((width, height))
+    netConn.send("game.create")
+    clientThreads = ThreadPool(processes=1)
+    threadResults = clientThreads.apply_async(getUpdates, (netConn, updates))
+    # threading.Thread(target=getUpdates, args=(netConn))?
+    clientUpdate = threadResults.get()
+    clientGame = clientUpdate
+    print (clientGame)
+    # clientGame = netConn.catch()
+    # clientGame = clientThread.join(1/1000)
     # List of managers used to set themes
     managerList = []
-    windowSurface = pygame.display.set_mode((width, height))
-    # Catch the game data and populate list of objects
-    # gameInfo = netConn.catch()
-    # characterList = 
-    netConn.send("game.create")
-    clientGame = netConn.catch()
-
-
-    # print("GET MY TURN ORDER:")
-    # for turnOrder in clientGame.getTurnOrder():
-        # print (turnOrder.getTokenCharacter())
-
-    # print("GET MY TOKEN: " + str(clientGame.getMyToken().getTokenCharacter()))
-    # print("GET MY CARDS: ")
-    # for myCards in clientGame.getMyCards():
-    #     print(myCards.getCardName())
-    # print("GET MY TURN?")
-    # print(str(clientGame.getMyTurn()))
-
-
-    netConn.send("game.create")
-    clientInitGame = netConn.catch()
-    print("Caught the conenctions")
-    layer0 = pygame_gui.UIManager((width, height), './ourTheme.json')
+    layer0 = pygame_gui.UIManager((width, height), './tileTheme.json')
     managerList.append(layer0)
-    layer1 = pygame_gui.UIManager((width, height), './tileTheme.json')
+    layer1 = pygame_gui.UIManager((width, height), './ourTheme.json')
     managerList.append(layer1)
+
     layer2 = pygame_gui.UIManager((width, height), './panelTheme.json')
     managerList.append(layer2)
     layer3 = pygame_gui.UIManager((width, height), './panelTheme.json')
@@ -60,23 +63,35 @@ def gameBoard(netConn):
     chatLog = TextBox(layer1)
     chatInput = InputBox(layer1)
 
-    gameGrid = GameGrid(width, height, layer1)
+    gameGrid = GameGrid(width, height, layer0)
 
     Image('board.png', layer0, 0, 0, width, height)
 
-    # End turn Button
-    endTurnButton = Button("End turn", layer1, 90, 30, 90, 30)
+    
 
     # Button to display player's hand of cards
     handButton = ImageButton(layer3, imageFile= 'weebcard.png', buttonText=" ")
-    handButton.setXLocYLoc(int((width*16)/17-(width/10)), int(height/4))
-    handButton.setWidthHeight(int(142), int(190))
+    handButton.setXLocYLoc(int((width*16)/17-(width/10)), int(height/4) - 60)
+    handButton.setWidthHeight(int(142), int(180))
+    Label("Look at Hand", layer1, handButton.getXLoc(), handButton.getYLoc() + 180, 142, 20)
 
+    # Button to roll the dice
+    diceButton = ImageButton(layer0, imageFile='dice.png', buttonText=" ")
+    diceButton.setXLocYLoc(int((width*16)/17-(width/10)), int(height/4)+180)
+    diceButton.setWidthHeight(int(120), int(120))
+    Label("Roll", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 100, 142, 20)
+    rollLabel = Label("Current Moves: 0", layer1, diceButton.getXLoc(), diceButton.getYLoc() - 20, 142, 20)
+    myRoll = -1
+    
+    # End turn Button
+    endTurnButton = Button("End turn", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 40 , 90, 30)
+    
     # Button to display the player's notebook
     # notebookButton = Button('Notebook', layer3)
     notebookButton = ImageButton(layer3, imageFile='notepadbutton.png', buttonText=" ")
-    notebookButton.setXLocYLoc(int((width*16)/17-(width/10))-60, int(height/2+height/20)+40)
+    notebookButton.setXLocYLoc(int((width*16)/17-(width/10))-60, int(height/2+height/20)+39)
     notebookButton.setWidthHeight(int(330), int(365))
+    Label("Check Notes", layer3, notebookButton.getXLoc() + int(notebookButton.getWidth()/2), notebookButton.getYLoc() + int(notebookButton.getHeight()/2) + 90, 100, 20)
 
     #initilization of the notebook panel
     notebook = Panel(layer3, layerHeight=2)
@@ -105,7 +120,7 @@ def gameBoard(netConn):
     i=0
     for card in playerCards:
         hand.addImageButton(ImageButton(hand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=hand.getContainer(), object_id="HandIB"+card.getCardName()))
-        if card.getCardCategory() != "people":
+        if card.getCardCategory() == "weapon":
             imageFormat = ".jpg"
         else:
             imageFormat = ".png"
@@ -114,7 +129,13 @@ def gameBoard(netConn):
         i+=1
     
     for character in characterList:
-        characterTokens.append(Image(str(character) +".png", layer2, 0, 0, 30, 30, object_id=character))
+        if clientGame.getMyToken().getTokenCharacter() == character:
+            tokenFileExtension = "mytoken.png"
+        else:
+            tokenFileExtension = ".png"
+        characterTokens.append(Image(str(character) + tokenFileExtension, layer2, 0, 0, 30, 30, object_id=character))
+
+
     
     characterTokens[0].setXLocYLoc(947, 60)
     characterTokens[0].setRowColumn(0, 16)
@@ -135,22 +156,34 @@ def gameBoard(netConn):
     characterTokens[5].setRowColumn(5, 0)
     characterTokens[5].setLocation("outside")
     gameGrid.grid[5][0].setOccupied(1)
+    
+
 
     for x in range(6):
         if (clientGame.getMyToken().getTokenCharacter() == characterTokens[x].getObjectId()):
             myToken = characterTokens[x]
             break
-    gameGrid.enterARoom(characterTokens[5], "lovehotel")
+    # gameGrid.enterARoom(characterTokens[5], "lovehotel")
+
+    if myToken.getObjectId() != clientGame.getTurnOrder()[0].getTokenCharacter():
+        rollLabel.setText(clientGame.getTurnOrder()[0].getTokenCharacter() + "'s Turn")
+    else:
+        rollLabel.setText("Your Turn")
+    threadResults = clientThreads.apply_async(getUpdates, (netConn, updates))
     loopCounter = 0
     while True:
         myTurn = clientGame.getMyTurn()
         if myTurn:
-            endTurnButton.setXLoc(90)
+            endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
             time_delta = clock.tick(60) / 1000.0
         else:
             endTurnButton.setXLoc(width)
             time_delta = clock.tick(60) / 1000.0
         
+        # if not clientUpdate.isAlive():
+        #     clientUpdate = threading.Thread(target=getUpdates, args=(netConn, updates))
+        #     clientUpdate.start()
+
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -158,7 +191,6 @@ def gameBoard(netConn):
                 raise SystemExit
                                    
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
-                
                 if chatInput.getText() != "" and event.type == KEYDOWN and event.key == K_RETURN:
                     netConn.send("game.chat.add:" + chatInput.getText())
                     chatInput.setText("")
@@ -214,27 +246,53 @@ def gameBoard(netConn):
                         if turnEnded[2] == "success":
                             endTurnButton.setXLoc(width)
                             netConn.send("game.update")
-                            clientUpdate = netConn.catch()
-                            clientGame.setTurnOrder(clientUpdate)
+                            # clientUpdate = netConn.catch()
+                            clientGame.setTurnOrder(clientUpdate.getTurnOrder())
                             myTurn = clientGame.getMyTurn()
+                            myRoll = -1
                             turnOrderImages = displayTurnOrder(clientGame.getTurnOrder(), layer1, turnOrderImages)
+                            if myToken.getObjectId() != clientGame.getTurnOrder()[0].getTokenCharacter():
+                                rollLabel.setText(clientGame.getTurnOrder()[0].getTokenCharacter() + "'s Turn")
+                            else:
+                                rollLabel.setText("Your Turn")
 
+                    elif diceButton.getClickedStatus(event):
+                        if myRoll == -1 and myTurn:
+                            myRoll = 100
+                            # myRoll = random.randrange(1,6,1)
+                            rollLabel.setText("You rolled: " + str(myRoll))
+                        elif myTurn:
+                            rollLabel.setText("Current Moves: " + str(myRoll))
+                        else:
+                            rollLabel.setText("You rolled: " + str(myRoll))
 
                     # Moves token
-                    elif myTurn and checkHidden(notebook) and checkHidden(hand) and gameGrid.clickedTile(event, myToken):
+                    elif myTurn and myRoll > 0 and checkHidden(notebook) and checkHidden(hand) and gameGrid.clickedTile(event, myToken):
                         netConn.send("game.move:"+str(myToken.getRow())+"."+str(myToken.getColumn()))
+                        myRoll-=1
+                        rollLabel.setText("Current Moves: " + str(myRoll))
 
-        # if not myTurn and loopCounter >= 50:
-        if loopCounter >= 50:
-            netConn.send("game.update")
-            clientUpdate = netConn.catch()
+        if not myTurn:
+        # if loopCounter >= 50:
+
+            # netConn.send("game.update")
+
+            # clientUpdate = netConn.catch()
+            clientUpdate = threadResults.get()
             tokenUpdates = clientUpdate.getTurnOrder()
             chatLog.addText(clientUpdate.getChatUpdate())
             updatePlayerPositions(characterTokens, tokenUpdates, gameGrid)
             loopCounter = 0
             if tokenUpdates[0].getTokenCharacter() != clientGame.getTurnOrder()[0].getTokenCharacter():
+                print(tokenUpdates)
                 clientGame.setTurnOrder(tokenUpdates)
                 turnOrderImages = displayTurnOrder(clientGame.getTurnOrder(), layer1, turnOrderImages)
+                if myToken.getObjectId() != clientGame.getTurnOrder()[0].getTokenCharacter():
+                    rollLabel.setText(clientGame.getTurnOrder()[0].getTokenCharacter() + "'s Turn")
+                else:
+                    rollLabel.setText("Your Turn")
+            threadResults = clientThreads.apply_async(getUpdates, (netConn, updates))
+
 
 
             

@@ -61,7 +61,7 @@ class GameGrid:
         schoolExits = [104, 179, 180]
         libraryExits = [161, "secret143"]
         hotelExits = [209,303]
-        beachExits = [427, "secret570"]
+        beachExits = [427, "secret571"]
         karaokeExits = [463, 393, 398, 472]
         mangastoreExits = [461, "secret456"]
         tearoomExits = [265, 366]
@@ -70,8 +70,8 @@ class GameGrid:
 
         self.roomExits = [("school", schoolExits), ("library", libraryExits), ("lovehotel", hotelExits), ("beach", beachExits), ("karaoke", karaokeExits), ("mangastore", mangastoreExits), ("tearoom", tearoomExits), ("hotspring", hotspringExits), ("shrine", shrineExits)]
         buttonNumber = -1
-        secretDoors = [72, 143, 456, 570]
-        doors = [78,105,137,155,156,198,233,243,289, 304, 365, 417, 422, 471, 451, 460, 464]
+        secretDoors = [72, 143, 456, 571]
+        doors = [78, 105, 137, 155, 156, 198, 233, 243, 289, 304, 365, 417, 422, 471, 451, 460, 464]
         for row in range(25):
             self.grid.append([])
             for column in range(24):
@@ -167,17 +167,23 @@ class GameGrid:
         checkYMove = token.getColumn() - column
         # If the player accused or is not inside a room, the move is only 1 square away, the move is not diaganol, and the space is not already occupied
         if (token.getLocation() == "outside" and (-2 < checkXMove < 2) and (-2 < checkYMove < 2) and (abs(checkXMove) + abs(checkYMove) < 2) and not gridLocation.getOccupied()):
-            # Free the current space that player occupied
-            self.grid[token.getRow()][token.getColumn()].setOccupied(0)
             # If player is moving along a path and not entering a room, move them and occupy new space
             if (gridLocation.getLocation() == "outside"):
+                # Free the current space that player occupied
+                self.grid[token.getRow()][token.getColumn()].setOccupied(0)
                 token.setXLocYLoc(gridLocation.getXLoc(), gridLocation.getYLoc())
                 token.setRowColumn(row, column)
                 gridLocation.setOccupied(1)
                 moved = True
             # If player is moving into a room, find the first non-occupied space in that room and move to it
             else:
-                moved = self.enterARoom(token, gridLocation.getLocation())
+                for room in self.roomExits:
+                    for exits in room[1]:
+                        if room[0] == gridLocation.getLocation() and str(self.grid[token.getRow()][token.getColumn()].getText()) == str(exits):
+                            # Free the current space that player occupied
+                            self.grid[token.getRow()][token.getColumn()].setOccupied(0)
+                            moved = self.enterARoom(token, gridLocation.getLocation())
+                            break
         else:
             moved = self.exitARoom(token, row, column)
             

@@ -3,7 +3,7 @@ import pygame_gui
 from pygame.locals import *
 
 class TextBox:
-    def __init__(self, manager, text="", xLoc=15, yLoc=510, width=343, height=200, container="", layer=1, objectId="chatlog"):
+    def __init__(self, manager, text="", xLoc=15, yLoc=680, width=341, height=200, container="", layer=1, objectId="chatlog"):
         self.xLoc = xLoc
         self.yLoc = yLoc
         self.width = width
@@ -52,6 +52,8 @@ class TextBox:
         return self.object_id
     def getTextBox(self):
         return self.textBox
+    def getFocus(self):
+        return self.focus
 
     def setRow(self, row):
         self.row = row
@@ -98,6 +100,9 @@ class TextBox:
         self.width = width
         self.height = height
         self.setObjectId()
+
+    def toggleFocus(self):
+        self.focus = not self.focus
 
     def update(self, time_delta):
         self.textBox.update(time_delta)
