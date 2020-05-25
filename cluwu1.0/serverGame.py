@@ -47,8 +47,7 @@ class serverGame:
             self.playerTurnOrder.append(player)
             player.sendClientAString("game.turn:success")
 
-
-    def getChat(self):
+    def getGameChat(self):
         return self.chat
 
 

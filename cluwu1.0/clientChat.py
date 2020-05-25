@@ -4,5 +4,5 @@ class clientChat:
     def __init__(self, htmlChatIn)
     self.htmlChatline = htmlCharIn
 
-    def getHtmlChat:
-        return htmlChatline
+    def getHtmlChat(self):
+        return self.htmlChatline

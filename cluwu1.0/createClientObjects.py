@@ -8,7 +8,7 @@ from serverGame import *
 from clientGame import *
 from serverCard import *
 from clientCard import *
-
+from serverChat import *
 
 def createClientPlayer(serverPlayer):
     clientPlayer = ClientPlayer(serverPlayer.getReady(), serverPlayer.getMyToken(), serverPlayer.getMyCards(), serverPlayer.getMyTurn(), serverPlayer.getLostGame())
@@ -48,12 +48,19 @@ def createClientGameInit(serverGame, player):
 
 def updateClientGame(serverGame):
     clientTurnOrder = []
+    print("before the string")
     htmlChatLine = ""
+    print("after the string")
     for players in serverGame.getPlayerTurnOrder():
+        print("in loop")
         clientTurnOrder.append(createClientToken(players.getMyToken()))
-    for chatlines in serverGame.getChatlog():
+        print("in ploop")
+    for chatlines in serverGame.getGameChat().getChatlog():
+        print("in loop2")
         htmlChatLine + "<b>" +  str(chatlines[0].getMyToken().getTokeCharacter()) + "</b> " + str(chatlines[1]) + "<br>"
+    print("after before")
     updateClientGame = UpdateClientGame(clientTurnOrder, htmlChatLine)
+    print("after")
     return updateClientGame
     
 

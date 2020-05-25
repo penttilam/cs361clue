@@ -161,6 +161,14 @@ def moveTokenCommand(player, gameList, block2):
     arguments = block2.split(".")
     player.getMyToken().setTokenXLocYLoc(arguments[0], arguments[1])
     player.sendClientAString("game.update:confirmed")
+    for games in gameList:
+        for players in games.getPlayerTurnOrder():
+            if players == player:
+                game = games
+                break
+    for players in game.getPlayerTurnOrder():
+        updateGameCommand(players, gameList)
+        
 
 
 def turnCommand(player, gameList):
@@ -172,6 +180,11 @@ def turnCommand(player, gameList):
 
 def rollCommand(player, gameList):
     pass
+
+
+def chatCommand(player, gameList, argumentInput):
+    player.sendClientAString("I got the shit")
+
 
 
 def gameCommand(block1, block2, player, lobbyList, gameList):
@@ -187,8 +200,8 @@ def gameCommand(block1, block2, player, lobbyList, gameList):
         turnCommand(player, gameList)
     elif arguments[1] == "roll":
         rollCommand(player, gameList)
-#    elif arguments[1] == "chat":
-#        charCommand(player, gameList, argument[2])
+    elif arguments[1] == "chat":
+        chatCommand(player, gameList, arguments[2])
 
 
 

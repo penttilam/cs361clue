@@ -21,15 +21,16 @@ class ClientGameInit:
         else:
             return False
 
-class updateClientGame:
+class UpdateClientGame:
     def __init__(self, turnIn, chatLineIn):
+        print("this is in init")
         self.turnOrder = turnIn
         self.chat = chatLineIn
 
-    def getTurnOrder(self, turnOrder):
+    def getTurnOrder(self):
         return self.turnOrder
 
-    def getChatUpdate(self, chatLineIn):
+    def getChatUpdate(self):
         return self.chat
 
 
