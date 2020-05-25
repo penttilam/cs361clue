@@ -1,7 +1,6 @@
 import pygame
 import pygame_gui
 import time
-# import sys; sys.path.insert(0, "..")
 from pygame.locals import *
 from pygame import surface
 from clientPlayer import ClientPlayer
@@ -13,7 +12,9 @@ from ImageButton import ImageButton
 from Image import Image
 from Panel import Panel
 from GameGrid import GameGrid
-from gameBoard import gameBoard
+from gameBoard import GameBoard
+from Label import Label
+from InputBox import InputBox
 
 #runs main menu
 def OpenMainMenu():
@@ -24,21 +25,17 @@ def OpenMainMenu():
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
-    menuLabelX = int(width/2-width/20)
-    menuLabelY = int(height/2-height/5)
-    menuLabelW = int(width/10)
-    menuLabelH = int(height/10)
-    pygame_gui.elements.ui_label.UILabel(pygame.Rect((menuLabelX, menuLabelY), (menuLabelW, menuLabelH)), text="Main Menu", manager=manager)
+    mainMenu = Label("Main Menu", manager)
+    mainMenu.setXLocYLoc(int(width/2-width/20), int(height/2-height/5))
+    mainMenu.setWidthHeight(int(width/10), int(height/10))
 
     hostButton = Button('Host', manager)
     hostButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
     hostButton.setWidthHeight(int(width/10), int(height/20))
     
-    
     joinButton = Button('Join', manager)
     joinButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/20))
     joinButton.setWidthHeight(int(width/10), int(height/20))
-    
     
     quitButton = Button("Quit", manager, shortcutKey=K_ESCAPE)
     quitButton.setXLocYLoc(int(width/2-width/20), int(height/2))
@@ -82,18 +79,14 @@ def hostGame():
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
-    gameNameLabelX = int(width/2-width/10)
-    gameNameLabelY = int(height/2-height/5)
-    gameNameLabelW = int(width/5)
-    gameNameLabelH = int(height/20)
-    pygame_gui.elements.ui_label.UILabel(relative_rect=pygame.Rect((gameNameLabelX, gameNameLabelY), (gameNameLabelW, gameNameLabelH)), text="Enter name for your game", manager=manager)
+    gameNameLabel = Label("Enter name for your game", manager)
+    gameNameLabel.setXLocYLoc(int(width/2-width/10), int(height/2-height/5))
+    gameNameLabel.setWidthHeight(int(width/5), int(height/20))
 
-    gameNameTextBoxX = int(width/2-width/10)
-    gameNameTextBoxY = int(height/2-width/6)
-    gameNameTextBoxW = int(width/5)
-    gameNameTextBoxH = int(height/20)
-    gameName = pygame_gui.elements.ui_text_entry_line.UITextEntryLine(relative_rect=pygame.Rect((gameNameTextBoxX, gameNameTextBoxY), (gameNameTextBoxW, gameNameTextBoxH)), manager=manager)
-    gameName.focus()
+    gameName = InputBox(manager)
+    gameName.setXLocYLoc(int(width/2-width/10), int(height/2-width/6))
+    gameName.setWidthHeight(int(width/5), int(height/20))
+    gameName.toggleFocus()
 
     startButton = Button("Start Game", manager, shortcutKey=K_RETURN)
     startButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
@@ -113,14 +106,15 @@ def hostGame():
                 if backButton.getClickedStatus(event):
                     return OpenMainMenu()
 
-                if startButton.getClickedStatus(event) and gameName.get_text() != "":
-                    gameNameCamel = gameName.get_text()
-                    if " " in gameName.get_text():
-                        gameNameCamel = gameName.get_text().replace(" ", "_")
+                if startButton.getClickedStatus(event) and gameName.getText() != "":
+                    gameNameCamel = gameName.getText()
+                    if " " in gameName.getText():
+                        gameNameCamel = gameName.getText().replace(" ", "_")
                     if "." in gameNameCamel:
                         gameNameCamel = gameNameCamel.replace(".", "*")
-                    print(netConn.send("lobby.new:"+gameNameCamel))
-                    return startLobby(gameName.get_text(), userId)
+                    netConn.send("lobby.new:"+gameNameCamel)
+                    netConn.catch()
+                    return startLobby(gameName.getText(), userId)
 
         # Redraw the background
         windowSurface.blit(background, (0, 0))
@@ -148,7 +142,7 @@ def startGameList():
     gameSelectListW = width/5
     gameSelectListH = height/5
     netConn.send("lobby.lobbies")
-
+    netConn.catch()
     gameSelectListActiveGamesList = netConn.catch()
 
     lobbyList = []
@@ -193,7 +187,8 @@ def startGameList():
                     else:
                         gameName = gameSelectList.get_single_selection().split(' ')[0]
 
-                    joinResponse = netConn.send("lobby.join:"+gameName)
+                    netConn.send("lobby.join:"+gameName)
+                    joinResponse = netConn.catch()
                     action = joinResponse.split(":")
                     command = action[2].split(".")
 
@@ -259,7 +254,7 @@ def startLobby(gameName, userId):
     playerStatusW = int(width/7)
     playerStatusH = int(height/20)
     netConn.send("lobby.update")
-    
+    netConn.catch()
     currentLobbyPlayerStatus = netConn.catch()
     playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify(), relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
@@ -272,17 +267,19 @@ def startLobby(gameName, userId):
         tmp = currentLobbyPlayerStatus
 
         netConn.send("lobby.update")
+        netConn.catch()
         currentLobbyPlayerStatus = netConn.catch()
 
         if currentLobbyPlayerStatus.getStartGame():
-            gameBoard(netConn)
-
+            gameBoard = GameBoard(netConn)
+            gameBoard.gameBoard()
         #if player number changes kill the text box and create a new one with updated information.
         if not currentLobbyPlayerStatus == tmp:
             playerStatus.kill()
             playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify(),relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
 
-        isHost = netConn.send("lobby.host").split(":")
+        netConn.send("lobby.host")
+        isHost = netConn.catch().split(":")
         
         if isHost[2] == "True":
             startButtonX = int(width/17)
@@ -300,12 +297,16 @@ def startLobby(gameName, userId):
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
                 if startButton.getClickedStatus(event):
                     netConn.send("lobby.start")
-                    gameBoard(netConn)
+                    netConn.catch()
+                    
+                    gameBoard = GameBoard(netConn)
+                    gameBoard.gameBoard()
 
                 #events for ready button
                 elif readyButton.getClickedStatus(event):
                     #if player presses the ready button
                     netConn.send("lobby.ready")
+                    netConn.catch()
                     # netConn.send("lobby.passCards")
                     #change color from red to green and back when button is pushed
                     if readyButton.getText() == "Not Ready":
@@ -319,6 +320,7 @@ def startLobby(gameName, userId):
                         width = 1000
                         height = 1000
                         netConn.send("lobby.leave")
+                        netConn.catch()
                         return OpenMainMenu()
 
             # Update events based on clock ticks
@@ -368,8 +370,11 @@ def splash():
 
 def testingFunction():
     netConn.send("lobby.new:TRASH")
+    netConn.catch()
     netConn.send("lobby.start")
-    gameBoard(netConn)
+    netConn.catch()
+    gameBoard = GameBoard(netConn)
+    gameBoard.gameBoard()
 
 #initialize game screen
 pygame.init()
@@ -393,7 +398,7 @@ clock = pygame.time.Clock()
 
 # TESTING 
 testingFunction()
-#run the program
+# run the program
 splash()
 
 print("print after splash :D ")
