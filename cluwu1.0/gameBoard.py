@@ -1,3 +1,4 @@
+"gameBoard contains the functions that control player movement and display of pertinent game items"
 import pygame
 import pygame_gui
 import random
@@ -19,8 +20,8 @@ from clientChat import *
 from Label import Label
 import threading
 import time
-from multiprocessing.pool import ThreadPool
-
+WIDTH = 1680
+HEIGHT = 900
 
 class GameBoard:
     def __init__(self, netConn):
@@ -32,93 +33,84 @@ class GameBoard:
         self.turnOrderImages = []
         self.clientGame = None
         random.seed()
-        self.width = 1680
-        self.height = 900
-        self.hiddenPanelLocation = self.width
+        self.hiddenPanelLocation = WIDTH
         self.rollLabel = None
         self.netConn = netConn
         self.clientUpdate = UpdateClientGame(None, None)
 
     def gameBoard(self):
         clock = pygame.time.Clock()
-        updates = 0
-        windowSurface = pygame.display.set_mode((self.width, self.height))
+        windowSurface = pygame.display.set_mode((WIDTH, HEIGHT))
         clientThreads = threading.Thread(target=self.getUpdates, args=(None, None))
 
         self.netConn.send("game.create")
         self.netConn.catch()
         self.clientGame = self.netConn.catch()
-        
         clientThreads.start()
-
         print("ClientGame:")
         print(self.clientGame)
-        
-        # List of managers used to set themes
-        layer0 = pygame_gui.UIManager((self.width, self.height), './tileTheme.json')
-        self.managerList.append(layer0)
-        layer1 = pygame_gui.UIManager((self.width, self.height), './ourTheme.json')
-        self.managerList.append(layer1)
 
-        layer2 = pygame_gui.UIManager((self.width, self.height), './panelTheme.json')
+        # List of managers used to set themes
+        layer0 = pygame_gui.UIManager((WIDTH, HEIGHT), './tileTheme.json')
+        self.managerList.append(layer0)
+        layer1 = pygame_gui.UIManager((WIDTH, HEIGHT), './ourTheme.json')
+        self.managerList.append(layer1)
+        layer2 = pygame_gui.UIManager((WIDTH, HEIGHT), './panelTheme.json')
         self.managerList.append(layer2)
-        layer3 = pygame_gui.UIManager((self.width, self.height), './panelTheme.json')
+        layer3 = pygame_gui.UIManager((WIDTH, HEIGHT), './panelTheme.json')
         self.managerList.append(layer3)
-        
+
         self.displayTurnOrder(self.clientGame.getTurnOrder(), layer1, initial=1)
         self.chatLog = TextBox(layer1)
         chatInput = InputBox(layer1)
 
-        self.gameGrid = GameGrid(self.width, self.height, layer0)
-        Image('board.png', layer0, 0, 0, self.width, self.height)
+        self.gameGrid = GameGrid(WIDTH, HEIGHT, layer0)
+        Image('board.png', layer0, 0, 0, WIDTH, HEIGHT)
 
         # Button to display player's hand of cards
         handButton = ImageButton(layer3, imageFile= 'weebcard.png', buttonText=" ")
-        handButton.setXLocYLoc(int((self.width*16)/17-(self.width/10)), int(self.height/4) - 60)
+        handButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)), int(HEIGHT/4) - 60)
         handButton.setWidthHeight(int(142), int(180))
         Label("Look at Hand", layer1, handButton.getXLoc(), handButton.getYLoc() + 180, 142, 20)
 
         # Button to roll the dice
         diceButton = ImageButton(layer0, imageFile='dice.png', buttonText=" ")
-        diceButton.setXLocYLoc(int((self.width*16)/17-(self.width/10)), int(self.height/4)+180)
+        diceButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)), int(HEIGHT/4)+180)
         diceButton.setWidthHeight(int(120), int(120))
         Label("Roll", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 100, 142, 20)
         self.rollLabel = Label("Current Moves: 0", layer1, diceButton.getXLoc(), diceButton.getYLoc() - 20, 142, 20)
         myRoll = -1
         # End turn Button
-        endTurnButton = Button("End turn", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 40 , 90, 30)
-        
+        endTurnButton = Button("End turn", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 40, 90, 30)
+
         # Button to display the player's notebook
-        # notebookButton = Button('Notebook', layer3)
         notebookButton = ImageButton(layer3, imageFile='cluwuNotebook.png', buttonText=" ")
-        notebookButton.setXLocYLoc(int((self.width*16)/17-(self.width/10))-70, int(self.height/2+self.height/20)+34)
+        notebookButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10))-70, int(HEIGHT/2+HEIGHT/20)+34)
         notebookButton.setWidthHeight(int(450), int(475))
         notebookButton.getButton().setManager(layer0)
-        # Label("Check Notes", layer3, notebookButton.getXLoc() + int(notebookButton.getWidth()/2), notebookButton.getYLoc() + int(notebookButton.getHeight()/2) + 90, 100, 20)
 
         #initilization of the notebook panel
         notebook = Panel(layer3, layerHeight=2)
-        notebook.setXLocYLoc(int(self.width), int(self.height/8))
-        notebook.setWidthHeight(int(self.width/4), int(3*self.height/4))
+        notebook.setXLocYLoc(int(WIDTH), int(HEIGHT/8))
+        notebook.setWidthHeight(int(WIDTH/4), int(3*HEIGHT/4))
         notebook.addImage(Image("clueNotepad.png", layer3, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
-        notebook.setVisibleLocation(int((self.width*3)/8))
-        notebook.setHiddenLocation(self.width)
+        notebook.setVisibleLocation(int((WIDTH*3)/8))
+        notebook.setHiddenLocation(WIDTH)
         # Creates a Button object to allow interaction with checkboxe buttons
         checkBoxButton = createNotebook(notebook)
         characterList = ["scarlet", "white", "mustard", "green", "peacock", "plum"]
- 
-        # playerCards = [("scarlet", "Card"),("white", "Card"),("mustard", "Card"),("green", "Card"),("peacock", "Card"),("plum", "Card")]
+
         self.playerCards = self.clientGame.getMyCards()
         #initilization of the hand panel
         hand = Panel(layer3, layerHeight=2)
-        hand.setXLocYLoc(int(self.width), int(self.height/3))
+        hand.setXLocYLoc(int(WIDTH), int(HEIGHT/3))
         hand.setWidthHeight(len(self.playerCards)*142 + 20 + 10*len(self.playerCards), 215)
-        hand.setVisibleLocation(int(self.width/2-hand.getWidth()/2))
-        hand.setHiddenLocation(self.width)
-        
+        hand.setVisibleLocation(int(WIDTH/2-hand.getWidth()/2))
+        hand.setHiddenLocation(WIDTH)
+
         cardXLoc = -142
         buffer = 10
-        i=0
+        i = 0
         for card in self.playerCards:
             hand.addImageButton(ImageButton(hand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=hand.getContainer(), object_id="HandIB"+card.getCardName()))
             if card.getCardCategory() == "weapon":
@@ -127,7 +119,7 @@ class GameBoard:
                 imageFormat = ".png"
             hand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
             cardXLoc += 142 + buffer
-            i+=1
+            i += 1
         
         for character in characterList:
             if self.clientGame.getMyToken().getTokenCharacter() == character:
@@ -161,20 +153,19 @@ class GameBoard:
                 self.myToken = self.characterTokens[x]
                 break
 
-        # gameGrid.enterARoom(characterTokens[5], "lovehotel")
-
-        if self.myToken.getObjectId() != self.clientGame.getTurnOrder()[0].getTokenCharacter():
-            self.rollLabel.setText(self.clientGame.getTurnOrder()[0].getTokenCharacter() + "'s Turn")
+        currentTurnPlayer = self.clientGame.getTurnOrder()[0].getTokenCharacter()
+        if self.myToken.getObjectId() != currentTurnPlayer:
+            self.rollLabel.setText(currentTurnPlayer + "'s Turn")
         else:
             self.rollLabel.setText("Your Turn")
 
         while True:
-            myTurn = self.clientGame.getMyTurn()
+            myTurn = currentTurnPlayer == self.myToken.getObjectId()
             if myTurn:
                 endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
                 time_delta = clock.tick(60) / 1000.0
             else:
-                endTurnButton.setXLoc(self.width)
+                endTurnButton.setXLoc(WIDTH)
                 time_delta = clock.tick(60) / 1000.0
             
             clientThreads.join(1/1000)
@@ -244,7 +235,7 @@ class GameBoard:
                         # End player turn
                         elif endTurnButton.getClickedStatus(event):
                             self.netConn.send("game.turn")
-                            endTurnButton.setXLoc(self.width)
+                            endTurnButton.setXLoc(WIDTH)
                             myRoll = -1
 
                         elif diceButton.getClickedStatus(event):
@@ -260,7 +251,7 @@ class GameBoard:
                         # Moves token
                         elif myTurn and myRoll > 0 and self.checkHidden(notebook) and self.checkHidden(hand) and self.gameGrid.clickedTile(event, self.myToken):
                             self.netConn.send("game.move:"+str(self.myToken.getRow())+"."+str(self.myToken.getColumn()))
-                            myRoll-=1
+                            myRoll -= 1
                             self.rollLabel.setText("Current Moves: " + str(myRoll))
             
             # Update events based on clock ticks
@@ -273,25 +264,26 @@ class GameBoard:
 
     def processClientUpdates(self):
         tokenUpdates = self.clientUpdate.getTurnOrder()
+        currentTurnCharacter = self.clientGame.getTurnOrder()[0].getTokenCharacter()
         # self.chatLog.addText(self.clientUpdate.getChatUpdate())
         self.updateTokenPositions(tokenUpdates)
-        if tokenUpdates[0].getTokenCharacter() != self.clientGame.getTurnOrder()[0].getTokenCharacter():
+        if tokenUpdates[0].getTokenCharacter() != currentTurnCharacter:
             self.clientGame.setTurnOrder(tokenUpdates)
             self.displayTurnOrder(self.clientGame.getTurnOrder(), self.managerList[1])
-            if self.myToken.getObjectId() != self.clientGame.getTurnOrder()[0].getTokenCharacter():
-                self.rollLabel.setText(self.clientGame.getTurnOrder()[0].getTokenCharacter() + "'s Turn")
+            if self.myToken.getObjectId() != currentTurnCharacter:
+                self.rollLabel.setText(currentTurnCharacter + "'s Turn")
             else:
                 self.rollLabel.setText("Your Turn")
 
 
     def hidePanel(self, panel):
         panel.setXLoc(panel.getHiddenLocation())
-            
+
     def showPanel(self, panel):
         panel.setXLoc(panel.getVisibleLocation())
 
     def checkHidden(self, panel):
-        return (panel.getXLoc() == panel.getHiddenLocation())
+        return panel.getXLoc() == panel.getHiddenLocation()
 
     def displayTurnOrder(self, turnOrder, manager, initial=0):
         yLoc = 0
@@ -313,14 +305,16 @@ class GameBoard:
     def updateTokenPositions(self, tokenUpdates):
         for player in self.characterTokens:
             for token in tokenUpdates:
-                if (player.getObjectId() == token.getTokenCharacter()):
-                    self.gameGrid.grid[player.getRow()][player.getColumn()].setOccupied(0)
-                    player.setXLocYLoc(self.gameGrid.grid[int(token.getTokenXLoc())][int(token.getTokenYLoc())].getXLoc(), self.gameGrid.grid[int(token.getTokenXLoc())][int(token.getTokenYLoc())].getYLoc())
-                    player.setRowColumn(int(token.getTokenXLoc()), int(token.getTokenYLoc()))
-                    self.gameGrid.grid[player.getRow()][player.getColumn()].setOccupied(1)
+                if player.getObjectId() == token.getCharacter():
+                    oldLocation = self.gameGrid.grid[player.getRow()][player.getColumn()]
+                    oldLocation.setOccupied(0)
+                    newLoc = self.gameGrid.grid[token.getRow()][token.getColumn()]
+                    player.setXLocYLoc(newLoc.getXLoc(), newLoc.getYLoc())
+                    player.setRowColumn(token.getRow(), token.getColumn())
+                    newLoc.setOccupied(1)
 
     def getUpdates(self, arg1, arg2):
         tempCatch = self.netConn.catch()
-        while (type(tempCatch) == type("")):
+        while type(tempCatch) == type(""):
             tempCatch = self.netConn.catch()
         self.clientUpdate = tempCatch

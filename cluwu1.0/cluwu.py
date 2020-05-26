@@ -6,7 +6,6 @@ from pygame import surface
 from clientPlayer import ClientPlayer
 from clientLobby import ClientLobby
 from clientNetwork import *
-from notebook import createNotebook
 from Button import Button
 from ImageButton import ImageButton
 from Image import Image
@@ -15,33 +14,50 @@ from GameGrid import GameGrid
 from gameBoard import GameBoard
 from Label import Label
 from InputBox import InputBox
-from resources import *
 from TextBox import *
+
+#initialize game screen
+pygame.init()
+
+pygame.display.set_caption('cluwu')
+#set the icon
+icon = pygame.image.load('images/cluwuIcon.png')
+pygame.display.set_icon(icon)
+
+#set up network connection
+netConn = Network()
+
+#screen set up
+WIDTH = 1680
+HEIGHT = 900
+
+#create pygame area to add splash image to
+windowSurface = pygame.display.set_mode((WIDTH, HEIGHT))
+clock = pygame.time.Clock()
 
 #runs main menu
 def OpenMainMenu():
     #pygame surface
-    windowSurface = pygame.display.set_mode((width, height))
-    manager = pygame_gui.UIManager((width, height), theme_path='./ourTheme.json')
+    manager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./ourTheme.json')
 
-    background = pygame.Surface((width, height))
+    background = pygame.Surface((WIDTH, HEIGHT))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
     mainMenu = Label("Main Menu", manager)
-    mainMenu.setXLocYLoc(int(width/2-width/20), int(height/2-height/5))
-    mainMenu.setWidthHeight(int(width/10), int(height/10))
+    mainMenu.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(HEIGHT/2-HEIGHT/5))
+    mainMenu.setWidthHeight(int(WIDTH/10), int(HEIGHT/10))
 
     hostButton = Button('Host', manager)
-    hostButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
-    hostButton.setWidthHeight(int(width/10), int(height/20))
+    hostButton.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(height/2-height/10))
+    hostButton.setWidthHeight(int(WIDTH/10), int(height/20))
     
     joinButton = Button('Join', manager)
-    joinButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/20))
-    joinButton.setWidthHeight(int(width/10), int(height/20))
+    joinButton.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(height/2-height/20))
+    joinButton.setWidthHeight(int(WIDTH/10), int(height/20))
     
     quitButton = Button("Quit", manager, shortcutKey=K_ESCAPE)
-    quitButton.setXLocYLoc(int(width/2-width/20), int(height/2))
-    quitButton.setWidthHeight(int(width/10), int(height/20))
+    quitButton.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(height/2))
+    quitButton.setWidthHeight(int(WIDTH/10), int(height/20))
 
     manager.draw_ui(windowSurface)
 
@@ -74,29 +90,28 @@ def OpenMainMenu():
 def hostGame():
     #pygame surface
     managerList = []
-    windowSurface = pygame.display.set_mode((width, height))
-    manager = pygame_gui.UIManager((width, height), theme_path='./ourTheme.json')
+    manager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./ourTheme.json')
     managerList.append(manager)    
 
-    background = pygame.Surface((width, height))
+    background = pygame.Surface((WIDTH, HEIGHT))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
     gameNameLabel = Label("Enter name for your game", manager)
-    gameNameLabel.setXLocYLoc(int(width/2-width/10), int(height/2-height/5))
-    gameNameLabel.setWidthHeight(int(width/5), int(height/20))
+    gameNameLabel.setXLocYLoc(int(WIDTH/2-WIDTH/10), int(HEIGHT/2-HEIGHT/5))
+    gameNameLabel.setWidthHeight(int(WIDTH/5), int(HEIGHT/20))
 
     gameName = InputBox(manager)
-    gameName.setXLocYLoc(int(width/2-width/10), int(height/2-width/6))
-    gameName.setWidthHeight(int(width/5), int(height/20))
+    gameName.setXLocYLoc(int(WIDTH/2-WIDTH/10), int(HEIGHT/2-WIDTH/6))
+    gameName.setWidthHeight(int(WIDTH/5), int(HEIGHT/20))
     gameName.toggleFocus()
 
     startButton = Button("Start Game", manager, shortcutKey=K_RETURN)
-    startButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/10))
-    startButton.setWidthHeight(int(width/10), int(height/20))
+    startButton.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(HEIGHT/2-HEIGHT/10))
+    startButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
     
     backButton = Button("Back", manager, shortcutKey=K_ESCAPE)
-    backButton.setXLocYLoc(int(width/2-width/20), int(height/2-height/20))
-    backButton.setWidthHeight(int(width/10), int(height/20))
+    backButton.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(HEIGHT/2-HEIGHT/20))
+    backButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
 
     while True:
         time_delta = clock.tick(60)/1000.0
@@ -116,7 +131,7 @@ def hostGame():
                         gameNameCamel = gameNameCamel.replace(".", "*")
                     netConn.send("lobby.new:"+gameNameCamel)
                     netConn.catch()
-                    return startLobby(gameName.getText(), userId)
+                    return startLobby(gameName.getText())
 
         # Redraw the background
         windowSurface.blit(background, (0, 0))
@@ -133,16 +148,16 @@ def hostGame():
 def startGameList():
     #pygame surface
     managerList = []
-    manager = pygame_gui.UIManager((width, height), theme_path='./ourTheme.json')
+    manager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./ourTheme.json')
     managerList.append(manager)
 
-    background = pygame.Surface((width, height))
+    background = pygame.Surface((WIDTH, HEIGHT))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
-    gameSelectListX = int(width/2-width/10)
-    gameSelectListY = int(height/2-height/5)
-    gameSelectListW = int(width/5)
-    gameSelectListH = int(height/5)
+    gameSelectListX = int(WIDTH/2-WIDTH/10)
+    gameSelectListY = int(HEIGHT/2-HEIGHT/5)
+    gameSelectListW = int(WIDTH/5)
+    gameSelectListH = int(HEIGHT/5)
     netConn.send("lobby.lobbies")
     netConn.catch()
     gameSelectListActiveGamesList = netConn.catch()
@@ -157,18 +172,18 @@ def startGameList():
 
     # Join Game button
     joinButton = Button('Join Game', manager)
-    joinButton.setXLocYLoc(int(width/2-width/20), int(height/2))
-    joinButton.setWidthHeight(int(width/10), int(height/20))
+    joinButton.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(HEIGHT/2))
+    joinButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
 
     # Refresh button
     refreshButton = Button('Refresh', manager)
-    refreshButton.setXLocYLoc(int(width/2-width/20), int(height/2+height/20))
-    refreshButton.setWidthHeight(int(width/10), int(height/20))
+    refreshButton.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(HEIGHT/2+HEIGHT/20))
+    refreshButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
 
     # Back button
     backButton = Button('Back', manager, shortcutKey=K_ESCAPE)
-    backButton.setXLocYLoc(int(width/2-width/20), int(height/2+height/10))
-    backButton.setWidthHeight(int(width/10), int(height/20))
+    backButton.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(HEIGHT/2+HEIGHT/10))
+    backButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
 
     while True:
         time_delta = clock.tick(60)/1000.0
@@ -181,8 +196,9 @@ def startGameList():
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
                 #events for join button
                 if joinButton.getClickedStatus(event):
-                    #send gameSelectList.get_single_selection() to server, make connection to the game lobby
-                    #if game list selection isn't valid refresh the list
+                    # send gameSelectList.get_single_selection() to server,
+                    # make connection to the game lobby
+                    # if game list selection isn't valid refresh the list
                     if not gameSelectList.get_single_selection():
                         return startGameList()
                     #if it does not throw an error make a game of this name
@@ -196,7 +212,7 @@ def startGameList():
 
                     #if success start game
                     if command[1] == "success":
-                        startLobby(gameName, userId)
+                        startLobby(gameName)
                     #otherwise refresh the lobby list
                     else:
                         return startGameList()
@@ -219,42 +235,39 @@ def startGameList():
                 each.draw_ui(windowSurface)
         pygame.display.update()
 
-def startLobby(gameName, userId):
-    width = 1680
-    height = 900
-    
+def startLobby():
+
     # List of managers used to set themes
     managerList = []
-    manager = pygame_gui.UIManager((width, height), theme_path='./ourTheme.json')
+    manager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./ourTheme.json')
     managerList.append(manager)
-    rdyManager = pygame_gui.UIManager((width, height), theme_path='./rdyTheme.json')
+    rdyManager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./rdyTheme.json')
     managerList.append(rdyManager)
-    notRdyManager = pygame_gui.UIManager((width, height), theme_path='./notRdyTheme.json')
+    notRdyManager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./notRdyTheme.json')
     managerList.append(notRdyManager)
 
     #pygame surface
-    windowSurface = pygame.display.set_mode((width, height))
-    Image('board.png', manager, 0, 0, width, height)
+    Image('board.png', manager, 0, 0, width, HEIGHT)
     
     # Button that starts the game when all players are ready, NOT visible to peons
     startButton = Button('Start Game', manager)
-    startButton.setXLocYLoc(int(width), int(height/2-height/20))
-    startButton.setWidthHeight(int(width/10), int(height/20))
+    startButton.setXLocYLoc(int(WIDTH), int(HEIGHT/2-HEIGHT/20))
+    startButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
 
     # Button that tells the server if player is ready and displays visuals to the player
     readyButton = Button('Not Ready', notRdyManager)
-    readyButton.setXLocYLoc(int(width/17), int(height/2))
-    readyButton.setWidthHeight(int(width/10), int(height/20))
+    readyButton.setXLocYLoc(int(WIDTH/17), int(HEIGHT/2))
+    readyButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
 
     backButton = Button('Back', manager)
-    backButton.setXLocYLoc(int(width/17), int(height/2+height/20))
-    backButton.setWidthHeight(int(width/10), int(height/20))
+    backButton.setXLocYLoc(int(WIDTH/17), int(HEIGHT/2+HEIGHT/20))
+    backButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
 
     #text box to display player ids and ready status 
-    playerStatusX = int((width*16)/17-(width/9))
-    playerStatusY = int(height/4)
-    playerStatusW = int(width/7)
-    playerStatusH = int(height/20)
+    playerStatusX = int((WIDTH*16)/17-(WIDTH/9))
+    playerStatusY = int(HEIGHT/4)
+    playerStatusW = int(WIDTH/7)
+    playerStatusH = int(HEIGHT/20)
     netConn.send("lobby.update")
     netConn.catch()
     currentLobbyPlayerStatus = netConn.catch()
@@ -279,13 +292,12 @@ def startLobby(gameName, userId):
         if not currentLobbyPlayerStatus == tmp:
             playerStatus.kill()
             playerStatus = TextBox(manager, currentLobbyPlayerStatus.htmlStringify(), playerStatusX, playerStatusY, playerStatusW, playerStatusH, wrapToHeight=True)
-            
-            
+
         netConn.send("lobby.host")
         isHost = netConn.catch().split(":")
         print("Caught " + str(isHost[0]) + " " + str(isHost[1]))
         if isHost[2] == "True":
-            startButtonX = int(width/17)
+            startButtonX = int(WIDTH/17)
             startButton.setXLoc(startButtonX)
             if currentLobbyPlayerStatus.getLobbyReadyStatus() and currentLobbyPlayerStatus.getNumberOfPlayers() > 0:
                 startButton.enable()
@@ -301,7 +313,6 @@ def startLobby(gameName, userId):
                 if startButton.getClickedStatus(event):
                     netConn.send("lobby.start")
                     netConn.catch()
-                    
                     gameBoard = GameBoard(netConn)
                     gameBoard.gameBoard()
 
@@ -310,7 +321,6 @@ def startLobby(gameName, userId):
                     #if player presses the ready button
                     netConn.send("lobby.ready")
                     netConn.catch()
-                    # netConn.send("lobby.passCards")
                     #change color from red to green and back when button is pushed
                     if readyButton.getText() == "Not Ready":
                         readyButton.setText("Ready")
@@ -320,11 +330,9 @@ def startLobby(gameName, userId):
                         readyButton.setManager(notRdyManager)
 
                 elif backButton.getClickedStatus(event):
-                        width = 1000
-                        height = 1000
-                        netConn.send("lobby.leave")
-                        netConn.catch()
-                        return OpenMainMenu()
+                    netConn.send("lobby.leave")
+                    netConn.catch()
+                    return OpenMainMenu()
 
             # Update events based on clock ticks
             for each in managerList:
@@ -356,10 +364,10 @@ def splash():
     while True:
         # Track the mouse movement
         mousePos = pygame.mouse.get_pos()
-        
+
         # Add splash screen
-        splash = addImage('images/splashScreen.jpg', 1, windowSurface, width/2, height/2, width, height)
-        
+        splash = addImage('images/splashScreen.jpg', 1, windowSurface, (WIDTH2, HEIGHT/2, width, HEIGHT)
+
         for event in pygame.event.get():
             # Quit when window X button is clicked
             if event.type == QUIT:
@@ -381,28 +389,10 @@ def testingFunction():
 
 # packae = pygame_gui.PackageResource(pygame_gui.data, 'ourTheme.json')
 
-#initialize game screen
-pygame.init()
 
-pygame.display.set_caption('cluwu')
-#set the icon
-icon = pygame.image.load('images/cluwuIcon.png')
-pygame.display.set_icon(icon)
 
-#set up network connection
-netConn = Network()
-userId = netConn.getId()
-
-#screen set up
-width = 1680
-height = 900
-
-#create pygame area to add splash image to
-windowSurface = pygame.display.set_mode((width, height))
-clock = pygame.time.Clock()
-
-# TESTING 
-testingFunction()
+# TESTING
+# testingFunction()
 # run the program
 splash()
 

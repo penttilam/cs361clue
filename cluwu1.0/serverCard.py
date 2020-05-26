@@ -79,7 +79,7 @@ def dealCards(deckList, playerList):
         while numberPlayerCards < divCards:
             numberPlayerCards += 1 
             tempHand.append(deckList.pop(0))
-        if not remCards is 0:
+        if remCards != 0:
             tempHand.append(deckList.pop(0))
             remCards -= 1
         player.setHand(tempHand)

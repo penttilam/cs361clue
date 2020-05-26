@@ -22,7 +22,8 @@ from serverGame import *
 
 ##Creating the server socket and listening for a connection
 
-server = "45.132.241.193"
+# server = "45.132.241.193"
+server = "localhost"
 port = 42069
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -263,5 +264,3 @@ while True:
     start_new_thread(Threaded_Client, (player, lobbyList, gameList))
     
     connectionNumber += 1
-
-
