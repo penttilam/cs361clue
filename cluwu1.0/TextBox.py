@@ -3,7 +3,7 @@ import pygame_gui
 from pygame.locals import *
 
 class TextBox:
-    def __init__(self, manager, text="", xLoc=15, yLoc=680, width=341, height=200, container="", layer=1, objectId="chatlog"):
+    def __init__(self, manager, text="", xLoc=8, yLoc=680, width=341, height=200, container="", layer=1, wrapToHeight=False, objectId="chatlog"):
         self.xLoc = xLoc
         self.yLoc = yLoc
         self.width = width
@@ -13,15 +13,16 @@ class TextBox:
         self.text = text
         self.layer = layer
         self.focus = 0
+        self.wrapToHeight = wrapToHeight
         self.object_id = objectId
         self.newTextBox()
         self.text = text
 
     def newTextBox(self):
         if (self.container == ""):
-            self.textBox = pygame_gui.elements.UITextBox(html_text=self.text, relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, object_id=self.object_id, wrap_to_height=False, layer_starting_height=self.layer)
+            self.textBox = pygame_gui.elements.UITextBox(html_text=self.text, relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, object_id=self.object_id, wrap_to_height=self.wrapToHeight, layer_starting_height=self.layer)
         else:
-            self.textBox = pygame_gui.elements.UITextBox(html_text=self.text, relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, container=self.container, object_id=self.object_id, wrap_to_height=True, layer_starting_height=self.layer)
+            self.textBox = pygame_gui.elements.UITextBox(html_text=self.text, relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, container=self.container, object_id=self.object_id, wrap_to_height=self.wrapToHeight, layer_starting_height=self.layer)
 
     def setObjectId(self, objectId=""):
         self.textBox.kill()
@@ -30,6 +31,9 @@ class TextBox:
         elif objectId != "":
             self.object_id = objectId
         self.newTextBox()
+
+    def setWrapToText(self):
+        self.textBox.wrap_to_height(True)
 
     def addText(self, text):
         self.text = text

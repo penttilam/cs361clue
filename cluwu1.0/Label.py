@@ -3,7 +3,7 @@ import pygame_gui
 from pygame.locals import *
 
 class Label:
-    def __init__(self, labelText, manager, xLoc=0, yLoc=0, width=0, height=0, container="", object_id=""):
+    def __init__(self, labelText, manager, xLoc=0, yLoc=0, width=1, height=1, container="", object_id=""):
         self.xLoc = xLoc
         self.yLoc = yLoc
         self.width = width

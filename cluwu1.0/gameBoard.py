@@ -70,7 +70,6 @@ class GameBoard:
         chatInput = InputBox(layer1)
 
         self.gameGrid = GameGrid(self.width, self.height, layer0)
-        print("Line 75")
         Image('board.png', layer0, 0, 0, self.width, self.height)
 
         # Button to display player's hand of cards
@@ -86,16 +85,16 @@ class GameBoard:
         Label("Roll", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 100, 142, 20)
         self.rollLabel = Label("Current Moves: 0", layer1, diceButton.getXLoc(), diceButton.getYLoc() - 20, 142, 20)
         myRoll = -1
-        print("Line 91")
         # End turn Button
         endTurnButton = Button("End turn", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 40 , 90, 30)
         
         # Button to display the player's notebook
         # notebookButton = Button('Notebook', layer3)
         notebookButton = ImageButton(layer3, imageFile='cluwuNotebook.png', buttonText=" ")
-        notebookButton.setXLocYLoc(int((self.width*16)/17-(self.width/10))-60, int(self.height/2+self.height/20)+39)
-        notebookButton.setWidthHeight(int(330), int(365))
-        Label("Check Notes", layer3, notebookButton.getXLoc() + int(notebookButton.getWidth()/2), notebookButton.getYLoc() + int(notebookButton.getHeight()/2) + 90, 100, 20)
+        notebookButton.setXLocYLoc(int((self.width*16)/17-(self.width/10))-70, int(self.height/2+self.height/20)+34)
+        notebookButton.setWidthHeight(int(450), int(475))
+        notebookButton.getButton().setManager(layer0)
+        # Label("Check Notes", layer3, notebookButton.getXLoc() + int(notebookButton.getWidth()/2), notebookButton.getYLoc() + int(notebookButton.getHeight()/2) + 90, 100, 20)
 
         #initilization of the notebook panel
         notebook = Panel(layer3, layerHeight=2)
@@ -106,7 +105,6 @@ class GameBoard:
         notebook.setHiddenLocation(self.width)
         # Creates a Button object to allow interaction with checkboxe buttons
         checkBoxButton = createNotebook(notebook)
-        print("Line 111")
         characterList = ["scarlet", "white", "mustard", "green", "peacock", "plum"]
  
         # playerCards = [("scarlet", "Card"),("white", "Card"),("mustard", "Card"),("green", "Card"),("peacock", "Card"),("plum", "Card")]
@@ -138,8 +136,6 @@ class GameBoard:
                 tokenFileExtension = ".png"
             self.characterTokens.append(Image(str(character) + tokenFileExtension, layer2, 0, 0, 30, 30, object_id=character))
 
-        print("Line 143")
-        
         self.characterTokens[0].setXLocYLoc(947, 60)
         self.characterTokens[0].setRowColumn(0, 16)
         self.gameGrid.grid[0][16].setOccupied(1)
@@ -160,8 +156,6 @@ class GameBoard:
         self.characterTokens[5].setLocation("outside")
         self.gameGrid.grid[5][0].setOccupied(1)
         
-
-        print("Line 166")
         for x in range(6):
             if (self.clientGame.getMyToken().getTokenCharacter() == self.characterTokens[x].getObjectId()):
                 self.myToken = self.characterTokens[x]
@@ -174,8 +168,6 @@ class GameBoard:
         else:
             self.rollLabel.setText("Your Turn")
 
-
-        print("Just before the loop!")
         while True:
             myTurn = self.clientGame.getMyTurn()
             if myTurn:
@@ -186,7 +178,6 @@ class GameBoard:
                 time_delta = clock.tick(60) / 1000.0
             
             clientThreads.join(1/1000)
-            print("Thread status: " + str(clientThreads.is_alive()))
             if not clientThreads.is_alive():
                 if type(self.clientUpdate) != type(""):
                     self.processClientUpdates()
@@ -282,7 +273,7 @@ class GameBoard:
 
     def processClientUpdates(self):
         tokenUpdates = self.clientUpdate.getTurnOrder()
-        self.chatLog.addText(self.clientUpdate.getChatUpdate())
+        # self.chatLog.addText(self.clientUpdate.getChatUpdate())
         self.updateTokenPositions(tokenUpdates)
         if tokenUpdates[0].getTokenCharacter() != self.clientGame.getTurnOrder()[0].getTokenCharacter():
             self.clientGame.setTurnOrder(tokenUpdates)

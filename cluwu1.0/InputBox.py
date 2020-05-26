@@ -3,7 +3,7 @@ import pygame_gui
 from pygame.locals import *
 
 class InputBox:
-    def __init__(self, manager, xLoc=15, yLoc=870, width=341, height=30, container="", object_id="", text=""):
+    def __init__(self, manager, xLoc=8, yLoc=870, width=341, height=30, container="", object_id="", text=""):
         self.xLoc = xLoc
         self.yLoc = yLoc
         self.width = width
@@ -20,7 +20,6 @@ class InputBox:
             self.inputBox = pygame_gui.elements.ui_text_entry_line.UITextEntryLine(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, object_id=self.object_id, )
         else:
             self.inputBox = pygame_gui.elements.ui_text_entry_line.UITextEntryLine(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, container=self.container, object_id=self.object_id)
-        self.inputBox.set_forbidden_characters(":")
         self.inputBox.set_text_length_limit(32)
 
     def setObjectId(self, objectId=""):

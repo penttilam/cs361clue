@@ -15,12 +15,14 @@ from GameGrid import GameGrid
 from gameBoard import GameBoard
 from Label import Label
 from InputBox import InputBox
+from resources import *
+from TextBox import *
 
 #runs main menu
 def OpenMainMenu():
     #pygame surface
     windowSurface = pygame.display.set_mode((width, height))
-    manager = pygame_gui.UIManager((width, height), './ourTheme.json')
+    manager = pygame_gui.UIManager((width, height), theme_path='./ourTheme.json')
 
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
@@ -73,7 +75,7 @@ def hostGame():
     #pygame surface
     managerList = []
     windowSurface = pygame.display.set_mode((width, height))
-    manager = pygame_gui.UIManager((width, height), './ourTheme.json')
+    manager = pygame_gui.UIManager((width, height), theme_path='./ourTheme.json')
     managerList.append(manager)    
 
     background = pygame.Surface((width, height))
@@ -131,16 +133,16 @@ def hostGame():
 def startGameList():
     #pygame surface
     managerList = []
-    manager = pygame_gui.UIManager((width, height), './ourTheme.json')
+    manager = pygame_gui.UIManager((width, height), theme_path='./ourTheme.json')
     managerList.append(manager)
 
     background = pygame.Surface((width, height))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
-    gameSelectListX = width/2-width/10
-    gameSelectListY = height/2-height/5
-    gameSelectListW = width/5
-    gameSelectListH = height/5
+    gameSelectListX = int(width/2-width/10)
+    gameSelectListY = int(height/2-height/5)
+    gameSelectListW = int(width/5)
+    gameSelectListH = int(height/5)
     netConn.send("lobby.lobbies")
     netConn.catch()
     gameSelectListActiveGamesList = netConn.catch()
@@ -223,11 +225,11 @@ def startLobby(gameName, userId):
     
     # List of managers used to set themes
     managerList = []
-    manager = pygame_gui.UIManager((width, height), './ourTheme.json')
+    manager = pygame_gui.UIManager((width, height), theme_path='./ourTheme.json')
     managerList.append(manager)
-    rdyManager = pygame_gui.UIManager((width, height), './rdyTheme.json')
+    rdyManager = pygame_gui.UIManager((width, height), theme_path='./rdyTheme.json')
     managerList.append(rdyManager)
-    notRdyManager = pygame_gui.UIManager((width, height), './notRdyTheme.json')
+    notRdyManager = pygame_gui.UIManager((width, height), theme_path='./notRdyTheme.json')
     managerList.append(notRdyManager)
 
     #pygame surface
@@ -267,20 +269,21 @@ def startLobby(gameName, userId):
         tmp = currentLobbyPlayerStatus
 
         netConn.send("lobby.update")
-        netConn.catch()
+        print("caught " + str(netConn.catch()))
         currentLobbyPlayerStatus = netConn.catch()
-
+        print("caught " + str(currentLobbyPlayerStatus))
         if currentLobbyPlayerStatus.getStartGame():
             gameBoard = GameBoard(netConn)
             gameBoard.gameBoard()
         #if player number changes kill the text box and create a new one with updated information.
         if not currentLobbyPlayerStatus == tmp:
             playerStatus.kill()
-            playerStatus = pygame_gui.elements.UITextBox(html_text=currentLobbyPlayerStatus.htmlStringify(),relative_rect = pygame.Rect((playerStatusX, playerStatusY), (playerStatusW, playerStatusH)), manager=manager, wrap_to_height=True, layer_starting_height=1)
-
+            playerStatus = TextBox(manager, currentLobbyPlayerStatus.htmlStringify(), playerStatusX, playerStatusY, playerStatusW, playerStatusH, wrapToHeight=True)
+            
+            
         netConn.send("lobby.host")
         isHost = netConn.catch().split(":")
-        
+        print("Caught " + str(isHost[0]) + " " + str(isHost[1]))
         if isHost[2] == "True":
             startButtonX = int(width/17)
             startButton.setXLoc(startButtonX)
@@ -375,6 +378,8 @@ def testingFunction():
     netConn.catch()
     gameBoard = GameBoard(netConn)
     gameBoard.gameBoard()
+
+# packae = pygame_gui.PackageResource(pygame_gui.data, 'ourTheme.json')
 
 #initialize game screen
 pygame.init()
