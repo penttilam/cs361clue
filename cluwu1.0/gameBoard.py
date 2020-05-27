@@ -312,6 +312,8 @@ class GameBoard:
                     player.setXLocYLoc(newLoc.getXLoc(), newLoc.getYLoc())
                     player.setRowColumn(token.getRow(), token.getColumn())
                     newLoc.setOccupied(1)
+                    tokenUpdates.remove(token)
+                    break
 
     def getUpdates(self, arg1, arg2):
         tempCatch = self.netConn.catch()
