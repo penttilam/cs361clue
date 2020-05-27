@@ -5,7 +5,7 @@ from serverChat import *
 import random
 
 
-class serverGame:
+class ServerGame:
     def __init__(self, playerList):
         self.playerTurnOrder = []
         for player in playerList:
@@ -15,7 +15,7 @@ class serverGame:
         self.guiltyCards = []
         assignTokens(self.playerTurnOrder)
         self.assignCards()
-        self.chat = ServerChat()
+        self.chat = None
 
     def getPlayerTurnOrder(self):
         return self.playerTurnOrder
@@ -32,10 +32,6 @@ class serverGame:
             tokenList.append(player.getToken())
         return tokenList
 
-    def rollDie():
-        return random.randint(1,6)
-
-
     def assignCards(self):
         serverCards = createDecks()
         self.guiltyCards = serverCards[0]
@@ -47,12 +43,12 @@ class serverGame:
             self.playerTurnOrder.append(player)
             player.sendClientAString("game.turn:success")
 
-
-    def getChat(self):
+    def getGameChat(self):
         return self.chat
 
+    def setGameChat(self, chatIn):
+        self.chat = chatIn
 
-     
 
 
 

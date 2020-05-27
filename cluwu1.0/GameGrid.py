@@ -58,7 +58,6 @@ class GameGrid:
         fileIn.close()
 
         self.rooms = [("school", schoolRooms),("library", libraryRooms), ("lovehotel", hotelRooms), ("beach", beachRooms), ("karaoke", karaokeRooms), ("mangastore", mangaRooms), ("tearoom", tearoomRooms), ("hotspring", hotspringRooms), ("shrine", shrineRooms)]
-        
         schoolExits = [104, 179, 180]
         libraryExits = [161, "secret143"]
         hotelExits = [209,303]
@@ -68,38 +67,39 @@ class GameGrid:
         tearoomExits = [265, 366]
         hotspringExits = [199, 267]
         shrineExits = [102, "secret72"]
+
         self.roomExits = [("school", schoolExits), ("library", libraryExits), ("lovehotel", hotelExits), ("beach", beachExits), ("karaoke", karaokeExits), ("mangastore", mangastoreExits), ("tearoom", tearoomExits), ("hotspring", hotspringExits), ("shrine", shrineExits)]
-        
         buttonNumber = -1
         secretDoors = [72, 143, 456, 571]
         doors = [78, 105, 137, 155, 156, 198, 233, 243, 289, 304, 365, 417, 422, 471, 451, 460, 464]
         for row in range(25):
             self.grid.append([])
             for column in range(24):
-                buttonNumber += 1
-                xLocation = 15 * 30 - 15 + column * 32
+                buttonNumber = buttonNumber + 1
+                xLocation = 15*30-15+column*32
                 yLocation = 60 + row*30
                 buttonId = str(row) + "," + str(column)
                 self.grid[row].append(Button(str(buttonNumber), manager, xLocation, yLocation, 30, 30, object_id=str(buttonId)))
                 newGridLocation = self.grid[row][column]
                 newGridLocation.setRowColumn(row, column)
                 newGridLocation.setLocation("outside")
-                if (newGridLocation.text in doors):
+                if (int(newGridLocation.text) in doors):
                     for room in self.rooms:
                         if (newGridLocation.text in room[1]):
                             newGridLocation.setLocation(room[0])
-                    doors.remove(newGridLocation.text)
-                elif (newGridLocation.text in secretDoors):
+                if (self.grid[row][column].text in secretDoors):
                     for room in self.rooms:
                         if (newGridLocation.text in room[1]):
                             newGridLocation.setLocation(room[0])
-                    secretDoors.remove(newGridLocation.text)
-                if (newGridLocation.text in badMove):
+                if (self.grid[row][column].text in badMove):
                     for room in self.rooms:
                         if (newGridLocation.text in room[1]):
                             newGridLocation.setLocation(room[0])
-                    newGridLocation.disable()
-                    badMove.remove(newGridLocation.text)
+                        
+                            
+                    # self.grid[row][column].setWidthHeight(0, 0)
+                    # self.grid[row][column].setText("")
+                    self.grid[row][column].disable()
 
     def clickedTile(self, event, token):
         moved = False
@@ -107,11 +107,7 @@ class GameGrid:
             if(event.ui_element.object_ids[0]=="chatlog"):
                 return moved
             # Take the object ID of the element clicked and split it out (grid tile IDs are "row,column")
-            try:
-                xLocYLoc = event.ui_element.object_ids[0].split(",")
-            except:
-                return False
-            
+            xLocYLoc = event.ui_element.object_ids[0].split(",")
             row = int(xLocYLoc[0])
             column = int(xLocYLoc[1])
             gridLocation = self.grid[row][column]

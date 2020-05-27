@@ -170,7 +170,6 @@ def startGameList():
     gameSelectListW = int(WIDTH/5)
     gameSelectListH = int(HEIGHT/5)
     netConn.send("lobby.lobbies")
-    netConn.catch()
     gameSelectListActiveGamesList = netConn.catch()
 
     lobbyList = []

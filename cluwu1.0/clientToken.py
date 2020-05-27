@@ -2,10 +2,10 @@
 class ClientToken:
     def __init__(self, characterName, tokenRow, tokenColumn):
         self.tokenCharacter = characterName
-        self.tokenRow = int(tokenRow)
-        self.tokenColumn = int(tokenColumn)
+        self.tokenRow = tokenRow
+        self.tokenColumn = tokenColumn
 
-    def getCharacter(self):
+    def getTokenCharacter(self):
         return self.tokenCharacter
 
     def getRow(self):

@@ -1,11 +1,12 @@
 from clientToken import *
 
-class ClientGameInit:
-    def __init__(self, turnIn, tokenIn, cardsIn):
+class ClientGame:
+    def __init__(self, turnIn, tokenIn, cardsIn, chatIn):
         self.turnOrder = turnIn
         self.myToken = tokenIn
         self.myCards = cardsIn
-        
+        self.myChat = chatIn
+
     def getTurnOrder(self):
         return self.turnOrder
 
@@ -21,18 +22,8 @@ class ClientGameInit:
         else:
             return False
 
-    def setTurnOrder(self, turnOrder):
-        self.turnOrder = turnOrder
+    def getChat(self):
+        return self.myChat
 
-class UpdateClientGame:
-    def __init__(self, turnIn, chatLineIn):
-        self.turnOrder = turnIn
-        self.chat = chatLineIn
-
-    def getTurnOrder(self):
-        return self.turnOrder
-
-    def getChatUpdate(self):
-        return self.chat
 
 

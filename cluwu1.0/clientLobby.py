@@ -6,11 +6,11 @@
 from clientPlayer import ClientPlayer
 
 class ClientLobby:
-    def __init__(self, lobbyName, playerNumber, playerNames, readyStatus, start):
+    def __init__(self, lobbyName, playerNumber, playerNames, lobbyReady, start):
         self.id = lobbyName
         self.numberOfPlayers = playerNumber
         self.playerNameList = playerNames
-        self.lobbyReadyStatus = readyStatus
+        self.lobbyReadyStatus = lobbyReady
         self.startGame = start
         self.lobbyHost = False
         
@@ -23,7 +23,7 @@ class ClientLobby:
     def getPlayerNameList(self):
         return self.playerNameList
     
-    def getReadyStatus(self):
+    def getLobbyReadyStatus(self):
         return self.lobbyReadyStatus
 
     def getStartGame(self):
@@ -31,6 +31,9 @@ class ClientLobby:
 
     def getLobbyHost(self):
         return self.lobbyHost
+
+    def setLobbyHost(self, hostIn):
+        self.lobbyHost = hostIn
 
     def htmlStringify(self):
         playerCount = 0

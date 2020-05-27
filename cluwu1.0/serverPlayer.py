@@ -47,7 +47,6 @@ class ServerPlayer():
     def setMyToken(self, newToken):
         self.myToken = newToken
 
-
      ##private playerConnection functions
     def sendClientAString(self, serverString):
         self.playerConnection.sendClientAString(serverString)
