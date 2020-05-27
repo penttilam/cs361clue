@@ -19,11 +19,11 @@ class ServerLobby:
     ##this adds a player into the lobby
     def addPlayer(self, player):
         if self.numberPlayers == 6:
-            return False;
+            return False
         else:
             self.players.append(player)
             self.numberPlayers += 1
-            return True;
+            return True
      
     ##this removes a player from the lobby
     def removePlayer(self, player):

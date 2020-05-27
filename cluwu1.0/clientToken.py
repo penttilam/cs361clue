@@ -1,16 +1,16 @@
 
 class ClientToken:
-    def __init__(self, characterName, tokenLocationX, tokenLocationY):
+    def __init__(self, characterName, tokenRow, tokenColumn):
         self.tokenCharacter = characterName
-        self.tokenXLoc = tokenLocationX
-        self.tokenYLoc = tokenLocationY
+        self.tokenRow = tokenRow
+        self.tokenColumn = tokenColumn
 
     def getTokenCharacter(self):
         return self.tokenCharacter
 
-    def getTokenXLoc(self):
-        return self.tokenXLoc
+    def getRow(self):
+        return self.tokenRow
 
-    def getTokenYLoc(self):
-        return self.tokenYLoc
+    def getColumn(self):
+        return self.tokenColumn
 
