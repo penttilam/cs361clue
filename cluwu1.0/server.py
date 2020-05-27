@@ -36,110 +36,126 @@ s.listen(6)
 print("Server waiting for a connection :D")
 
 
+class ServerInfo():
+    def __init__(self, lobbList, gameList):
+        self.serverLobbyList = lobbyList
+        self.serverGameList = gameList
+
+    def getGameList(self):
+        return self.serverGameList
+
+    def getLobbyList(self):
+        return self.serverLobbyList
+
 ##This functions creates a new lobby and adds the current Player
-def newCommand(newLobbyName, player, lobbyList):
-    newLobbyName = ServerLobby(player, newLobbyName)
-    lobbyList.append(newLobbyName)
+def newCommand(newLobbyName, serverThreadInfo, serverInfo):
+    newLobbyName = ServerLobby(serverThreadInfo.getServerPlayer(), newLobbyName)
+    serverInfo.getLobbyList().append(newLobbyName)
+    serverThreadInfo.setServerLobby(newLobbyName)
 
 
 ##This function adds a user to a given lobby
-def joinCommand(lobbyName, player, lobbyList):
-    joinedLobby = False
-    for serverLobby in lobbyList:
+def joinCommand(lobbyName, serverThreadInfo, serverInfo):
+    for serverLobby in serverInfo.getLobbyList():
         if serverLobby.getId() == lobbyName:
-            serverLobby.addPlayer(player)
-            joinedLobby = True
-    if joinedLobby == False:
-        player.sendClientAString("lobby.join:" + lobbyName + ".failed")
+            if serverLobby.addPlayer(serverThreadInfo.getServerPlayer()):
+                serverThreadInfo.setServerLobby(serverLobby)
+                sendUpdatedLobby(serverThreadInfo)
+            else:
+                listCommand(serverThreadInfo, serverInfo)
+            break
 
 
 ##This function lists available lobbies
-def listCommand(player, lobbyList):
-    player.sendClientAString("lobby.list.confirmed")
+def listCommand(serverThreadInfo, serverInfo):
     clientLobbyList = []
-    for serverLobby in lobbyList:
+    for serverLobby in serverInfo.getLobbyList():
         clientLobbyList.append(createClientLobby(serverLobby))
     player.sendClientAObject(clientLobbyList)
 
 
 ##this function revomes a player from their lobby
-def leaveCommand(player, lobbyList):
-    for lobby in lobbyList:
-        for lobbyPlayer in lobby.getPlayers():
-            if lobbyPlayer == player:
-                playerLobby = lobby
+def leaveCommand(player, serverThreadInfo, serverInfo):
     try:
-        playerLobby.removePlayer(player)
-        if playerLobby.getPNumber() == 0:
-            lobbyList.remove(playerLobby)
-
+        serverThreadInfo.getServerLobby().removePlayer(player)
     except:
         pass
+    else:
+        if serverThreadInfo.getServerLobby().getPNumber() == 0:
+            serverInfo.getLobbyList().remove(serverThreadInfo.getServerLobby())
+            serverThreadInfo.setServerLobby(None)
+    finally:
+        sendUpdatedLobby(serverThreadInfo)
+
 
 ##this function initializes the game
-def startCommand(player, lobbyList, gameList):
-    for lobby in lobbyList:
-        for lobbyPlayer in lobby.getPlayers():
-            if lobbyPlayer == player:
-                playerLobby = lobby
-    playerLobby.setStartGame()
-    startInfo = "lobby.start.confirmed"
-    player.sendClientAString(startInfo)
-    gameList.append(serverGame(playerLobby.getPlayers()))
+def startCommand(serverThreadInfo, serverInfo):
+    serverThreadInfo.getServerLobby().setStartGame()
+    serverInfo.getGameList().append(serverGame(serverThreadInfo.getServerLobby()))
+    sendUpdatedLobby(serverThreadInfo)
 
 
 ##this function sets the player to ready
-def readyCommand(player):
-    if player.getReady() == False:
-        player.setReady(True)
-        player.sendClientAString("lobby.ready:" + str(player.getReady()))
-    elif player.getReady() == True:
-        player.setReady(False)
-        player.sendClientAString("lobby.ready:" + str(player.getReady()))
-    else:
-        player.sendClientAString("lobby.ready:SeriouslyHowDidYouFuckItUpThisBad?")
+def readyCommand(serverThreadInfo):
+    if serverThreadinfo.getServerPlayer().getReady() == False:
+        serverThreadinfo.getServerPlayer().setReady(True)
+    elif serverThreadinfo.getServerPlayer().getReady() == True:
+        serverThreadinfo.getServerPlayer().setReady(False)
 
-##this function updates the current clobby for the client
-def updateCommand(player, lobbyList):
-    player.sendClientAString("lobby.update:confirmed")
-    for lobby in lobbyList:
-        for lobbyPlayer in lobby.getPlayers():
-            if lobbyPlayer == player:
-                clientLobby = createClientLobby(lobby)
-                player.sendClientAObject(clientLobby)
-                return
+    sendUpdatedLobby(serverThreadInfo)
 
 
-def hostCommand(player, lobbyList):
-    hostFlag = False
-    for lobby in lobbyList:
-        playerList = lobby.getPlayers()
-        if playerList[0] == player:
-             hostFlag = True
-    player.sendClientAString("lobby.host:" + str(hostFlag))
-
+def sendUpdatedLobby(serverThreadInfo):
+    clientLobby = createClientLobby(serverThreadInfo.getServerLobby())
+    LobbyPlayers = serverThreadInfo.getServerLobby().getPlayers()
+    for player in LobbyPlayers:
+        if player is LobbyPlayer[0]:
+            clientLobby.setLobbyHost(True)
+        else:
+            clientLobby.setLobbyHost(False)
+        player.sendClientAObject(clientLobby)
 
 
 ##This is the subset of lobby actions
-def lobbyCommand(block1, block2, player, lobbyList, gameList):
+def lobbyCommand(block1, block2, player, serverInfo):
     arguments = block1.split(".")
 
     if arguments[1] == "new":
-        newCommand(block2, player, lobbyList)
+        try:
+            newCommand(block2, serverThreadInfo, serverInfo)
+        except:
+            error_string = str(datetime.now()) + " -- error -- lobby.new Failed " 
+            logging.debug(error_string)
     elif arguments[1] == "lobbies":
-        listCommand(player, lobbyList)
+        try:
+            listCommand(serverThreadInfo, serverInfo)
+        except:
+            error_string = str(datetime.now()) + " -- error -- lobby.lobbies Failed " 
+            logging.debug(error_string)
     elif arguments[1] == "join":
-        joinCommand(block2, player, lobbyList)
+        try:
+            joinCommand(block2, serverThreadInfo, serverInfo)
+        except:
+            error_string = str(datetime.now()) + " -- error -- lobby.join Failed " 
+            logging.debug(error_string)
     elif arguments[1] == "leave":
-        leaveCommand(player, lobbyList)
+        try:
+            leaveCommand(serverThreadInfo, serverInfo)
+        except:
+            error_string = str(datetime.now()) + " -- error -- lobby.ready Failed " 
+            logging.debug(error_string)
     elif arguments[1] == "ready":
-        readyCommand(player)
+        try:
+            readyCommand(serverThreadInfo)
+        except:
+            error_string = str(datetime.now()) + " -- error -- lobby.start Failed " 
+            logging.debug(error_string)
     elif arguments[1] == "start":
-        startCommand(player, lobbyList, gameList)
-    elif arguments[1] == "update":
-        updateCommand(player, lobbyList)
-    elif arguments[1] == "host":
-        hostCommand(player, lobbyList)
+        try:
+            startCommand(serverThreadInfo, serverInfo)
+        except:
+            error_string = str(datetime.now()) + " -- error -- lobby.start Failed " 
+            logging.debug(error_string)
 
 
 def createCommand(serverThreadInfo):
@@ -150,57 +166,73 @@ def createCommand(serverThreadInfo):
 def moveTokenCommand(serverThreadInfo, block2):
     arguments = block2.split(".")
     serverThreadInfo.getServerPlayer().getMyToken().setTokenXLocYLoc(arguments[0], arguments[1])
-    for player in serverThreadInfo.getServerGame().getPlayerTurnOrder()
+    for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
         player.sendClientAObject(ClientGame(serverThreadInfo.getServerGame()))
 
 
 def turnCommand(serverThreadInfo):
     try:
         serverThreadInfo.getServerGame().changeTurn(serverThreadInfo.getServerPlayer())
-        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder()
+        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
             player.sendClientAObject(ClientGame(serverThreadInfo.getServerGame()))
     except:
         error_string = str(datetime.now()) + " -- error -- game.turn -- " + str(serverThreadInfo.getServerPlayer())
         logging.debug(error_string)
 
 
-def chatCommand(player, gameList, argumentInput):
+def chatCommand(player, argumentInput):
     pass
 
 
-def gameCommand(block1, block2, serverThreadInfo, lobbyList, gameList):
+def gameCommand(block1, block2, serverThreadInfo, serverInfo):
     arguments = block1.split(".")
 
     if arguments[1] == "create":
-        createCommand(serverThreadInfo)
+        try:
+            createCommand(serverThreadInfo)
+        except:
+            error_string = str(datetime.now()) + " -- error -- game.create Failed " 
+            logging.debug(error_string)
     elif arguments[1] == "move":
-        moveTokenCommand(serverThreadInfo, block2)
+        try:
+            moveTokenCommand(serverThreadInfo, block2)
+        except:
+            error_string = str(datetime.now()) + " -- error -- game.move Failed " 
+            logging.debug(error_string)
     elif arguments[1] == "turn":
-        turnCommand(serverThreadInfo)
+        try:
+            turnCommand(serverThreadInfo)
+        except:
+            error_string = str(datetime.now()) + " -- error -- game.turn Failed " 
+            logging.debug(error_string)
     elif arguments[1] == "chat":
-        chatCommand(serverThreadInfo, gameList, arguments[2])
+        try:
+            chatCommand(serverThreadInfo, arguments[2])
+        except:
+            error_string = str(datetime.now()) + " -- error -- game.chat Failed " 
+            logging.debug(error_string)
 
 
 
 ##This is the command interperter from the client
-def clientCommand(clientCommand, serverThreadInfo, lobbyList, gameList):
+def clientCommand(clientCommand, serverThreadInfo, serverInfo):
     blocks = clientCommand.split(":")
     arguments = blocks[1].split(".")
 
     if arguments[0] == "lobby":
         if len(blocks) == 3:
-            lobbyCommand(blocks[1], blocks[2], serverThreadInfo, lobbyList, gameList)
+            lobbyCommand(blocks[1], blocks[2], serverThreadInfo, serverInfo)
             return True
         else:
-            lobbyCommand(blocks[1], None, serverThreadInfo, lobbyList, gameList)
+            lobbyCommand(blocks[1], None, serverThreadInfo, serverInfo)
             return True
 
     elif arguments[0] == "game":
         if len(blocks) == 3:
-            gameCommand(blocks[1], blocks[2], serverThreadInfo, lobbyList, gameList)
+            gameCommand(blocks[1], blocks[2], serverThreadInfo, serverInfo)
             return True
         else:
-            gameCommand(blocks[1], None, serverThreadInfo, lobbyList, gameList)
+            gameCommand(blocks[1], None, serverThreadInfo, serverInfo)
             return True
 
     elif arguments[0] == "quit":
@@ -209,7 +241,7 @@ def clientCommand(clientCommand, serverThreadInfo, lobbyList, gameList):
 
 
 ##This the individual client thread that sends and recieves data from the client
-def Threaded_Client(serverThreadInfo, lobbyList, gameList):
+def Threaded_Client(serverThreadInfo, serverInfo):
     runThread = True
 
     while runThread:
@@ -220,14 +252,20 @@ def Threaded_Client(serverThreadInfo, lobbyList, gameList):
                 break
             else:
                 print("Received  --  " + data)
-                runThread = clientCommand(data, serverThreadInfo, lobbyList, gameList)
+                runThread = clientCommand(data, serverThreadInfo, serverInfo)
 
         except:
             error_string = str(datetime.now()) + " -- error -- " + str(data)
             logging.debug(error_string)
             break
-    
-    serverThreadInfo.getServerLobby().removePlayer(serverThreadInfo.getServerPlayer())
+   
+    if not serverThreadInfo.getServerLobby() == None:
+        serverThreadInfo.getServerLobby().removePlayer(serverThreadInfo.getServerPlayer())
+        serverThreadInfo.setServerLobby(None)
+        if serverThreadInfo.getServerLobby().getPNumber() == 0:
+            serverInfo.getLobbyList().remove(serverThreadInfo.getServerLobby())
+            print("Lobby " + serverThreadInfo.getServerPlayer().getConnectionId())
+        
     print("Lost connection to " + serverThreadInfo.getServerPlayer().getConnectionId())
     serverThreadInfo.getServerPlayer().closeConnection()
 ##
@@ -236,6 +274,7 @@ def Threaded_Client(serverThreadInfo, lobbyList, gameList):
 connectionNumber = 1
 lobbyList = []
 gameList = []
+serverInfo =  ServerInfo(lobbyList, gameList)
 logging.basicConfig(filename='Epic_Server_Fails', level=logging.DEBUG)
 
 while True:
@@ -249,7 +288,7 @@ while True:
     player = ServerPlayer(connectionId)
     serverThreadInfo = ServerThread(player)
 
-    start_new_thread(Threaded_Client, (serverThreadInfo, lobbyList, gameList))
+    start_new_thread(Threaded_Client, (serverThreadInfo, serverInfo))
     
     connectionNumber += 1
 
