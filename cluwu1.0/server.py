@@ -15,6 +15,7 @@ from serverLobby import *
 from clientLobby import *
 from serverCard import * 
 from serverGame import * 
+from serverThread import * 
 
 
 
@@ -49,9 +50,30 @@ class ServerInfo():
 
 ##This functions creates a new lobby and adds the current Player
 def newCommand(newLobbyName, serverThreadInfo, serverInfo):
-    newLobbyName = ServerLobby(serverThreadInfo.getServerPlayer(), newLobbyName)
-    serverInfo.getLobbyList().append(newLobbyName)
-    serverThreadInfo.setServerLobby(newLobbyName)
+    try:
+        newLobbyName = ServerLobby(serverThreadInfo.getServerPlayer(), newLobbyName)
+    except:
+        error_string = str(datetime.now()) + " -- error -- ServerLobby __init__ Failed " 
+        logging.debug(error_string)
+    try:
+        serverInfo.getLobbyList().append(newLobbyName)
+        print("lobby list: " + str(serverInfo.getLobbyList()))
+    except:
+        error_string = str(datetime.now()) + " -- error -- serverInfo.getLobbyList Failed " 
+        logging.debug(error_string)
+    try:
+        serverThreadInfo.setServerLobby(newLobbyName)
+        print("lobby: " + str(serverThreadInfo.getServerLobby()))
+        print("lobbyName: " + str(serverThreadInfo.getServerLobby().getId()))
+    except:
+        error_string = str(datetime.now()) + " -- error -- serverThreadInfo.getServerLobby Failed " 
+        logging.debug(error_string)
+    try:
+        sendUpdatedLobby(serverThreadInfo)
+    except:
+        error_string = str(datetime.now()) + " -- error -- sendUpdatedLobby Failed " 
+        logging.debug(error_string)
+
 
 
 ##This function adds a user to a given lobby
@@ -75,12 +97,13 @@ def listCommand(serverThreadInfo, serverInfo):
 
 
 ##this function revomes a player from their lobby
-def leaveCommand(player, serverThreadInfo, serverInfo):
+def leaveCommand(serverThreadInfo, serverInfo):
     try:
         serverThreadInfo.getServerLobby().removePlayer(player)
     except:
         pass
     else:
+        serverThreadInfo.getServerPlayer().sendClientAString("lobby.leave:confimed")
         if serverThreadInfo.getServerLobby().getPNumber() == 0:
             serverInfo.getLobbyList().remove(serverThreadInfo.getServerLobby())
             serverThreadInfo.setServerLobby(None)
@@ -97,34 +120,44 @@ def startCommand(serverThreadInfo, serverInfo):
 
 ##this function sets the player to ready
 def readyCommand(serverThreadInfo):
-    if serverThreadinfo.getServerPlayer().getReady() == False:
-        serverThreadinfo.getServerPlayer().setReady(True)
-    elif serverThreadinfo.getServerPlayer().getReady() == True:
-        serverThreadinfo.getServerPlayer().setReady(False)
-
+    print("at the start")
+    if serverThreadInfo.getServerPlayer().getReady() == False:
+        serverThreadInfo.getServerPlayer().setReady(True)
+    elif serverThreadInfo.getServerPlayer().getReady() == True:
+        serverThreadInfo.getServerPlayer().setReady(False)
+    print("in the middle")
     sendUpdatedLobby(serverThreadInfo)
+    print("after update")
 
 
 def sendUpdatedLobby(serverThreadInfo):
+    print("here1")
     clientLobby = createClientLobby(serverThreadInfo.getServerLobby())
+    print("here2")
     LobbyPlayers = serverThreadInfo.getServerLobby().getPlayers()
+    print("here3")
     for player in LobbyPlayers:
-        if player is LobbyPlayer[0]:
+        print("here4")
+        print(LobbyPlayers)
+        if player is LobbyPlayers[0]:
+            print("here5")
             clientLobby.setLobbyHost(True)
         else:
+            print("here6")
             clientLobby.setLobbyHost(False)
+        print("here7")
         player.sendClientAObject(clientLobby)
 
 
 ##This is the subset of lobby actions
-def lobbyCommand(block1, block2, player, serverInfo):
+def lobbyCommand(block1, block2, serverThreadInfo, serverInfo):
     arguments = block1.split(".")
 
     if arguments[1] == "new":
         try:
             newCommand(block2, serverThreadInfo, serverInfo)
         except:
-            error_string = str(datetime.now()) + " -- error -- lobby.new Failed " 
+            error_string = str(datetime.now()) + " -- error -- lobby.new(" + str(block2) + ", " + str(serverThreadInfo) + ", " + str(serverInfo) +",  Failed " 
             logging.debug(error_string)
     elif arguments[1] == "lobbies":
         try:
@@ -246,7 +279,7 @@ def Threaded_Client(serverThreadInfo, serverInfo):
 
     while runThread:
         try:
-            data = serverThreadInfo.getServerPlayer.getClientMessage()
+            data = serverThreadInfo.getServerPlayer().getClientMessage()
 
             if not data:
                 break
@@ -258,13 +291,17 @@ def Threaded_Client(serverThreadInfo, serverInfo):
             error_string = str(datetime.now()) + " -- error -- " + str(data)
             logging.debug(error_string)
             break
-   
-    if not serverThreadInfo.getServerLobby() == None:
-        serverThreadInfo.getServerLobby().removePlayer(serverThreadInfo.getServerPlayer())
-        serverThreadInfo.setServerLobby(None)
-        if serverThreadInfo.getServerLobby().getPNumber() == 0:
-            serverInfo.getLobbyList().remove(serverThreadInfo.getServerLobby())
-            print("Lobby " + serverThreadInfo.getServerPlayer().getConnectionId())
+
+    try:
+        if not serverThreadInfo.getServerLobby() == None:
+            serverThreadInfo.getServerLobby().removePlayer(serverThreadInfo.getServerPlayer())
+            serverThreadInfo.setServerLobby(None)
+            print("Removed from Lobby")
+            if serverThreadInfo.getServerLobby().getPNumber() == 0:
+                serverInfo.getLobbyList().remove(serverThreadInfo.getServerLobby())
+                print("Lobby Removed")
+    except:
+        pass
         
     print("Lost connection to " + serverThreadInfo.getServerPlayer().getConnectionId())
     serverThreadInfo.getServerPlayer().closeConnection()

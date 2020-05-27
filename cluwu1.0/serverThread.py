@@ -1,6 +1,6 @@
-from serverPlayer.py import *
-from serverLobby.py import *
-from serverGame.py import *
+from serverPlayer import *
+from serverLobby import *
+from serverGame import *
 
 class ServerThread():
     def __init__(self, player):
