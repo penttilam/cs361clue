@@ -116,48 +116,30 @@ def leaveCommand(serverThreadInfo, serverInfo):
 
 ##this function initializes the game
 def startCommand(serverThreadInfo, serverInfo):
-    print("here 1")
     serverThreadInfo.getServerLobby().setStartGame()
-    print("here 2")
-    print(serverThreadInfo.getServerLobby())
-    print(serverThreadInfo.getServerLobby().getPlayers())
     serverGame = ServerGame(serverThreadInfo.getServerLobby().getPlayers())
-    print("here 2.5")
     serverInfo.getGameList().append(serverGame)
     serverThreadInfo.setServerGame(serverGame)
-    print("here 3")
     sendUpdatedLobby(serverThreadInfo.getServerLobby())
-    print("here 4")
 
 
 ##this function sets the player to ready
 def readyCommand(serverThreadInfo):
-    print("at the start")
     if serverThreadInfo.getServerPlayer().getReady() == False:
         serverThreadInfo.getServerPlayer().setReady(True)
     elif serverThreadInfo.getServerPlayer().getReady() == True:
         serverThreadInfo.getServerPlayer().setReady(False)
-    print("in the middle")
     sendUpdatedLobby(serverThreadInfo.getServerLobby())
-    print("after update")
 
 
 def sendUpdatedLobby(serverLobbyIn):
-    print("here1")
     clientLobby = createClientLobby(serverLobbyIn)
-    print("here2")
     LobbyPlayers = serverLobbyIn.getPlayers()
-    print("here3")
     for player in LobbyPlayers:
-        print("here4")
-        print(LobbyPlayers)
         if player is LobbyPlayers[0]:
-            print("here5")
             clientLobby.setLobbyHost(True)
         else:
-            print("here6")
             clientLobby.setLobbyHost(False)
-        print("here7")
         player.sendClientAObject(clientLobby)
 
 
@@ -205,27 +187,16 @@ def lobbyCommand(block1, block2, serverThreadInfo, serverInfo):
 
 def createCommand(serverThreadInfo, serverInfo):
     if serverThreadInfo.getServerGame() == None:
-        print("Not the host!")
         for games in serverInfo.getGameList():
-            print("Which Game?")
             for players in games.getPlayerTurnOrder():
-                print("Which Player?")
                 if players is serverThreadInfo.getServerPlayer():
-                    print("Found My Game!")
                     serverThreadInfo.setServerGame(games)
-                    print("Saved My GAME!")
-    print("here1")
     serverThreadInfo.getServerPlayer().sendClientAObject(createClientGame(serverThreadInfo))
-    print("here12")
     removeLobby = serverThreadInfo.getServerLobby()
-    print("here123")
     removeLobby.removePlayer(serverThreadInfo.getServerPlayer())
-    print("here1234")
     serverThreadInfo.setServerLobby(None)
-    print("here12345")
     if removeLobby.getPNumber() == 0:
         serverInfo.getLobbyList().remove(removeLobby)
-    print("here-6")
 
 def moveTokenCommand(serverThreadInfo, block2):
     arguments = block2.split(".")
