@@ -8,7 +8,7 @@ from serverGame import *
 from clientGame import *
 from serverCard import *
 from clientCard import *
-
+from serverChat import *
 
 def createClientPlayer(serverPlayer):
     clientPlayer = ClientPlayer(serverPlayer.getReady(), serverPlayer.getMyToken(), serverPlayer.getMyCards(), serverPlayer.getMyTurn(), serverPlayer.getLostGame())
@@ -37,23 +37,42 @@ def createClientCards(serverCards):
     return clientHand
 
 
-def createClientGameInit(serverGame, player):
+def createClientChat(serverChat):
+    htmlString = ""
+    for lines in serverChat:
+        htmlString += "<b>" + str(lines[0].getMyToken().getTokenCharacter()) + "</b> " + str(lines[1]) + "<br>"
+    return htmlString
+
+
+
+
+
+def createClientGame(serverThreadInfo):
     clientTurnOrder = []
-    for players in serverGame.getPlayerTurnOrder():
-        clientTurnOrder.append(createClientToken(players.getMyToken()))
-    clientPlayerToken = createClientToken(player.getMyToken())
-    clientCards = createClientCards(player.getMyCards())
-    clientGameInit = ClientGameInit(clientTurnOrder, clientPlayerToken, clientCards)
+    for players in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+        clientTurnOrder.append(createClientPlayer(players))
+    clientPlayerToken = createClientToken(serverThreadInfo.getServerPlayer().getMyToken())
+    clientCards = createClientCards(serverThreadInfo.getServerPlayer().getMyCards())
+    clientChat = createClientChat(serverThreadInfo.getServerPlayer().getGameChat())
+    clientGame = ClientGame(clientTurnOrder, clientPlayerToken, clientCards, clientChat)
     return clientGameInit
+
 
 def updateClientGame(serverGame):
     clientTurnOrder = []
+    print("before the string")
     htmlChatLine = ""
+    print("after the string")
     for players in serverGame.getPlayerTurnOrder():
+        print("in loop")
         clientTurnOrder.append(createClientToken(players.getMyToken()))
-    for chatlines in serverGame.getChatlog():
+        print("in ploop")
+    for chatlines in serverGame.getGameChat().getChatlog():
+        print("in loop2")
         htmlChatLine + "<b>" +  str(chatlines[0].getMyToken().getTokeCharacter()) + "</b> " + str(chatlines[1]) + "<br>"
+    print("after before")
     updateClientGame = UpdateClientGame(clientTurnOrder, htmlChatLine)
+    print("after")
     return updateClientGame
     
 

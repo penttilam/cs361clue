@@ -1,6 +1,6 @@
 from serverPlayer import *
 
-class serverChat:
+class ServerChat:
     def __init__(self):
         self.chatlog = []
 
