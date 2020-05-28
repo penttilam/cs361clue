@@ -15,7 +15,7 @@ class ServerGame:
         self.guiltyCards = []
         assignTokens(self.playerTurnOrder)
         self.assignCards()
-        self.chat = None
+        self.chat = []
 
     def getPlayerTurnOrder(self):
         return self.playerTurnOrder
@@ -41,13 +41,14 @@ class ServerGame:
         if self.playerTurnOrder[0] is player:
             self.playerTurnOrder.remove(player)
             self.playerTurnOrder.append(player)
-            player.sendClientAString("game.turn:success")
 
     def getGameChat(self):
         return self.chat
 
     def setGameChat(self, chatIn):
-        self.chat = chatIn
+        if len(self.chat) == 10:
+            del(self.chat[0])
+        self.chat.append(chatIn) 
 
 
 

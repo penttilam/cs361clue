@@ -70,7 +70,7 @@ def newCommand(newLobbyName, serverThreadInfo, serverInfo):
         error_string = str(datetime.now()) + " -- error -- serverThreadInfo.getServerLobby Failed " 
         logging.debug(error_string)
     try:
-        sendUpdatedLobby(serverThreadInfo)
+        sendUpdatedLobby(serverThreadInfo.getServerLobby())
     except:
         error_string = str(datetime.now()) + " -- error -- sendUpdatedLobby Failed " 
         logging.debug(error_string)
@@ -83,7 +83,7 @@ def joinCommand(lobbyName, serverThreadInfo, serverInfo):
         if serverLobby.getId() == lobbyName:
             if serverLobby.addPlayer(serverThreadInfo.getServerPlayer()):
                 serverThreadInfo.setServerLobby(serverLobby)
-                sendUpdatedLobby(serverThreadInfo)
+                sendUpdatedLobby(serverThreadInfo.getServerLobby())
             else:
                 listCommand(serverThreadInfo, serverInfo)
             break
@@ -94,29 +94,40 @@ def listCommand(serverThreadInfo, serverInfo):
     clientLobbyList = []
     for serverLobby in serverInfo.getLobbyList():
         clientLobbyList.append(createClientLobby(serverLobby))
+    print(clientLobbyList)
     player.sendClientAObject(clientLobbyList)
 
 
 ##this function revomes a player from their lobby
 def leaveCommand(serverThreadInfo, serverInfo):
     try:
-        serverThreadInfo.getServerLobby().removePlayer(player)
+        removeLobby = serverThreadInfo.getServerLobby()
+        removeLobby.removePlayer(player)
+        serverThreadInfo.setServerLobby(None)
     except:
         pass
     else:
         serverThreadInfo.getServerPlayer().sendClientAString("lobby.leave:confimed")
-        if serverThreadInfo.getServerLobby().getPNumber() == 0:
-            serverInfo.getLobbyList().remove(serverThreadInfo.getServerLobby())
-            serverThreadInfo.setServerLobby(None)
+        if removeLobby.getPNumber() == 0:
+            serverInfo.getLobbyList().remove(removeLobby)
     finally:
-        sendUpdatedLobby(serverThreadInfo)
+        sendUpdatedLobby(removeLobby)
 
 
 ##this function initializes the game
 def startCommand(serverThreadInfo, serverInfo):
+    print("here 1")
     serverThreadInfo.getServerLobby().setStartGame()
-    serverInfo.getGameList().append(serverGame(serverThreadInfo.getServerLobby()))
-    sendUpdatedLobby(serverThreadInfo)
+    print("here 2")
+    print(serverThreadInfo.getServerLobby())
+    print(serverThreadInfo.getServerLobby().getPlayers())
+    serverGame = ServerGame(serverThreadInfo.getServerLobby().getPlayers())
+    print("here 2.5")
+    serverInfo.getGameList().append(serverGame)
+    serverThreadInfo.setServerGame(serverGame)
+    print("here 3")
+    sendUpdatedLobby(serverThreadInfo.getServerLobby())
+    print("here 4")
 
 
 ##this function sets the player to ready
@@ -127,15 +138,15 @@ def readyCommand(serverThreadInfo):
     elif serverThreadInfo.getServerPlayer().getReady() == True:
         serverThreadInfo.getServerPlayer().setReady(False)
     print("in the middle")
-    sendUpdatedLobby(serverThreadInfo)
+    sendUpdatedLobby(serverThreadInfo.getServerLobby())
     print("after update")
 
 
-def sendUpdatedLobby(serverThreadInfo):
+def sendUpdatedLobby(serverLobbyIn):
     print("here1")
-    clientLobby = createClientLobby(serverThreadInfo.getServerLobby())
+    clientLobby = createClientLobby(serverLobbyIn)
     print("here2")
-    LobbyPlayers = serverThreadInfo.getServerLobby().getPlayers()
+    LobbyPlayers = serverLobbyIn.getPlayers()
     print("here3")
     for player in LobbyPlayers:
         print("here4")
@@ -192,30 +203,52 @@ def lobbyCommand(block1, block2, serverThreadInfo, serverInfo):
             logging.debug(error_string)
 
 
-def createCommand(serverThreadInfo):
-    serverThreadInfo.getServerPlayer().sendClientAObject(creatClientGameInit(serverThreadInfo.getServerGame(), serverThreadInfo.getServerPlayer()))
-    serverThreadInfo.getServerLobby().removePlayer(serverThreadInfo.getServerPlayer())
-
+def createCommand(serverThreadInfo, serverInfo):
+    if serverThreadInfo.getServerGame() == None:
+        print("Not the host!")
+        for games in serverInfo.getGameList():
+            print("Which Game?")
+            for players in games.getPlayerTurnOrder():
+                print("Which Player?")
+                if players is serverThreadInfo.getServerPlayer():
+                    print("Found My Game!")
+                    serverThreadInfo.setServerGame(games)
+                    print("Saved My GAME!")
+    print("here1")
+    serverThreadInfo.getServerPlayer().sendClientAObject(createClientGame(serverThreadInfo))
+    print("here12")
+    removeLobby = serverThreadInfo.getServerLobby()
+    print("here123")
+    removeLobby.removePlayer(serverThreadInfo.getServerPlayer())
+    print("here1234")
+    serverThreadInfo.setServerLobby(None)
+    print("here12345")
+    if removeLobby.getPNumber() == 0:
+        serverInfo.getLobbyList().remove(removeLobby)
+    print("here-6")
 
 def moveTokenCommand(serverThreadInfo, block2):
     arguments = block2.split(".")
     serverThreadInfo.getServerPlayer().getMyToken().setTokenXLocYLoc(arguments[0], arguments[1])
     for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
-        player.sendClientAObject(ClientGame(serverThreadInfo.getServerGame()))
+        player.sendClientAObject(createClientGame(serverThreadInfo))
 
 
 def turnCommand(serverThreadInfo):
     try:
         serverThreadInfo.getServerGame().changeTurn(serverThreadInfo.getServerPlayer())
         for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
-            player.sendClientAObject(ClientGame(serverThreadInfo.getServerGame()))
+            player.sendClientAObject(createClientGame(serverThreadInfo))
     except:
         error_string = str(datetime.now()) + " -- error -- game.turn -- " + str(serverThreadInfo.getServerPlayer())
         logging.debug(error_string)
 
 
-def chatCommand(player, argumentInput):
-    pass
+def chatCommand(serverThreadInfo, argumentInput):
+    htmlString = "<b>" + str(serverThreadInfo.getServerPlayer().getMyToken().getTokenCharacter()) + "</b> " + str(argumentInput) + "<br>"
+    serverGame.setGameChat(htmlString)
+    for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+        player.sendClientAObject(createClientGame(serverThreadInfo))
 
 
 def gameCommand(block1, block2, serverThreadInfo, serverInfo):
@@ -223,7 +256,7 @@ def gameCommand(block1, block2, serverThreadInfo, serverInfo):
 
     if arguments[1] == "create":
         try:
-            createCommand(serverThreadInfo)
+            createCommand(serverThreadInfo, serverInfo)
         except:
             error_string = str(datetime.now()) + " -- error -- game.create Failed " 
             logging.debug(error_string)
@@ -295,11 +328,12 @@ def Threaded_Client(serverThreadInfo, serverInfo):
 
     try:
         if not serverThreadInfo.getServerLobby() == None:
-            serverThreadInfo.getServerLobby().removePlayer(serverThreadInfo.getServerPlayer())
+            removeLobby = serverThreadInfo.getServerLobby()
+            removeLobby.removePlayer(serverThreadInfo.getServerPlayer())
             serverThreadInfo.setServerLobby(None)
             print("Removed from Lobby")
-            if serverThreadInfo.getServerLobby().getPNumber() == 0:
-                serverInfo.getLobbyList().remove(serverThreadInfo.getServerLobby())
+            if removeLobby.getPNumber() == 0:
+                serverInfo.getLobbyList().remove(removeLobby)
                 print("Lobby Removed")
     except:
         pass

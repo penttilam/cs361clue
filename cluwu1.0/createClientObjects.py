@@ -11,7 +11,11 @@ from clientCard import *
 from serverChat import *
 
 def createClientPlayer(serverPlayer):
-    clientPlayer = ClientPlayer(serverPlayer.getReady(), serverPlayer.getMyToken(), serverPlayer.getMyCards(), serverPlayer.getMyTurn(), serverPlayer.getLostGame())
+    print(serverPlayer.getMyToken())
+    print(createClientToken(serverPlayer.getMyToken()))
+    clientPlayer = ClientPlayer(serverPlayer.getReady(), createClientToken(serverPlayer.getMyToken()), serverPlayer.getMyCards(), serverPlayer.getMyTurn(), serverPlayer.getLostGame())
+    print("after clientPlayer")
+    print(clientPlayer)
     return clientPlayer
 
 
@@ -20,13 +24,19 @@ def createClientLobby(serverLobby):
     serverPlayers = []
     serverPlayers = serverLobby.getPlayers()
     for player in serverPlayers:
+        print("before")
         clientPlayer = createClientPlayer(player)
+        print("After")
         clientPlayerList.append(clientPlayer)
+    print(clientPlayerList)
     clientLobby = ClientLobby(serverLobby.getId(), serverLobby.getPNumber(), clientPlayerList, serverLobby.getLobbyReady(), serverLobby.getStartGame())
     return clientLobby
 
 def createClientToken(serverToken):
-    clientToken = ClientToken(serverToken.getTokenCharacter(), serverToken.getTokenXLoc(), serverToken.getTokenYLoc())
+    try:
+        clientToken = ClientToken(serverToken.getTokenCharacter(), serverToken.getTokenXLoc(), serverToken.getTokenYLoc())
+    except:
+        clientToken = None
     return clientToken
 
 def createClientCards(serverCards):
@@ -40,7 +50,7 @@ def createClientCards(serverCards):
 def createClientChat(serverChat):
     htmlString = ""
     for lines in serverChat:
-        htmlString += "<b>" + str(lines[0].getMyToken().getTokenCharacter()) + "</b> " + str(lines[1]) + "<br>"
+        htmlString += lines
     return htmlString
 
 
@@ -48,14 +58,21 @@ def createClientChat(serverChat):
 
 
 def createClientGame(serverThreadInfo):
+    print("ClientGameStart")
     clientTurnOrder = []
     for players in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+        print("ClientGameFor")
         clientTurnOrder.append(createClientPlayer(players))
+    print("ClientGameAfterFor")
     clientPlayerToken = createClientToken(serverThreadInfo.getServerPlayer().getMyToken())
+    print("ClientGameAfterToken")
     clientCards = createClientCards(serverThreadInfo.getServerPlayer().getMyCards())
-    clientChat = createClientChat(serverThreadInfo.getServerPlayer().getGameChat())
+    print("ClientGameAfterCards")
+    clientChat = createClientChat(serverThreadInfo.getServerGame().getGameChat())
+    print("ClientGameAfterChar")
     clientGame = ClientGame(clientTurnOrder, clientPlayerToken, clientCards, clientChat)
-    return clientGameInit
+    print("ClientGameAfterCLIENTGAME")
+    return clientGame
 
 
 def updateClientGame(serverGame):
