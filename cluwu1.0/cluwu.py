@@ -157,11 +157,12 @@ def hostGame():
 
 #starts game list selection
 def startGameList():
-    #pygame surface
+    
     managerList = []
     manager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./ourTheme.json')
     managerList.append(manager)
 
+    #pygame surface
     background = pygame.Surface((WIDTH, HEIGHT))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
@@ -215,7 +216,7 @@ def startGameList():
                     else:
                         gameName = gameSelectList.get_single_selection().split(' ')[0]
 
-                    netConn.send("lobby.join:"+gameName)
+                    netConn.send("lobby.join:" + gameName)
                     joinResponse = netConn.catch()
                     joinLobby = LobbyStart(netConn, joinResponse)
                     joinedLobby = joinLobby.startLobby()
@@ -289,11 +290,7 @@ def testingFunction():
     gameBoard = GameBoard(netConn)
     gameBoard.gameBoard()
 
-# packae = pygame_gui.PackageResource(pygame_gui.data, 'ourTheme.json')
-
-
-
-# TESTING
+# TESTING FUNCTION ENSURE COMMENTED OUT IF NEED TO TEST ANYTHING BEFORE THE GAME BOARD
 # testingFunction()
 # run the program
 splash()

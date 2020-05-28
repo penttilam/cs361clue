@@ -19,13 +19,13 @@ from clientChat import *
 from Label import Label
 import threading
 import time
+# set resolution as a constant, yes 1680 is weird, but the grid lines up properly at those numbers
 WIDTH = 1680
 HEIGHT = 900
 
 class LobbyStart:
     def __init__(self, netConn, lobby):
         self.lobbyStatus = lobby
-        print("lobby: " + lobby.getId())
         self.lobbyPlayersStatus = None
         self.netConn = netConn
         #text box to display player ids and ready status 
@@ -38,10 +38,11 @@ class LobbyStart:
         self.managerList.append(self.manager)
     
     def startLobby(self):
+
         clock = pygame.time.Clock()
         windowSurface = pygame.display.set_mode((WIDTH, HEIGHT))
-        # List of managers used to set themes
 
+        # List of managers used to set themes/screen height of objects
         manager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./ourTheme.json')
         self.managerList.append(manager)
         rdyManager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./rdyTheme.json')
@@ -49,10 +50,10 @@ class LobbyStart:
         notRdyManager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path='./notRdyTheme.json')
         self.managerList.append(notRdyManager)
 
+        # Display the background
         background = pygame.Surface((WIDTH, HEIGHT))
-        # background.fill(manager.ui_theme.get_colour('dark_bg'))
         windowSurface.blit(background, (0, 0))
-        #pygame surface
+        # Set the background image of the game board
         Image('board.png', manager, 0, 0, WIDTH, HEIGHT)
         
         # Button that starts the game when all players are ready, NOT visible to peons
@@ -65,68 +66,85 @@ class LobbyStart:
         readyButton.setXLocYLoc(int(WIDTH/17), int(HEIGHT/2))
         readyButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
 
+        # Button to return to lobby list or host game menu
         backButton = Button('Back', manager)
         backButton.setXLocYLoc(int(WIDTH/17), int(HEIGHT/2+HEIGHT/20))
         backButton.setWidthHeight(int(WIDTH/10), int(HEIGHT/20))
         
+        # Draw all items associated with managers
         for each in self.managerList:
             each.draw_ui(windowSurface)
         pygame.display.update()
+
+        # Declare and start thread for getting updates from server
         clientThreads = threading.Thread(target=self.getUpdates, args=(None, None))
         clientThreads.start()
+
+        # Display a textbox with current player status (Ready, Not Ready)
         self.lobbyPlayersStatus = TextBox(self.managerList[1], self.lobbyStatus.htmlStringify(), self.lobbyPlayersStatusX, self.lobbyPlayersStatusY, self.lobbyPlayersStatusW, self.lobbyPlayersStatusH, wrapToHeight=True)
+        
         while True:
+            # Set refresh rate for managers
             time_delta = clock.tick(60) / 1000.0
-            #update the text box to let players know who is ready etc...
+        
+            # Attempt to re-join the thread listening for server commands
             clientThreads.join(1/1000)
+
+            # If thread caught something from server it should not be alive
+            # If it is not alive, handle the input from the server
             if not clientThreads.is_alive():
-                print("LobbyStatus: " + str(self.lobbyStatus))
-                print(str(self.lobbyStatus.getStartGame()))
+                # If server told us the game is starting, launch the game board
                 if self.lobbyStatus.getStartGame():
-                    print("did it work")
                     gameBoard = GameBoard(self.netConn)
-                    print("that worked")
-                    return gameBoard.gameBoard()                    
+                    return gameBoard.gameBoard()
+                # If the server returned an object, process the update then start a new thread
                 elif type(self.lobbyStatus) != type(""):
-                    print("lobbyStatus is not a string")
                     self.processClientUpdates()
                     clientThreads = threading.Thread(target=self.getUpdates, args=(None, None))
                     clientThreads.start()
-                    print("updates processed")
+                # If server sent confirmation that player wanted to leave, return from function
                 elif self.lobbyStatus == "lobby.leave:confirmed":
-                    print("Got to the return on leave")
                     return "leave"
 
+            # If the player is the host, display the Start Game button
             if self.lobbyStatus.getLobbyHost():
                 startButtonX = int(WIDTH/17)
                 startButton.setXLoc(startButtonX)
+                # If there are 1 or more players that are ready, enable the start button, otherwise disable
                 if self.lobbyStatus.getLobbyReadyStatus() and self.lobbyStatus.getNumberOfPlayers() > 0:
                     startButton.enable()
                 else:
                     startButton.disable()
+
+            # Check for interaction with the game
             for event in pygame.event.get():
                 if event.type == QUIT:
                     self.netConn.send("quit")
                     raise SystemExit
+                # If the player clicked a button or pressed a key
                 if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
+                    # Check if the player clicked to start the game and send command to server
                     if startButton.getClickedStatus(event):
                         self.netConn.send("lobby.start")
 
-                    #events for ready button
+                    # Check if the ready button was clicked, send ready command to server and toggle the value if so
                     elif readyButton.getClickedStatus(event):
                         #if player presses the ready button
                         self.netConn.send("lobby.ready")
                         #change color from red to green and back when button is pushed
                         if readyButton.getText() == "Not Ready":
                             readyButton.setText("Ready")
+                            # Change manager to change displayed color green
                             readyButton.setManager(rdyManager)
                         else:
                             readyButton.setText("Not Ready")
+                            # Change manager to change displayed color to red
                             readyButton.setManager(notRdyManager)
-
+                    
+                    # Check if the back button was pressed and return from function
                     elif backButton.getClickedStatus(event):
                         self.netConn.send("lobby.leave")
-                        # return "leave"
+
             # Update events based on clock ticks
             for each in self.managerList:
                 each.process_events(event)
@@ -134,17 +152,10 @@ class LobbyStart:
                 each.draw_ui(windowSurface)
             pygame.display.update()
 
+    # processClientUpdates function updates the player status information.
     def processClientUpdates(self):
-        print("updatin yo box")
-        #if player status changes update the information.
         self.lobbyPlayersStatus.setText(self.lobbyStatus.htmlStringify())
-        print("yo box updated")
 
-
+    # getUpdates function takes two empty args and attempts to catch data from the server
     def getUpdates(self, arg1, arg2):
-        tempCatch = self.netConn.catch()
-        print("In the catch1: " + tempCatch.getId())
-        while type(tempCatch) == type(""):
-            tempCatch = self.netConn.catch()
-            print("In the catch2: " + tempCatch.getId())
-        self.lobbyStatus = tempCatch
+        self.lobbyStatus = self.netConn.catch()
