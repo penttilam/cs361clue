@@ -204,7 +204,7 @@ class GameBoard:
         # Game loop
         while True:
             # check if it's the player's turn
-            myTurn = self.clientGame.getTurnOrder()[0] == self.myToken.getObjectId()
+            myTurn = self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter() == self.myToken.getObjectId()
             if myTurn:
                 # Display and end turn button for the player next to the die
                 endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
