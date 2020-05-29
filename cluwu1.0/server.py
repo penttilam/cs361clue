@@ -23,9 +23,9 @@ from serverThread import *
 
 ##Creating the server socket and listening for a connection
 
-# server = "45.132.241.193"
-server = "localhost"
-port = 42069
+server = "45.132.241.193"
+#server = "localhost"
+port = 4206
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -202,23 +202,34 @@ def moveTokenCommand(serverThreadInfo, block2):
     arguments = block2.split(".")
     serverThreadInfo.getServerPlayer().getMyToken().setTokenXLocYLoc(arguments[0], arguments[1])
     for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
-        player.sendClientAObject(createClientGame(serverThreadInfo))
+        if not player is serverThreadInfo.getServerPlayer():
+            player.sendClientAObject(createClientGame(serverThreadInfo))
 
 
 def turnCommand(serverThreadInfo):
     try:
+        print("print try")
         serverThreadInfo.getServerGame().changeTurn(serverThreadInfo.getServerPlayer())
-        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
-            player.sendClientAObject(createClientGame(serverThreadInfo))
+        print(serverThreadInfo.getServerGame().getPlayerTurnOrder())
+        updateGame(serverThreadInfo)
+
     except:
+        print("print except")
         error_string = str(datetime.now()) + " -- error -- game.turn -- " + str(serverThreadInfo.getServerPlayer())
         logging.debug(error_string)
 
 
 def chatCommand(serverThreadInfo, argumentInput):
+    print(argumentInput)
     htmlString = "<b>" + str(serverThreadInfo.getServerPlayer().getMyToken().getTokenCharacter()) + "</b> " + str(argumentInput) + "<br>"
-    serverGame.setGameChat(htmlString)
+    print(htmlString)
+    serverThreadInfo.getServerGame().setGameChat(htmlString)
+    updateGame(serverThreadInfo)
+
+def updateGame(serverThreadInfo):
+    print("this is update game")
     for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+        print("print for loop")
         player.sendClientAObject(createClientGame(serverThreadInfo))
 
 
@@ -245,7 +256,7 @@ def gameCommand(block1, block2, serverThreadInfo, serverInfo):
             logging.debug(error_string)
     elif arguments[1] == "chat":
         try:
-            chatCommand(serverThreadInfo, arguments[2])
+            chatCommand(serverThreadInfo, block2)
         except:
             error_string = str(datetime.now()) + " -- error -- game.chat Failed " 
             logging.debug(error_string)

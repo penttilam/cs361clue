@@ -337,3 +337,32 @@ DEBUG:root:2020-05-27 08:10:45.637256 -- error -- game.create Failed
 DEBUG:root:2020-05-27 08:10:58.997325 -- error -- connection3:game.create
 DEBUG:root:2020-05-27 08:13:09.311433 -- error -- connection2:game.create
 DEBUG:root:2020-05-27 08:16:00.907447 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 04:28:57.651731 -- error -- connection4:game.create
+DEBUG:root:2020-05-29 04:31:54.589373 -- error -- connection5:lobby.lobbies
+DEBUG:root:2020-05-29 04:33:14.847129 -- error -- connection7:lobby.lobbies
+DEBUG:root:2020-05-29 04:34:35.177625 -- error -- connection8:lobby.new:wshjk
+DEBUG:root:2020-05-29 04:41:16.399245 -- error -- connection12:game.create
+DEBUG:root:2020-05-29 04:45:36.181244 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x7fd88fd3fcf8>
+DEBUG:root:2020-05-29 04:53:05.484952 -- error -- connection2:game.turn
+DEBUG:root:2020-05-29 05:05:58.514325 -- error -- connection2:game.create
+DEBUG:root:2020-05-29 05:09:31.556159 -- error -- game.create Failed 
+DEBUG:root:2020-05-29 05:09:31.592401 -- error -- game.create Failed 
+DEBUG:root:2020-05-29 05:09:47.134128 -- error -- connection1:game.create
+DEBUG:root:2020-05-29 05:09:58.826270 -- error -- connection2:game.create
+DEBUG:root:2020-05-29 05:10:25.247809 -- error -- game.create Failed 
+DEBUG:root:2020-05-29 05:10:25.259295 -- error -- game.create Failed 
+DEBUG:root:2020-05-29 05:10:40.788066 -- error -- connection3:game.create
+DEBUG:root:2020-05-29 05:14:06.761739 -- error -- game.create Failed 
+DEBUG:root:2020-05-29 05:14:21.602537 -- error -- connection1:lobby.lobbies
+DEBUG:root:2020-05-29 05:14:53.556617 -- error -- game.create Failed 
+DEBUG:root:2020-05-29 05:14:53.572902 -- error -- game.create Failed 
+DEBUG:root:2020-05-29 05:18:12.895149 -- error -- connection2:lobby.lobbies
+DEBUG:root:2020-05-29 05:21:26.661095 -- error -- connection2:game.turn
+DEBUG:root:2020-05-29 05:34:21.412751 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 05:35:11.691473 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 06:14:11.035988 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x7f6c7bd98e80>
+DEBUG:root:2020-05-29 06:29:44.811584 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 06:29:55.475410 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 06:32:24.634436 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 06:32:53.245370 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 06:33:16.215497 -- error -- game.chat Failed 
