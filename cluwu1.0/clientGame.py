@@ -22,6 +22,9 @@ class ClientGame:
         else:
             return False
 
+    def setTurnOrder(self, turnOrder):
+        self.turnOrder = turnOrder
+        
     def getChat(self):
         return self.myChat
 

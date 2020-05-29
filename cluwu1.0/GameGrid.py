@@ -1,5 +1,5 @@
 import pygame
-# import pygame_gui
+import pygame_gui
 from pygame.locals import *
 from Button import Button
 

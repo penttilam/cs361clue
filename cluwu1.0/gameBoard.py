@@ -96,7 +96,7 @@ class GameBoard:
         # ImageButton to roll the dice
         diceButton = ImageButton(layer0, imageFile='die6.png', buttonText=" ")
         diceButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)), int(HEIGHT/4)+180)
-        diceButton.setWidthHeight(int(120), int(120))
+        diceButton.setWidthHeight(int(80), int(80))
         Label("Roll", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 100, 142, 20)
         self.rollLabel = Label("Current Moves: 0", layer1, diceButton.getXLoc(), diceButton.getYLoc() - 20, 142, 20)
         # myRoll should always be -1 unless it is that player's turn
@@ -294,7 +294,7 @@ class GameBoard:
                             if myRoll == -1 and myTurn:
                                 myRoll = 100
                                 # myRoll = random.randrange(1,6,1)
-                                diceButton.setImage("die" + myRoll + ".png")
+                                diceButton.setImage("die" + str(myRoll) + ".png")
                                 self.rollLabel.setText("You rolled: " + str(myRoll))
                             # If player has already rolle dthis turn, indicate how many moves they have left
                             elif myTurn:
@@ -306,8 +306,9 @@ class GameBoard:
                         # Moves token if it is the player's turn, they have moves left, the notebook and hand are not visible and they clicked on a valid game tile
                         elif myTurn and myRoll > 0 and self.checkHidden(notebook) and self.checkHidden(hand) and self.gameGrid.clickedTile(event, self.myToken):
                             self.netConn.send("game.move:"+str(self.myToken.getRow())+"."+str(self.myToken.getColumn()))
-                            # Reset the die roll 
+                            # Decrease die roll by 1
                             myRoll -= 1
+                            self.rollLabel.setText("Current Moves: " + str(myRoll))
             
             # Update events based on clock ticks
             for each in self.managerList:
@@ -323,9 +324,11 @@ class GameBoard:
         # Store the character who has the current turn
         currentTurnCharacter = self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter()
         # Update the Chatlog from the server, currently stores 10 lines of text
-        #self.chatLog.addText(self.clientUpdate.getChatUpdate())
+        self.chatLog.setText(self.clientUpdate.getChat())
         # Call function to move the tokens to locations indicated by server
+        print("In the update")
         self.updateTokenPositions(tokenUpdates)
+        # self.clientGame = self.clientUpdate
         # Update the client game turn order
         if tokenUpdates[0].getGameToken().getTokenCharacter() != currentTurnCharacter:
             self.clientGame.setTurnOrder(tokenUpdates)
@@ -365,7 +368,7 @@ class GameBoard:
             for image in self.turnOrderImages:
                 image.kill()
             for character in reversed(turnOrder):
-                name = character.getTokenCharacter()
+                name = character.getGameToken().getTokenCharacter()
                 # Add images to the turn order
                 self.turnOrderImages[i] = Image(name + "Head.png", manager, 90, yLoc + 90, 142, 190, object_id="turn"+name)
                 # Set yLoc for the next card to move it down to stagger the cards
