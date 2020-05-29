@@ -4,6 +4,7 @@
 
 class ClientPlayer:
     def __init__(self, ready, token, cards, turn, lost):
+        print("init")
         self.ready = ready
         self.myToken = token 
         self.myCards = cards

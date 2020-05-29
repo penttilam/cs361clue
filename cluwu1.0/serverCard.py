@@ -15,7 +15,6 @@ class serverCards:
 
 
 def createDecks():
-    print("the start of create")
 
     serverCardSet = []
     serverDeck = []
@@ -41,12 +40,12 @@ def createDecks():
 
     location = [shrine, library, tearoom, karaoke, lovehotel, mangastore, school, hotsprings, beach]
 
-    colonelmustard = serverCards("colonelmustard", "people")
-    mrgreen = serverCards("mrgreen", "people")
-    mrswhite = serverCards("mrswhite", "people")
-    mspeacock = serverCards("mspeacock", "people")
-    msscarlet = serverCards("msscarlet", "people")
-    professorplum = serverCards("professorplum", "people")
+    colonelmustard = serverCards("mustard", "people")
+    mrgreen = serverCards("green", "people")
+    mrswhite = serverCards("white", "people")
+    mspeacock = serverCards("peacock", "people")
+    msscarlet = serverCards("scarlet", "people")
+    professorplum = serverCards("plum", "people")
 
     character = [colonelmustard, mrgreen, mrswhite, mspeacock, msscarlet, professorplum]
 
@@ -71,10 +70,6 @@ def createDecks():
     return serverCardSet
 
 def dealCards(deckList, playerList):
-    print("this a deal of a lifetime")
-    for card in deckList:
-        print(card.cardName)
-
     remCards = 18 % len(playerList)
     divCards = (18 - remCards)/len(playerList)
 
@@ -83,14 +78,10 @@ def dealCards(deckList, playerList):
         tempHand = []
         while numberPlayerCards < divCards:
             numberPlayerCards += 1 
-            print("is it pop")
             tempHand.append(deckList.pop(0))
-            print("after the pop")
-        if not remCards is 0:
-            print("we shouldn't see this...")
+        if remCards != 0:
             tempHand.append(deckList.pop(0))
             remCards -= 1
-        print("before the hand set")
         player.setHand(tempHand)
         
 

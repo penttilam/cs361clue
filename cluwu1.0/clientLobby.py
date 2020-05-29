@@ -12,6 +12,7 @@ class ClientLobby:
         self.playerNameList = playerNames
         self.lobbyReadyStatus = lobbyReady
         self.startGame = start
+        self.lobbyHost = False
         
     def getId(self):
         return self.id
@@ -27,6 +28,12 @@ class ClientLobby:
 
     def getStartGame(self):
         return self.startGame
+
+    def getLobbyHost(self):
+        return self.lobbyHost
+
+    def setLobbyHost(self, hostIn):
+        self.lobbyHost = hostIn
 
     def htmlStringify(self):
         playerCount = 0

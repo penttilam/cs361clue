@@ -11,6 +11,7 @@ class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server = "45.132.241.193"
+        # self.server = "localhost"
         self.port   = 42069
         self.addr   = (self.server, self.port)
         self.id     = self.connect()
@@ -36,11 +37,6 @@ class Network:
         try:
             print("    Sent  --  " + send)
             self.client.send(pickle.dumps(send))#encode the objects to binary code which traveling between server and newtork
-            data = pickle.loads(self.client.recv(2048))
-            print("Received  --  " + str(data))
-            return data  #decode/convert the code to objects
-            
-
         except socket.error as e:
             print(e)
 
@@ -50,8 +46,6 @@ class Network:
     
 ## this catches the objects list 
     def catch(self):
-         print("printing before data!!!!!!")
          data = pickle.loads(self.client.recv(2048))
-         print("object received")
          return data
 

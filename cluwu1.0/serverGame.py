@@ -1,21 +1,21 @@
 from serverPlayer import *
 from serverCard import *
 from serverToken import *
+from serverChat import *
 import random
 
 
-class serverGame:
+class ServerGame:
     def __init__(self, playerList):
-        print("do we make it here")
-        self.playerTurnOrder = playerList
+        self.playerTurnOrder = []
+        for player in playerList:
+            self.playerTurnOrder.append(player)
+
         self.numberPlayers = len(playerList)
         self.guiltyCards = []
-        print("if we made it there we'll make it here")
-        print(self.playerTurnOrder)
         assignTokens(self.playerTurnOrder)
-        print("but can we make it here?")
         self.assignCards()
-        print("with Jesus we can")
+        self.chat = []
 
     def getPlayerTurnOrder(self):
         return self.playerTurnOrder
@@ -32,22 +32,23 @@ class serverGame:
             tokenList.append(player.getToken())
         return tokenList
 
-    def rollDie():
-        return random.randint(1,6)
-
-
     def assignCards(self):
-        print("b4 create")
         serverCards = createDecks()
-        print("after create")
         self.guiltyCards = serverCards[0]
-        print("guilty?")
         dealCards(serverCards[1], self.playerTurnOrder)
-        print("after deal")
 
+    def changeTurn(self, player):
+        if self.playerTurnOrder[0] is player:
+            self.playerTurnOrder.remove(player)
+            self.playerTurnOrder.append(player)
 
+    def getGameChat(self):
+        return self.chat
 
-
+    def setGameChat(self, chatIn):
+        if len(self.chat) == 10:
+            del(self.chat[0])
+        self.chat.append(chatIn) 
 
 
 

@@ -10,7 +10,6 @@ class ServerLobby:
         self.players = []                 ## This is the list holding the players in the lobby 
         self.players.append(host_player)  ## This adds the host directly into the lobby
         self.numberPlayers = 1            ## The lobby starts with the a player in it.. the host
-        host_player.sendClientAString("lobby.created:" + str(self.id)) ## Sends a message to the client
         self.startGame = False
 
     ##this returns the a list of the players
@@ -20,21 +19,19 @@ class ServerLobby:
     ##this adds a player into the lobby
     def addPlayer(self, player):
         if self.numberPlayers == 6:
-            player.sendClient("lobby.join:" + str(self.id) + ".error.full" )
+            return False
         else:
             self.players.append(player)
             self.numberPlayers += 1
-            player.sendClientAString("lobby.join:" + str(self.id) + ".success")
+            return True
      
     ##this removes a player from the lobby
     def removePlayer(self, player):
         self.players.remove(player)
         self.numberPlayers -= 1
-        player.sendClientAString("lobby.remove:" + str(self.id))
 
     ##this this returns a list of the player names
     def getPName(self):
-        print("Am i in the PNAME?")
         names = []
         for x in self.players:
             names.append(x.getConnectionId())
@@ -60,7 +57,5 @@ class ServerLobby:
 
     def setStartGame(self):
         self.startGame = True
-
-
 
 
