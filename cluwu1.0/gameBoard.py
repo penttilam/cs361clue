@@ -194,17 +194,17 @@ class GameBoard:
         self.gameGrid.grid[5][0].setOccupied(1)
 
         # Set the current player
-        currentTurnPlayer = self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter()
+        currentTurnCharacter = self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter()
         # If is not the player's turn, set the label under the die to identify the player whose turn it is
-        if self.myToken.getObjectId() != currentTurnPlayer:
-            self.rollLabel.setText(currentTurnPlayer + "'s Turn")
+        if self.myToken.getObjectId() != currentTurnCharacter:
+            self.rollLabel.setText(currentTurnCharacter + "'s Turn")
         else:
             self.rollLabel.setText("Your Turn") 
 
         # Game loop
         while True:
             # check if it's the player's turn
-            myTurn = currentTurnPlayer == self.myToken.getObjectId()
+            myTurn = self.clientGame.getTurnOrder()[0] == self.myToken.getObjectId()
             if myTurn:
                 # Display and end turn button for the player next to the die
                 endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
@@ -224,7 +224,6 @@ class GameBoard:
                 # Start the thread back up
                 clientThreads = threading.Thread(target=self.getUpdates, args=(None, None))
                 clientThreads.start()
-
             # Get interactions with the game
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -296,12 +295,12 @@ class GameBoard:
                                 # myRoll = random.randrange(1,6,1)
                                 diceButton.setImage("die" + str(myRoll) + ".png")
                                 self.rollLabel.setText("You rolled: " + str(myRoll))
-                            # If player has already rolle dthis turn, indicate how many moves they have left
+                            # If player has already rolled this turn, indicate how many moves they have left
                             elif myTurn:
                                 self.rollLabel.setText("Current Moves: " + str(myRoll))
                             # If it is not the player's turn, roll for fun.
                             else:
-                                self.rollLabel.setText("You rolled: " + str(myRoll))
+                                self.rollLabel.setText("You rolled: " + str(random.randrange(1,6,1)))
 
                         # Moves token if it is the player's turn, they have moves left, the notebook and hand are not visible and they clicked on a valid game tile
                         elif myTurn and myRoll > 0 and self.checkHidden(notebook) and self.checkHidden(hand) and self.gameGrid.clickedTile(event, self.myToken):
@@ -326,7 +325,6 @@ class GameBoard:
         # Update the Chatlog from the server, currently stores 10 lines of text
         self.chatLog.setText(self.clientUpdate.getChat())
         # Call function to move the tokens to locations indicated by server
-        print("In the update")
         self.updateTokenPositions(tokenUpdates)
         # self.clientGame = self.clientUpdate
         # Update the client game turn order
@@ -338,6 +336,7 @@ class GameBoard:
                 self.rollLabel.setText(currentTurnCharacter + "'s Turn")
             else:
                 self.rollLabel.setText("Your Turn")
+        
 
     # Hide the passed panel offscreen
     def hidePanel(self, panel):
