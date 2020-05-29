@@ -94,7 +94,7 @@ class GameBoard:
         Label("Look at Hand", layer1, handButton.getXLoc(), handButton.getYLoc() + 180, 142, 20)
 
         # ImageButton to roll the dice
-        diceButton = ImageButton(layer0, imageFile='dice.png', buttonText=" ")
+        diceButton = ImageButton(layer0, imageFile='die6.png', buttonText=" ")
         diceButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)), int(HEIGHT/4)+180)
         diceButton.setWidthHeight(int(120), int(120))
         Label("Roll", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 100, 142, 20)
@@ -294,6 +294,7 @@ class GameBoard:
                             if myRoll == -1 and myTurn:
                                 myRoll = 100
                                 # myRoll = random.randrange(1,6,1)
+                                diceButton.setImage("die" + myRoll + ".png")
                                 self.rollLabel.setText("You rolled: " + str(myRoll))
                             # If player has already rolle dthis turn, indicate how many moves they have left
                             elif myTurn:
