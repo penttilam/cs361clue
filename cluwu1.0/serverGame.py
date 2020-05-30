@@ -38,7 +38,12 @@ class ServerGame:
         dealCards(serverCards[1], self.playerTurnOrder)
 
     def changeTurn(self, player):
+        print("in change")
+        print(self.playerTurnOrder)
+        print(self.playerTurnOrder[0])
+        print(player)
         if self.playerTurnOrder[0] is player:
+            print("in if")
             self.playerTurnOrder.remove(player)
             self.playerTurnOrder.append(player)
 
@@ -46,9 +51,12 @@ class ServerGame:
         return self.chat
 
     def setGameChat(self, chatIn):
+        print("start chat")
         if len(self.chat) == 10:
+            print("in if")
             del(self.chat[0])
-        self.chat.append(chatIn) 
+        self.chat.append(chatIn)
+        print(self.chat)
 
 
 
