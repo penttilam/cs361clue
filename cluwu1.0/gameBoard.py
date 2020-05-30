@@ -93,6 +93,13 @@ class GameBoard:
         handButton.getButton().setManager(layer0)
         Label("Look at Hand", layer1, handButton.getXLoc(), handButton.getYLoc() + 180, 142, 20)
 
+        # ImageButton to display discarded cards from players that have left
+        discardedButton = ImageButton(layer3, imageFile="cardPile.png", buttonText=" ")
+        discardedButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)) + 100, int(HEIGHT/4) - 60)
+        discardedButton.setWidthHeight(int(142), int(180))
+        discardedButton.getButton().setManager(layer0)
+        Label("Look at Discards", layer1, discardedButton.getXLoc(), discardedButton.getYLoc() + 180, 142, 20)
+
         # ImageButton to roll the dice
         diceButton = ImageButton(layer0, imageFile='die6.png', buttonText=" ")
         diceButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)), int(HEIGHT/4)+180)
