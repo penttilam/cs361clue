@@ -23,8 +23,8 @@ from serverThread import *
 
 ##Creating the server socket and listening for a connection
 
-server = "45.132.241.193"
-#server = "localhost"
+#server = "45.132.241.193"
+server = "localhost"
 port = 4206
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -285,6 +285,14 @@ def clientCommand(clientCommand, serverThreadInfo, serverInfo):
             return True
 
     elif arguments[0] == "quit":
+        print("print before the server quit")
+        serverThreadInfo.getServerGame().setDiscardedCards(serverThreadInfo.getServerPlayer())
+        print("print after discarding cards function call ")
+        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+            if player != serverThreadInfo.getServerPlayer():
+                print("in discard loop")
+                player.sendClientAObject(createClientGame(serverThreadInfo))
+        
         return False
 
 

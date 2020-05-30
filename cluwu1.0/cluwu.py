@@ -70,17 +70,18 @@ def OpenMainMenu():
                 netConn.send("quit")
                 raise SystemExit
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
-                if hostButton.getClickedStatus(event):
-                    #when host is pressed starts the game list by calling the function
-                    return hostGame()
-
-                if joinButton.getClickedStatus(event):
-                    #when join button is pressed starts the game list by calling the function
-                    return startGameList()
-
+                
                 if quitButton.getClickedStatus(event):
                     netConn.send("quit")
                     raise SystemExit
+
+                elif hostButton.getClickedStatus(event):
+                    #when host is pressed starts the game list by calling the function
+                    hostGame()
+
+                elif joinButton.getClickedStatus(event):
+                    #when join button is pressed starts the game list by calling the function
+                    startGameList()
 
             manager.process_events(event)
             manager.update(time_delta)
@@ -122,10 +123,10 @@ def hostGame():
             if event.type == QUIT:
                 netConn.send("quit")
                 raise SystemExit
-            try:
-                event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED or event.type == KEYDOWN
+          
+            if event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED or event.type == KEYDOWN:
                 if backButton.getClickedStatus(event):
-                    return OpenMainMenu()
+                    return 
 
                 if startButton.getClickedStatus(event) and gameName.getText() != "":
                     gameNameCamel = gameName.getText()
@@ -138,12 +139,8 @@ def hostGame():
                     startLobby = LobbyStart(netConn, newLobby)
                     print(startLobby)
                     startedLobby = startLobby.startLobby()
-                    if startedLobby == "leave":
-                        OpenMainMenu()
-                    else:
-                        return
-            except:
-                pass
+                    return
+
             # Redraw the background
             windowSurface.blit(background, (0, 0))
             # Update events based on clock ticks
@@ -220,11 +217,7 @@ def startGameList():
                     joinResponse = netConn.catch()
                     joinLobby = LobbyStart(netConn, joinResponse)
                     joinedLobby = joinLobby.startLobby()
-                    if joinedLobby == "leave":
-                        return OpenMainMenu()
-                    #otherwise refresh the lobby list
-                    else:
-                        return startGameList()
+                    return
 
                 #events for refresh button 
                 elif refreshButton.getClickedStatus(event):
@@ -232,7 +225,7 @@ def startGameList():
                 
                 #events for back button
                 elif backButton.getClickedStatus(event):
-                    return OpenMainMenu()
+                    return 
 
             # Redraw the background
             windowSurface.blit(background, (0, 0))
@@ -291,7 +284,7 @@ def testingFunction():
     gameBoard.gameBoard()
 
 # TESTING FUNCTION ENSURE COMMENTED OUT IF NEED TO TEST ANYTHING BEFORE THE GAME BOARD
-testingFunction()
+# testingFunction()
 # run the program
 splash()
 

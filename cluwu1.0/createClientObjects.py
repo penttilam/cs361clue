@@ -72,6 +72,7 @@ def createClientGame(serverThreadInfo):
     print("ClientGameAfterChar")
     clientGame = ClientGame(clientTurnOrder, clientPlayerToken, clientCards, clientChat)
     print("ClientGameAfterCLIENTGAME")
+    clientGame.setDiscardedCards(serverThreadInfo.getServerGame().getDiscardedCards())
     return clientGame
 
 

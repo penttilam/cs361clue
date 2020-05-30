@@ -6,6 +6,7 @@ class ClientGame:
         self.myToken = tokenIn
         self.myCards = cardsIn
         self.myChat = chatIn
+        self.discards = None
 
     def getTurnOrder(self):
         return self.turnOrder
@@ -27,4 +28,10 @@ class ClientGame:
         
     def getChat(self):
         return self.myChat
+
+    def getDiscardedCards(self):
+        return self.discards
+
+    def setDiscardedCards(self, cards):
+        self.discards = cards
 

@@ -16,6 +16,7 @@ class ServerGame:
         assignTokens(self.playerTurnOrder)
         self.assignCards()
         self.chat = []
+        self.discards = []
 
     def getPlayerTurnOrder(self):
         return self.playerTurnOrder
@@ -57,6 +58,18 @@ class ServerGame:
             del(self.chat[0])
         self.chat.append(chatIn)
         print(self.chat)
+
+    def setDiscardedCards(self, player): 
+        for card in player.getMyCards():
+            self.discards.append(card)
+        # print("print from SET discarded cards")
+        # self.discards.append(player.getMyCards())
+        # print(player.getMyCards()) 
+        # print(self.discards)
+
+    def getDiscardedCards(self): 
+        return self.discards
+        
 
 
 
