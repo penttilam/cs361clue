@@ -23,8 +23,8 @@ from serverThread import *
 
 ##Creating the server socket and listening for a connection
 
-#server = "45.132.241.193"
-server = "localhost"
+server = "45.132.241.193"
+#server = "localhost"
 port = 42069
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -95,7 +95,7 @@ def listCommand(serverThreadInfo, serverInfo):
     for serverLobby in serverInfo.getLobbyList():
         clientLobbyList.append(createClientLobby(serverLobby))
     print(clientLobbyList)
-    player.sendClientAObject(clientLobbyList)
+    serverThreadInfo.getServerPlayer().sendClientAObject(clientLobbyList)
 
 
 ##this function revomes a player from their lobby
@@ -208,13 +208,10 @@ def moveTokenCommand(serverThreadInfo, block2):
 
 def turnCommand(serverThreadInfo):
     try:
-        print("print try")
         serverThreadInfo.getServerGame().changeTurn(serverThreadInfo.getServerPlayer())
-        print(serverThreadInfo.getServerGame().getPlayerTurnOrder())
         updateGame(serverThreadInfo)
 
     except:
-        print("print except")
         error_string = str(datetime.now()) + " -- error -- game.turn -- " + str(serverThreadInfo.getServerPlayer())
         logging.debug(error_string)
 
@@ -231,6 +228,21 @@ def updateGame(serverThreadInfo):
     for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
         print("print for loop")
         player.sendClientAObject(createClientGame(serverThreadInfo))
+
+
+def accuseCommand(serverThreadInfo, block2):
+    print("HERE")
+    accused = block2.split(".")
+    print("HERE")
+    for x in len(serverThreadInfo.getServerGame().getGuiltyCards()):
+        if not accused[x] == serverThreadInfo.getServerGame().getGuiltyCards()[X]:
+            serverThreadInfo.getServerPlayer().setLostGame()
+    if(serverThreadInfo.getServerPlayer().getLostGame() == False):
+        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+            if not player == serverThreadInfo.getServerPlayer():
+                player.setLostGame()
+    print("the update")
+    updateGame(serverThreadInfo)
 
 
 def gameCommand(block1, block2, serverThreadInfo, serverInfo):
@@ -260,6 +272,15 @@ def gameCommand(block1, block2, serverThreadInfo, serverInfo):
         except:
             error_string = str(datetime.now()) + " -- error -- game.chat Failed " 
             logging.debug(error_string)
+    elif arguments[1] == "accuse":
+        print("before Try")
+        try:
+            print("HERE")
+            accuseCommand(serverThreadInfo, block2)
+        except:
+            error_string = str(datetime.now()) + " -- error -- accuse.chat Failed " 
+            logging.debug(error_string)
+
 
 
 
