@@ -4,8 +4,8 @@
 
 import sys
 
-from serverConnection import *
-from serverToken import *
+from serverConnection import Connection
+from serverToken import ServerToken
 
 
 class ServerPlayer():
@@ -15,7 +15,7 @@ class ServerPlayer():
         self.myCards = []
         self.myToken = None
         self.myTurn = False
-        self.lostGame = False
+        self.wonLostGame = None
 
     def setReady(self, ready):
         self.ready = ready
@@ -35,11 +35,11 @@ class ServerPlayer():
     def getMyTurn(self):
         return self.myTurn
 
-    def setLostGame(self):
-        self.lostGame = True
+    def setWonLostGame(self, wonLostBool):
+        self.wonLostGame = wonLostBool
 
-    def getLostGame(self):
-        return self.lostGame
+    def getWonLostGame(self):
+        return self.wonLostGame
 
     def getMyToken(self):
         return self.myToken

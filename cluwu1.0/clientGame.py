@@ -8,6 +8,7 @@ class ClientGame:
         self.myChat = chatIn
         self.discards = None
         self.fullDeck = fullDeckIn
+        self.wonLostGame = None
 
     def getTurnOrder(self):
         return self.turnOrder
@@ -38,3 +39,9 @@ class ClientGame:
 
     def getFullDeck(self): 
         return self.fullDeck
+
+    def getWonLostGame(self):
+        return self.wonLostGame
+
+    def setWonLostGame(self, wonLost):
+        self.wonLostGame = wonLost

@@ -11,13 +11,13 @@ from GameGrid import GameGrid
 from notebook import createNotebook
 from clientPlayer import ClientPlayer
 from clientLobby import ClientLobby
-from clientNetwork import *
-from clientCard import *
-from clientGame import *
-from clientToken import *
+from clientNetwork import Network
+from clientCard import ClientCards
+from clientGame import ClientGame
+from clientToken import ClientToken
 from TextBox import *
 from InputBox import *
-from clientChat import *
+# from clientChat import *
 from Label import Label
 import threading
 import time
@@ -26,6 +26,7 @@ HEIGHT = 900
 
 class GameBoard:
     def __init__(self, netConn):
+        # self.myChar = ClientPlayer(True, None, [], False, False)
         self.characterTokens = []
         self.playerCards = []
         self.fullDeck = None
@@ -42,16 +43,7 @@ class GameBoard:
         self.rollLabel = None
         self.netConn = netConn
         self.clientUpdate = None
-
-    # def showDiscardedCards(self): 
-    #     # ImageButton to display discarded cards from players that have left
-    #     print("Trying to make the discarded card button!!!!!!!!!!!!!!!!!!")
-    #     discardedButton = ImageButton(self.managerList[3], imageFile="cardPile.png", buttonText=" ")
-    #     discardedButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)) + 125, int(HEIGHT/4) - 60)
-    #     discardedButton.setWidthHeight(int(175), int(180))
-    #     discardedButton.getButton().setManager(self.managerList[0])
-    #     Label("Discarded", self.managerList[1], discardedButton.getXLoc(), discardedButton.getYLoc() + 180, 142, 20)
-    #     print("MADE THE BUTTON YAY")
+        self.lostGame = False
 
     def gameBoard(self):
 
@@ -274,7 +266,7 @@ class GameBoard:
                 # Display and end turn button for the player next to the die
                 endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
             else:
-                self.rollLabel.setText(currentTurnCharacter + "'s Turn")
+                # self.rollLabel.setText(currentTurnCharacter + "'s Turn")
                 # Hide the end turn button off screen
                 endTurnButton.setXLoc(WIDTH)
             
@@ -396,15 +388,16 @@ class GameBoard:
                         elif self.discardedButtonFlag and self.discardedButton.getClickedStatus(event):
                             self.hidePanel(accuseHand)
                             self.showPanel(self.discardHand)
-                        elif weaponButton.getClickedStatus(event):
+
+                        elif peopleButton.getClickedStatus(event):
                             accused[0] = event.ui_element.text
-                            weapon = event.ui_element.text
+                            person = event.ui_element.text
                         elif locationButton.getClickedStatus(event):
                             accused[1] = event.ui_element.text
                             location = event.ui_element.text
-                        elif peopleButton.getClickedStatus(event):
+                        elif weaponButton.getClickedStatus(event):
                             accused[2] = event.ui_element.text
-                            person = event.ui_element.text
+                            weapon = event.ui_element.text
                         elif submitAccuse.getClickedStatus(event): 
                             if not (accused[0] == None and accused[1] == None and accused[2] == None):
                                 self.netConn.send("game.accuse:" + str(accused[0]) + "." + str(accused[1]) + "." + str(accused[2]))
@@ -487,12 +480,14 @@ class GameBoard:
             Label("View Discards", self.managerList[1], self.discardedButton.getXLoc(), self.discardedButton.getYLoc() + 180, 142, 20)
             self.discardedButtonFlag = True 
 
-        for player in self.clientGame.getTurnOrder():
-            if self.clientGame.getMyToken() == player.getGameToken():
-                if player.getLostGame() == True:
-                    print("You lost loser") 
-                    pass
-
+        for player in self.clientUpdate.getTurnOrder():
+            if self.myToken.getObjectId() == player.getGameToken().getTokenCharacter() and player.getWonLostGame() == False:
+                print("You lost loser")
+                break
+            elif self.myToken.getObjectId() == player.getGameToken().getTokenCharacter() and player.getWonLostGame() == True:
+                print("You're a weiner")
+                # Trigger WINNER SCREEN HERE
+                break
 
         if self.clientGame.getDiscardedCards() != self.clientUpdate.getDiscardedCards():
             self.clientGame.setDiscardedCards(self.clientUpdate.getDiscardedCards())
@@ -516,8 +511,7 @@ class GameBoard:
             # For each card in the player hand
             for card in self.clientGame.getDiscardedCards():
                 # Create an ImageButton and add it to the hand, clean up this code once all images share the same extension type
-                print(str(card.getCardName()))
-                self.discardHand.addImageButton(ImageButton(self.discardHand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190,container=self.discardHand.getContainer(), object_id="discardIB"+card.getCardName()))
+                self.discardHand.addImageButton(ImageButton(self.discardHand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=self.discardHand.getContainer(), object_id="discardIB"+card.getCardName()))
                 # hand.addImageButton(ImageButton(hand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=hand.getContainer(), object_id="HandIB"+card.getCardName()))
                 if card.getCardCategory() == "weapon":
                     imageFormat = ".jpg"
@@ -534,7 +528,7 @@ class GameBoard:
             self.clientGame.setTurnOrder(tokenUpdates)
             self.displayTurnOrder(self.clientGame.getTurnOrder(), self.managerList[1])
             # Identify whose turn it is and update label accordingly
-            currentTurnCharacter = self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter()
+            currentTurnCharacter = self.turnOrderImages[0].getObjectId()
             if self.myToken.getObjectId() != currentTurnCharacter:
                 self.rollLabel.setText(currentTurnCharacter + "'s Turn")
             else:
@@ -562,7 +556,7 @@ class GameBoard:
             for character in reversed(turnOrder):
                 name = character.getGameToken().getTokenCharacter()
                 # Add images to the turn order
-                self.turnOrderImages.append(Image(name + "Head.png", manager, 90, yLoc + 90, 142, 190, object_id="turn"+name))
+                self.turnOrderImages.append(Image(name + "Head.png", manager, 90, yLoc + 90, 142, 190, object_id=name))
                 # Set yLoc for the next card to move it down to stagger the cards
                 yLoc += 60
         # For subsequent runs, kill the existing images and recreate them with new turn order
@@ -572,7 +566,7 @@ class GameBoard:
             for character in reversed(turnOrder):
                 name = character.getGameToken().getTokenCharacter()
                 # Add images to the turn order
-                self.turnOrderImages[i] = Image(name + "Head.png", manager, 90, yLoc + 90, 142, 190, object_id="turn"+name)
+                self.turnOrderImages[i] = Image(name + "Head.png", manager, 90, yLoc + 90, 142, 190, object_id=name)
                 # Set yLoc for the next card to move it down to stagger the cards
                 yLoc += 60
                 i += 1

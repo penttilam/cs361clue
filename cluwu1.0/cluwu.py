@@ -172,7 +172,6 @@ def startGameList():
 
     lobbyList = []
 
-    print(gameSelectListActiveGamesList)
     for clientLobby in gameSelectListActiveGamesList:
         lobbyList.append(str(clientLobby.getId())+" "+str(clientLobby.getNumberOfPlayers())+ " players")
 
