@@ -28,7 +28,11 @@ class GameBoard:
     def __init__(self, netConn):
         self.characterTokens = []
         self.playerCards = []
+        self.fullDeck = None
         self.managerList = []
+        self.discardedButtonFlag = False 
+        self.discardedButton = None
+        self.discardHand = None
         self.chatLog = None
         self.gameGrid = None
         self.turnOrderImages = []
@@ -39,13 +43,22 @@ class GameBoard:
         self.netConn = netConn
         self.clientUpdate = None
 
+    # def showDiscardedCards(self): 
+    #     # ImageButton to display discarded cards from players that have left
+    #     print("Trying to make the discarded card button!!!!!!!!!!!!!!!!!!")
+    #     discardedButton = ImageButton(self.managerList[3], imageFile="cardPile.png", buttonText=" ")
+    #     discardedButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)) + 125, int(HEIGHT/4) - 60)
+    #     discardedButton.setWidthHeight(int(175), int(180))
+    #     discardedButton.getButton().setManager(self.managerList[0])
+    #     Label("Discarded", self.managerList[1], discardedButton.getXLoc(), discardedButton.getYLoc() + 180, 142, 20)
+    #     print("MADE THE BUTTON YAY")
+
     def gameBoard(self):
+
+        accused = [None, None, None] 
+
         # Set for use in updating displays
         clock = pygame.time.Clock()
-        
-        
-
-        
 
         # Send command to start game and catch the response
         self.netConn.send("game.create")
@@ -74,6 +87,12 @@ class GameBoard:
 
         # Set cards in player hand
         self.playerCards = self.clientGame.getMyCards()
+
+        # Set full deck for player
+        self.fullDeck = self.clientGame.getFullDeck()  
+
+        print("This is the full deck")
+        print(self.fullDeck) 
 
         # Display the turn order of players and display
         self.displayTurnOrder(self.clientGame.getTurnOrder(), layer1, initial=1)
@@ -119,6 +138,15 @@ class GameBoard:
         notebook.setVisibleLocation(int((WIDTH*3)/8))
         notebook.setHiddenLocation(WIDTH)
 
+        # Accuse Button
+        accuseButton = Button("Accuse", layer1, handButton.getXLoc(), 20, 90, 30)
+
+        # Suggest Button
+        suggestButton = Button("Suggest", layer1, handButton.getXLoc(), 80, 90, 30)
+
+
+
+
         # Creates a Button object to allow interaction with checkbox buttons
         checkBoxButton = createNotebook(notebook)
 
@@ -131,6 +159,16 @@ class GameBoard:
         hand.setWidthHeight(len(self.playerCards)*142 + 20 + 10*len(self.playerCards), 215)
         hand.setVisibleLocation(int(WIDTH/2-hand.getWidth()/2))
         hand.setHiddenLocation(WIDTH)
+
+        # Create the panel to display the accuse cards
+        accuseHand = Panel(layer3, layerHeight=2)
+        accuseHand.setXLocYLoc(int(WIDTH), int(HEIGHT/3) - 225)
+        accuseHand.setWidthHeight(len(self.fullDeck[1])*142 + 105, 615)
+        accuseHand.setVisibleLocation(int(WIDTH/2-accuseHand.getWidth()/2))
+        accuseHand.setHiddenLocation(WIDTH)
+
+        # Accusation Submit Button
+        submitAccuse = Button("Accuse", layer3, 1090, 450, 90, 30, container=accuseHand.getContainer())
         
         # cardXLoc allows cards to be placed a card distance apart plus the buffer value between them
         cardXLoc = -142
@@ -166,7 +204,25 @@ class GameBoard:
             self.characterTokens[i].setLocation("outside")
             
             i += 1
-        
+
+        y = 10
+        i = 0
+        # For each card in the the deck
+        for cardType in self.fullDeck:
+            cardXLoc = -142
+            for card in cardType:
+                # Create an ImageButton and add it to the hand, clean up this code once all images share the same extension type
+                accuseHand.addImageButton(ImageButton(accuseHand.getManager(), cardXLoc + 142 + buffer, y, 142, 190, container=accuseHand.getContainer(), object_id="accuseHandIB"+card.getCardCategory(), buttonText=card.getCardName()))
+                if card.getCardCategory() == "weapon":
+                    imageFormat = ".jpg"
+                else:
+                    imageFormat = ".png"
+                # Set the image for the ImageButton
+                accuseHand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
+                cardXLoc += 142 + buffer
+                i += 1
+            y += 200
+            
         # Set the starting locations of each character
         # Scarlet
         self.characterTokens[0].setXLocYLoc(947, 60)
@@ -224,6 +280,9 @@ class GameBoard:
                 # Start the thread back up
                 clientThreads = threading.Thread(target=self.getUpdates, args=(None, None))
                 clientThreads.start()
+
+        
+
             # Get interactions with the game
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -247,6 +306,15 @@ class GameBoard:
                         elif handButton.getClickedStatus(event):
                             self.hidePanel(notebook)
                             self.showPanel(hand)
+                        # If the player clicks the dsicard hand button, display it and hide the notebook
+                        elif self.discardedButtonFlag and self.discardedButton.getClickedStatus(event):
+                            self.hidePanel(notebook)
+                            self.showPanel(self.discardHand)
+                        # If the player clicks the accuse hand button, display it and hide the notebook
+                        elif accuseButton.getClickedStatus(event):
+                            self.hidePanel(notebook)
+                            self.showPanel(accuseHand)
+                            
                         # Cycle notebook checkboxes between blank, X, and checked
                         elif (checkBoxButton.getClickedStatus(event)): 
                             if event.ui_element.text == " ":
@@ -255,6 +323,7 @@ class GameBoard:
                                 event.ui_element.set_text(u'\u2713')
                             elif event.ui_element.text == u'\u2713':
                                 event.ui_element.set_text(" ")
+
                     # If the hand is visible, set the hand to handle all events that come in to prevent clickthrough to the board
                     elif (not self.checkHidden(hand)):
                         hand.panel.process_event(event)
@@ -265,11 +334,85 @@ class GameBoard:
                         elif notebookButton.getClickedStatus(event):
                             self.hidePanel(hand)
                             self.showPanel(notebook)
+                        # If the player clicks the dsicard hand button, display it and hide the hand
+                        elif self.discardedButtonFlag and self.discardedButton.getClickedStatus(event):
+                            self.hidePanel(hand)
+                            self.showPanel(self.discardHand)
+                        # If the player clicks the accuse hand button, display it and hide the hand cards
+                        elif accuseButton.getClickedStatus(event):
+                            self.hidePanel(hand)
+                            self.showPanel(accuseHand)
                         else:
                             # Check if the cards in the hand are clicked, used for accusations/suggestions NOT CURRENTLY IMPLEMENTED TO DO ANYTHING
                             for clicked in range(int(hand.getHandSize()/2)):
                                 if (hand.getImageButton(clicked).getClickedStatus(event)):
+                                    
                                     break
+
+                    # If the discarded cards is visible, set the discarded cards to handle all events that come in to prevent clickthrough to the board
+                    elif self.discardedButtonFlag and (not self.checkHidden(self.discardHand)):
+                        self.discardHand.panel.process_event(event)
+                        # If the player clicks the hand image again or hits escape key, close the discarded cards
+                        if event.type == KEYDOWN and event.key == K_ESCAPE or self.discardedButton.getClickedStatus(event):
+                            self.hidePanel(self.discardHand)
+                        # If the player clicks the notebook button, display it and hide the discarded cards
+                        elif notebookButton.getClickedStatus(event):
+                            self.hidePanel(self.discardHand)
+                            self.showPanel(notebook)
+                        # If the player clicks the hand button, display it and hide the discarded cards
+                        elif handButton.getClickedStatus(event):
+                            self.hidePanel(self.discardHand)
+                            self.showPanel(hand)
+                        # If the player clicks the accuse hand button, display it and hide the discarded cards
+                        elif accuseButton.getClickedStatus(event):
+                            self.hidePanel(self.discardHand)
+                            self.showPanel(accuseHand)
+                        # else:
+                        #     # Check if the cards in the hand are clicked, used for accusations/suggestions NOT CURRENTLY IMPLEMENTED TO DO ANYTHING
+                        #     for clicked in range(int(self.discardHand.getHandSize()/2)):
+                        #         if (self.discardHand.getImageButton(clicked).getClickedStatus(event)):
+                        #             break
+
+                    # If the accuse cards is visible, set the accuse cards to handle all events that come in to prevent clickthrough to the board
+                    elif (not self.checkHidden(accuseHand)):
+                        accuseHand.panel.process_event(event)
+                        # If the player clicks the hand image again or hits escape key, close the accuse cards
+                        if event.type == KEYDOWN and event.key == K_ESCAPE or accuseButton.getClickedStatus(event):
+                            self.hidePanel(accuseHand)
+                        # If the player clicks the notebook button, display it and hide the accuse cards
+                        elif notebookButton.getClickedStatus(event):
+                            self.hidePanel(accuseHand)
+                            self.showPanel(notebook)
+                        # If the player clicks the hand button, display it and hide the accuse cards
+                        elif handButton.getClickedStatus(event):
+                            self.hidePanel(accuseHand)
+                            self.showPanel(hand)
+                        # If the player clicks the dsicard hand button, display it and hide the hand
+                        elif self.discardedButtonFlag and self.discardedButton.getClickedStatus(event):
+                            self.hidePanel(accuseHand)
+                            self.showPanel(self.discardHand)
+                        else:
+                            # If the player clicks accused cards, they can submit a card
+                            for clicked in range(20):
+                                if (accuseHand.getImageButton(clicked).getClickedStatus(event)):
+                                    if event.ui_element.object_ids[2] == "accuseHandIBweapon":
+                                        accused[0] = event.ui_element.text
+                                        break
+                                    elif event.ui_element.object_ids[2] == "accuseHandIBlocation":
+                                        accused[1] = event.ui_element.text
+                                        break
+                                    elif event.ui_element.object_ids[2] == "accuseHandIBpeople":
+                                        accused[2] = event.ui_element.text
+                                        break
+                            if submitAccuse.getClickedStatus(event): 
+                                if not (accused[0] == None and accused[1] == None and accused[2] == None):
+                                    self.netConn.send("game.accuse:" + str(accused[0]) + "." + str(accused[1]) + "." + str(accused[2]))
+                                    self.hidePanel(accuseHand)
+                                
+                                
+                               
+                                    
+
                     else:
                         # Open the Notebook
                         if notebookButton.getClickedStatus(event):
@@ -278,6 +421,14 @@ class GameBoard:
                         # Open the Hand
                         elif handButton.getClickedStatus(event):
                             self.showPanel(hand)
+
+                        # Open the discard hand
+                        elif self.discardedButtonFlag and self.discardedButton.getClickedStatus(event):
+                            self.showPanel(self.discardHand)
+
+                        # Open the accuse hand
+                        elif accuseButton.getClickedStatus(event):
+                            self.showPanel(accuseHand)
                         
                         # End player turn, send command to server
                         elif endTurnButton.getClickedStatus(event):
@@ -286,6 +437,7 @@ class GameBoard:
                             endTurnButton.setXLoc(WIDTH)
                             # reset myRoll to -1
                             myRoll = -1
+
 
                         # Roll the die
                         elif diceButton.getClickedStatus(event):
@@ -326,6 +478,57 @@ class GameBoard:
         self.chatLog.setText(self.clientUpdate.getChat())
         # Call function to move the tokens to locations indicated by server
         self.updateTokenPositions(tokenUpdates)
+
+        #displays discarded cards button if a player leaves the game
+        if self.clientGame.getDiscardedCards() != self.clientUpdate.getDiscardedCards() and self.discardedButtonFlag == False:
+            self.discardedButton = ImageButton(self.managerList[3], imageFile="cardPile.png", buttonText=" ")
+            self.discardedButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)) + 125, int(HEIGHT/4) - 60)
+            self.discardedButton.setWidthHeight(int(175), int(180))
+            self.discardedButton.getButton().setManager(self.managerList[0])
+            Label("Discarded", self.managerList[1], self.discardedButton.getXLoc(), self.discardedButton.getYLoc() + 180, 142, 20)
+            self.discardedButtonFlag = True 
+
+
+        if self.clientGame.getDiscardedCards() != self.clientUpdate.getDiscardedCards():
+            self.clientGame.setDiscardedCards(self.clientUpdate.getDiscardedCards())
+
+            if self.discardHand != None:
+                self.discardHand.kill()
+
+            # Create the panel to display the discarded cards
+            self.discardHand = Panel(self.managerList[3], layerHeight=2)
+            self.discardHand.setXLocYLoc(int(WIDTH), int(HEIGHT/3))
+            self.discardHand.setWidthHeight(len(self.clientGame.getDiscardedCards())*142 + 20 + 10*len(self.clientGame.getDiscardedCards()), 215)
+            self.discardHand.setVisibleLocation(int(WIDTH/2-self.discardHand.getWidth()/2))
+            self.discardHand.setHiddenLocation(WIDTH)
+
+            print("Are you the problem3")
+            
+            # cardXLoc allows cards to be placed a card distance apart plus the buffer value between them
+            cardXLoc = -142
+            buffer = 10
+            i = 0
+
+            print("card list")
+
+            print(self.clientGame.getDiscardedCards())
+
+            # For each card in the player hand
+            for card in self.clientGame.getDiscardedCards():
+                # Create an ImageButton and add it to the hand, clean up this code once all images share the same extension type
+                print(str(card.getCardName()))
+                self.discardHand.addImageButton(ImageButton(self.discardHand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190,container=self.discardHand.getContainer(), object_id="discardIB"+card.getCardName()))
+                # hand.addImageButton(ImageButton(hand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=hand.getContainer(), object_id="HandIB"+card.getCardName()))
+                if card.getCardCategory() == "weapon":
+                    imageFormat = ".jpg"
+                else:
+                    imageFormat = ".png"
+                # Set the image for the ImageButton
+                self.discardHand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
+                # Move the location of the next card in the hand
+                cardXLoc += 142 + buffer
+                i += 1
+
         # self.clientGame = self.clientUpdate
         # Update the client game turn order
         if tokenUpdates[0].getGameToken().getTokenCharacter() != currentTurnCharacter:

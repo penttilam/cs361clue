@@ -16,6 +16,10 @@ class ServerGame:
         assignTokens(self.playerTurnOrder)
         self.assignCards()
         self.chat = []
+        self.discards = []
+        serverCards = createDecks()
+        self.fullDeck = serverCards[2]
+
 
     def getPlayerTurnOrder(self):
         return self.playerTurnOrder
@@ -35,7 +39,13 @@ class ServerGame:
     def assignCards(self):
         serverCards = createDecks()
         self.guiltyCards = serverCards[0]
+        # print("server cards 2")
+        # print(serverCards[2])
+        # self.fullDeck = serverCards[2]
         dealCards(serverCards[1], self.playerTurnOrder)
+
+    def getFullDeck(self):
+        return self.fullDeck 
 
     def changeTurn(self, player):
         print("in change")
@@ -57,6 +67,18 @@ class ServerGame:
             del(self.chat[0])
         self.chat.append(chatIn)
         print(self.chat)
+
+    def setDiscardedCards(self, player): 
+        for card in player.getMyCards():
+            self.discards.append(card)
+        # print("print from SET discarded cards")
+        # self.discards.append(player.getMyCards())
+        # print(player.getMyCards()) 
+        # print(self.discards)
+
+    def getDiscardedCards(self): 
+        return self.discards
+        
 
 
 

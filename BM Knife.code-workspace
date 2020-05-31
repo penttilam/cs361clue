@@ -3,5 +3,8 @@
 		{
 			"path": "cluwu1.0"
 		}
-	]
+	],
+	"settings": {
+		"python.pythonPath": "C:\\Python\\Python36\\python.exe"
+	}
 }

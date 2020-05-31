@@ -337,6 +337,13 @@ DEBUG:root:2020-05-27 08:10:45.637256 -- error -- game.create Failed
 DEBUG:root:2020-05-27 08:10:58.997325 -- error -- connection3:game.create
 DEBUG:root:2020-05-27 08:13:09.311433 -- error -- connection2:game.create
 DEBUG:root:2020-05-27 08:16:00.907447 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 18:35:24.944962 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 18:35:29.352273 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 18:35:30.087246 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 18:35:31.680059 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 18:35:32.288901 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 18:35:32.727916 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 18:35:33.321979 -- error -- game.chat Failed 
 DEBUG:root:2020-05-29 04:28:57.651731 -- error -- connection4:game.create
 DEBUG:root:2020-05-29 04:31:54.589373 -- error -- connection5:lobby.lobbies
 DEBUG:root:2020-05-29 04:33:14.847129 -- error -- connection7:lobby.lobbies
@@ -366,3 +373,84 @@ DEBUG:root:2020-05-29 06:29:55.475410 -- error -- game.chat Failed
 DEBUG:root:2020-05-29 06:32:24.634436 -- error -- game.chat Failed 
 DEBUG:root:2020-05-29 06:32:53.245370 -- error -- game.chat Failed 
 DEBUG:root:2020-05-29 06:33:16.215497 -- error -- game.chat Failed 
+DEBUG:root:2020-05-29 19:21:53.916129 -- error -- connection1:quit
+DEBUG:root:2020-05-29 19:28:15.044129 -- error -- connection2:quit
+DEBUG:root:2020-05-29 19:28:18.257674 -- error -- connection1:game.create
+DEBUG:root:2020-05-29 19:30:18.709447 -- error -- connection1:quit
+DEBUG:root:2020-05-29 19:31:26.867422 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:27.453765 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:28.828868 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:29.296616 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:29.733448 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:30.299447 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:30.654447 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:31.059363 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:32.286756 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:32.708629 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:33.408302 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:34.682388 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x0000029025D49C70>
+DEBUG:root:2020-05-29 19:31:47.221575 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:47.877253 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:48.377458 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:48.952920 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:49.328918 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:52.375768 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x0000029025D49C70>
+DEBUG:root:2020-05-29 19:31:54.574636 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:54.940831 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:55.330103 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:55.798917 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:56.187540 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:31:57.381614 -- error -- connection3:quit
+DEBUG:root:2020-05-29 19:41:09.739154 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:41:10.091212 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:41:10.727496 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:41:11.169314 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:41:11.618212 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:41:12.167163 -- error -- game.move Failed 
+DEBUG:root:2020-05-29 19:41:18.590623 -- error -- connection1:quit
+DEBUG:root:2020-05-29 19:49:36.064006 -- error -- connection1:quit
+DEBUG:root:2020-05-29 19:53:31.290434 -- error -- connection1:quit
+DEBUG:root:2020-05-29 20:30:28.225258 -- error -- connection1:quit
+DEBUG:root:2020-05-29 20:37:17.333074 -- error -- connection1:game.create
+DEBUG:root:2020-05-29 20:44:38.037315 -- error -- connection1:game.create
+DEBUG:root:2020-05-29 20:49:37.173444 -- error -- connection1:game.create
+DEBUG:root:2020-05-29 20:52:55.591399 -- error -- connection1:quit
+DEBUG:root:2020-05-29 21:02:34.081693 -- error -- connection1:game.create
+DEBUG:root:2020-05-29 21:06:51.396986 -- error -- connection2:lobby.leave
+DEBUG:root:2020-05-29 21:08:01.184431 -- error -- connection1:quit
+DEBUG:root:2020-05-29 21:09:26.046258 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x000001D38F939B50>
+DEBUG:root:2020-05-29 21:09:37.618543 -- error -- connection1:quit
+DEBUG:root:2020-05-29 21:13:52.599488 -- error -- connection1:quit
+DEBUG:root:2020-05-29 21:16:32.605653 -- error -- connection2:quit
+DEBUG:root:2020-05-29 21:17:06.893170 -- error -- connection3:quit
+DEBUG:root:2020-05-29 21:22:29.787734 -- error -- connection2:quit
+DEBUG:root:2020-05-29 21:23:18.780569 -- error -- connection4:lobby.new:asdasdfsadf
+DEBUG:root:2020-05-29 21:23:59.388125 -- error -- connection3:lobby.lobbies
+DEBUG:root:2020-05-29 21:39:57.353218 -- error -- connection2:lobby.new:asdf
+DEBUG:root:2020-05-29 21:41:16.030102 -- error -- connection1:lobby.lobbies
+DEBUG:root:2020-05-29 21:41:46.333852 -- error -- connection2:lobby.new:asdf
+DEBUG:root:2020-05-29 21:41:59.317160 -- error -- connection1:lobby.lobbies
+DEBUG:root:2020-05-29 21:45:49.152727 -- error -- connection2:lobby.new:aasdf
+DEBUG:root:2020-05-30 19:05:28.520893 -- error -- game.create Failed 
+DEBUG:root:2020-05-30 19:05:28.534037 -- error -- game.create Failed 
+DEBUG:root:2020-05-30 19:06:03.488428 -- error -- connection1:game.create
+DEBUG:root:2020-05-30 19:06:08.862736 -- error -- connection2:game.create
+DEBUG:root:2020-05-30 19:09:44.682213 -- error -- connection2:quit
+DEBUG:root:2020-05-30 19:12:10.341725 -- error -- connection4:quit
+DEBUG:root:2020-05-30 19:12:10.343717 -- error -- connection7:quit
+DEBUG:root:2020-05-30 19:37:50.056534 -- error -- connection1:game.create
+DEBUG:root:2020-05-30 19:40:00.478408 -- error -- connection2:game.create
+DEBUG:root:2020-05-30 19:40:50.622290 -- error -- lobby.start Failed 
+DEBUG:root:2020-05-30 19:41:10.410103 -- error -- connection1:lobby.start
+DEBUG:root:2020-05-30 19:43:42.106233 -- error -- lobby.start Failed 
+DEBUG:root:2020-05-30 19:46:27.327296 -- error -- connection1:game.create
+DEBUG:root:2020-05-30 19:54:58.914480 -- error -- connection1:game.create
+DEBUG:root:2020-05-30 20:03:26.679467 -- error -- connection1:game.create
+DEBUG:root:2020-05-30 20:05:15.496328 -- error -- connection1:game.create
+DEBUG:root:2020-05-30 20:22:35.262981 -- error -- connection6:game.create
+DEBUG:root:2020-05-30 20:23:13.580899 -- error -- connection7:game.create
+DEBUG:root:2020-05-30 20:57:28.261381 -- error -- connection15:game.create
+DEBUG:root:2020-05-30 21:00:01.385972 -- error -- connection16:game.create
+DEBUG:root:2020-05-30 21:46:48.951587 -- error -- connection26:game.create
+DEBUG:root:2020-05-30 21:55:11.519872 -- error -- connection33:game.create
+DEBUG:root:2020-05-30 22:27:58.951653 -- error -- connection3:game.create
