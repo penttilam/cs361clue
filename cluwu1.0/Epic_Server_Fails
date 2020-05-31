@@ -454,3 +454,138 @@ DEBUG:root:2020-05-30 21:00:01.385972 -- error -- connection16:game.create
 DEBUG:root:2020-05-30 21:46:48.951587 -- error -- connection26:game.create
 DEBUG:root:2020-05-30 21:55:11.519872 -- error -- connection33:game.create
 DEBUG:root:2020-05-30 22:27:58.951653 -- error -- connection3:game.create
+DEBUG:root:2020-05-31 05:52:52.627635 -- error -- connection1:game.accuse:katana.tearoom.green
+DEBUG:root:2020-05-31 06:01:41.896425 -- error -- connection1:game.accuse:katana.tearoom.white
+DEBUG:root:2020-05-31 06:05:02.694771 -- error -- connection1:game.accuse:curse.None.None
+DEBUG:root:2020-05-31 06:07:22.319238 -- error -- connection1:game.accuse:mecha.mangastore.plum
+DEBUG:root:2020-05-31 06:09:17.741356 -- error -- connection3:game.create
+DEBUG:root:2020-05-31 06:09:55.141006 -- error -- connection6:game.create
+DEBUG:root:2020-05-31 06:09:56.353068 -- error -- connection5:game.accuse:mecha.mangastore.plum
+DEBUG:root:2020-05-31 06:15:25.894791 -- error -- connection13:game.accuse:mecha.lovehotel.plum
+DEBUG:root:2020-05-31 06:15:39.652439 -- error -- connection14:game.accuse:mecha.None.plum
+DEBUG:root:2020-05-31 06:17:50.191286 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:18:14.339392 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:18:27.683801 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:18:37.225507 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:18:42.479394 -- error -- connection2:game.chat.add:Weeeeeeb
+DEBUG:root:2020-05-31 06:18:48.634103 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:19:01.091122 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:22:13.248034 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:30:18.077050 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:33:04.209833 -- error -- connection3:game.turn
+DEBUG:root:2020-05-31 06:33:23.678889 -- error -- connection4:game.turn
+DEBUG:root:2020-05-31 06:35:30.640662 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:37:32.522281 -- error -- connection3:game.create
+DEBUG:root:2020-05-31 06:37:39.285135 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:37:40.675430 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:37:45.989012 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:37:48.071206 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:37:52.847820 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:37:54.627208 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:37:57.674700 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:37:58.923935 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:38:00.952812 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:38:07.283170 -- error -- connection5:quit
+DEBUG:root:2020-05-31 06:38:22.597407 -- error -- connection6:game.create
+DEBUG:root:2020-05-31 06:38:30.965707 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:38:32.943792 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:38:40.270317 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:38:49.719041 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:50.112647 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:50.514601 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:50.880680 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:52.016717 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:52.390239 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:52.828107 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:53.389538 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:54.034281 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:54.784250 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:55.690892 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:38:56.226639 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:39:08.938056 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:09.801311 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:10.483484 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:11.217990 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:11.896613 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:12.463913 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:17.051873 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:21.017177 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:21.516737 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:22.161689 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:22.972041 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:26.563005 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x7f9fc2f73278>
+DEBUG:root:2020-05-31 06:39:34.083490 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:39:44.441232 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:40:14.478209 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x7f9fc2f73278>
+DEBUG:root:2020-05-31 06:40:17.051386 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:40:33.022696 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:40:33.459061 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:40:33.898919 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:40:34.290581 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:40:34.740021 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:40:35.334965 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:40:35.672362 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:40:36.790240 -- error -- game.move Failed 
+DEBUG:root:2020-05-31 06:40:39.348069 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:40:41.539917 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x7f9fc2f73278>
+DEBUG:root:2020-05-31 06:40:51.695412 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:40:52.882763 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:40:56.581610 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:41:06.346740 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:41:07.831155 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:43:45.835358 -- error -- connection2:game.create
+DEBUG:root:2020-05-31 06:43:49.483579 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:43:52.358187 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:43:59.062137 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 06:44:12.954948 -- error -- connection1:quit
+DEBUG:root:2020-05-31 06:52:24.523473 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:52:30.064092 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:52:41.491037 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:52:51.617700 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:52:58.571416 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:53:10.511393 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:53:19.192639 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:53:22.680090 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:53:32.276960 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:53:38.805506 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:53:43.288382 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:53:53.928424 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:53:55.324386 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:03.655302 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:05.349929 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:13.652851 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:16.819298 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:24.819342 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:39.548058 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:46.028139 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:51.429542 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:52.673280 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:54:57.327920 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:55:05.250507 -- error -- connection1:quit
+DEBUG:root:2020-05-31 06:55:42.927359 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 06:57:01.884343 -- error -- connection4:quit
+DEBUG:root:2020-05-31 06:57:32.423199 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 07:00:52.203867 -- error -- connection6:quit
+DEBUG:root:2020-05-31 07:00:54.332014 -- error -- connection7:quit
+DEBUG:root:2020-05-31 07:06:09.413729 -- error -- connection10:game.create
+DEBUG:root:2020-05-31 07:06:24.242336 -- error -- game.chat Failed 
+DEBUG:root:2020-05-31 07:06:26.336489 -- error -- connection9:quit
+DEBUG:root:2020-05-31 07:08:18.333585 -- error -- connection11:quit
+DEBUG:root:2020-05-31 07:08:56.408368 -- error -- connection13:game.create
+DEBUG:root:2020-05-31 07:09:07.129328 -- error -- connection12:quit
+DEBUG:root:2020-05-31 07:10:12.257788 -- error -- connection14:game.turn
+DEBUG:root:2020-05-31 07:10:16.811526 -- error -- connection15:quit
+DEBUG:root:2020-05-31 07:12:35.948294 -- error -- connection16:game.move:10.17
+DEBUG:root:2020-05-31 07:12:37.413307 -- error -- connection17:quit
+DEBUG:root:2020-05-31 07:14:27.695272 -- error -- connection18:quit
+DEBUG:root:2020-05-31 07:23:07.558420 -- error -- connection23:game.create
+DEBUG:root:2020-05-31 07:27:23.152494 -- error -- connection26:game.create
+DEBUG:root:2020-05-31 07:28:03.994963 -- error -- connection27:game.create
+DEBUG:root:2020-05-31 07:33:50.287945 -- error -- connection30:game.create
+DEBUG:root:2020-05-31 07:38:52.992619 -- error -- connection32:game.create
+DEBUG:root:2020-05-31 07:46:15.012444 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 07:48:23.622710 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 07:48:34.686770 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 07:48:57.264147 -- error -- accuse.chat Failed 
+DEBUG:root:2020-05-31 08:14:38.665440 -- error -- connection42:game.create
+DEBUG:root:2020-05-31 08:23:00.936694 -- error -- connection46:game.create
