@@ -265,10 +265,15 @@ class GameBoard:
             if myTurn:
                 # Display and end turn button for the player next to the die
                 endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
+                accuseButton.setXLoc(diceButton.getXLoc()) 
+                if self.myToken.getLocation() != "outside":
+                    suggestButton.setXLoc(diceButton.getXLoc()) 
             else:
                 # self.rollLabel.setText(currentTurnCharacter + "'s Turn")
                 # Hide the end turn button off screen
                 endTurnButton.setXLoc(WIDTH)
+                accuseButton.setXLoc(WIDTH)
+                suggestButton.setXLoc(WIDTH)
             
             time_delta = clock.tick(60) / 1000.0
             
@@ -403,6 +408,7 @@ class GameBoard:
                                 self.netConn.send("game.accuse:" + str(accused[0]) + "." + str(accused[1]) + "." + str(accused[2]))
                                 self.hidePanel(accuseHand)
                         accuseText.addText("It was <b>" + person + "</b> in the <b>" + location + "</b> with the <b>" + weapon +"</b>.")
+                        
                     else:
                         # Open the Notebook
                         if notebookButton.getClickedStatus(event):
