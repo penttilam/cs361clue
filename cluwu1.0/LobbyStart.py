@@ -96,7 +96,7 @@ class LobbyStart:
                 # If server told us the game is starting, launch the game board
                 if self.lobbyStatus.getStartGame():
                     gameBoard = GameBoard(self.netConn)
-                    return gameBoard.gameBoard()
+                    gameBoard.gameBoard()
                 # If the server returned an object, process the update then start a new thread
                 elif type(self.lobbyStatus) != type(""):
                     self.processClientUpdates()
