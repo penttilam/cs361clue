@@ -166,9 +166,12 @@ class GameBoard:
         accuseHand.setWidthHeight(len(self.fullDeck[1])*142 + 105, 615)
         accuseHand.setVisibleLocation(int(WIDTH/2-accuseHand.getWidth()/2))
         accuseHand.setHiddenLocation(WIDTH)
-
+        person = "_____"
+        location = "_____"
+        weapon = "_____"
+        accuseText = TextBox(layer3, "It was <b>" + person + "</b> in the <b>" + location + "</b> with the <b>" + weapon +"</b>.", xLoc=1069, yLoc=450, width=145, height=195, container=accuseHand.getContainer(), layer=1, objectId="accuseText", wrapToHeight=True)
         # Accusation Submit Button
-        submitAccuse = Button("Accuse", layer3, 1090, 450, 90, 30, container=accuseHand.getContainer())
+        submitAccuse = Button("Accuse", layer3, 1090, 550, 90, 30, container=accuseHand.getContainer())
         
         # cardXLoc allows cards to be placed a card distance apart plus the buffer value between them
         cardXLoc = -142
@@ -187,6 +190,8 @@ class GameBoard:
             # Move the location of the next card in the hand
             cardXLoc += 142 + buffer
             i += 1
+
+
         
         # For each character check if it is the player's token, if it is use the token with the purple highlight around it
         i = 0
@@ -207,9 +212,13 @@ class GameBoard:
 
         y = 10
         i = 0
+        j = 1
         # For each card in the the deck
-        for cardType in self.fullDeck:
-            cardXLoc = -142
+        for cardType in reversed(self.fullDeck):
+            if j != 1:
+                cardXLoc = -142
+            else:
+                cardXLoc = 10
             for card in cardType:
                 # Create an ImageButton and add it to the hand, clean up this code once all images share the same extension type
                 accuseHand.addImageButton(ImageButton(accuseHand.getManager(), cardXLoc + 142 + buffer, y, 142, 190, container=accuseHand.getContainer(), object_id="accuseHandIB"+card.getCardCategory(), buttonText=card.getCardName()))
@@ -221,7 +230,11 @@ class GameBoard:
                 accuseHand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
                 cardXLoc += 142 + buffer
                 i += 1
+            j = not j
             y += 200
+        weaponButton = Button("", layer3, container=accuseHand.getContainer(), object_id = "accuseHandIBweapon", xLoc=WIDTH)
+        locationButton = Button("", layer3, container=accuseHand.getContainer(), object_id = "accuseHandIBlocation", xLoc=WIDTH)
+        peopleButton = Button("", layer3, container=accuseHand.getContainer(), object_id = "accuseHandIBpeople", xLoc=WIDTH)
             
         # Set the starting locations of each character
         # Scarlet
@@ -391,24 +404,20 @@ class GameBoard:
                         elif self.discardedButtonFlag and self.discardedButton.getClickedStatus(event):
                             self.hidePanel(accuseHand)
                             self.showPanel(self.discardHand)
-                        else:
-                            # If the player clicks accused cards, they can submit a card
-                            for clicked in range(20):
-                                if (accuseHand.getImageButton(clicked).getClickedStatus(event)):
-                                    if event.ui_element.object_ids[2] == "accuseHandIBweapon":
-                                        accused[0] = event.ui_element.text
-                                        break
-                                    elif event.ui_element.object_ids[2] == "accuseHandIBlocation":
-                                        accused[1] = event.ui_element.text
-                                        break
-                                    elif event.ui_element.object_ids[2] == "accuseHandIBpeople":
-                                        accused[2] = event.ui_element.text
-                                        break
-                            if submitAccuse.getClickedStatus(event): 
-                                if not (accused[0] == None and accused[1] == None and accused[2] == None):
-                                    self.netConn.send("game.accuse:" + str(accused[0]) + "." + str(accused[1]) + "." + str(accused[2]))
-                                    self.hidePanel(accuseHand)
-                            
+                        elif weaponButton.getClickedStatus(event):
+                            accused[0] = event.ui_element.text
+                            weapon = event.ui_element.text
+                        elif locationButton.getClickedStatus(event):
+                            accused[1] = event.ui_element.text
+                            location = event.ui_element.text
+                        elif peopleButton.getClickedStatus(event):
+                            accused[2] = event.ui_element.text
+                            person = event.ui_element.text
+                        elif submitAccuse.getClickedStatus(event): 
+                            if not (accused[0] == None and accused[1] == None and accused[2] == None):
+                                self.netConn.send("game.accuse:" + str(accused[0]) + "." + str(accused[1]) + "." + str(accused[2]))
+                                self.hidePanel(accuseHand)
+                        accuseText.addText("It was <b>" + person + "</b> in the <b>" + location + "</b> with the <b>" + weapon +"</b>.")
                     else:
                         # Open the Notebook
                         if notebookButton.getClickedStatus(event):
