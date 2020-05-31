@@ -28,5 +28,3 @@ class ClientGame:
     def getChat(self):
         return self.myChat
 
-
-
