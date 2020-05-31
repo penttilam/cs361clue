@@ -25,7 +25,7 @@ from serverThread import *
 
 server = "45.132.241.193"
 #server = "localhost"
-port = 4206
+port = 42069
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -95,7 +95,7 @@ def listCommand(serverThreadInfo, serverInfo):
     for serverLobby in serverInfo.getLobbyList():
         clientLobbyList.append(createClientLobby(serverLobby))
     print(clientLobbyList)
-    player.sendClientAObject(clientLobbyList)
+    serverThreadInfo.getServerPlayer().sendClientAObject(clientLobbyList)
 
 
 ##this function revomes a player from their lobby
@@ -233,6 +233,18 @@ def updateGame(serverThreadInfo):
         player.sendClientAObject(createClientGame(serverThreadInfo))
 
 
+def accuseCommand(serverThreadInfo, block2):
+    accused = block2.split(".")
+    for x in len(serverThreadInfo.getServerGame().getGuiltyCards()):
+        if not accused[x] == serverThreadInfo.getServerGame().getGuiltyCards()[X]:
+            serverThreadInfo.getServerPlayer().setLostGame()
+            return
+    for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+        if not player == serverThreadInfo.getServerPlayer():
+            player.setLostGame()
+    updateGame(serverThreadInfo)
+
+
 def gameCommand(block1, block2, serverThreadInfo, serverInfo):
     arguments = block1.split(".")
 
@@ -260,6 +272,13 @@ def gameCommand(block1, block2, serverThreadInfo, serverInfo):
         except:
             error_string = str(datetime.now()) + " -- error -- game.chat Failed " 
             logging.debug(error_string)
+    elif arguements[1] == "accuse":
+        try:
+            accuseCommand(serverThreadInfo, block2)
+        except:
+            error_string = str(datetime.now()) + " -- error -- accuse.chat Failed " 
+            logging.debug(error_string)
+
 
 
 
