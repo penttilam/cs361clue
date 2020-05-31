@@ -208,13 +208,10 @@ def moveTokenCommand(serverThreadInfo, block2):
 
 def turnCommand(serverThreadInfo):
     try:
-        print("print try")
         serverThreadInfo.getServerGame().changeTurn(serverThreadInfo.getServerPlayer())
-        print(serverThreadInfo.getServerGame().getPlayerTurnOrder())
         updateGame(serverThreadInfo)
 
     except:
-        print("print except")
         error_string = str(datetime.now()) + " -- error -- game.turn -- " + str(serverThreadInfo.getServerPlayer())
         logging.debug(error_string)
 
@@ -234,14 +231,17 @@ def updateGame(serverThreadInfo):
 
 
 def accuseCommand(serverThreadInfo, block2):
+    print("HERE")
     accused = block2.split(".")
+    print("HERE")
     for x in len(serverThreadInfo.getServerGame().getGuiltyCards()):
         if not accused[x] == serverThreadInfo.getServerGame().getGuiltyCards()[X]:
             serverThreadInfo.getServerPlayer().setLostGame()
-            return
-    for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
-        if not player == serverThreadInfo.getServerPlayer():
-            player.setLostGame()
+    if(serverThreadInfo.getServerPlayer().getLostGame() == False):
+        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+            if not player == serverThreadInfo.getServerPlayer():
+                player.setLostGame()
+    print("the update")
     updateGame(serverThreadInfo)
 
 
@@ -272,8 +272,10 @@ def gameCommand(block1, block2, serverThreadInfo, serverInfo):
         except:
             error_string = str(datetime.now()) + " -- error -- game.chat Failed " 
             logging.debug(error_string)
-    elif arguements[1] == "accuse":
+    elif arguments[1] == "accuse":
+        print("before Try")
         try:
+            print("HERE")
             accuseCommand(serverThreadInfo, block2)
         except:
             error_string = str(datetime.now()) + " -- error -- accuse.chat Failed " 
@@ -304,6 +306,14 @@ def clientCommand(clientCommand, serverThreadInfo, serverInfo):
             return True
 
     elif arguments[0] == "quit":
+        print("print before the server quit")
+        serverThreadInfo.getServerGame().setDiscardedCards(serverThreadInfo.getServerPlayer())
+        print("print after discarding cards function call ")
+        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+            if player != serverThreadInfo.getServerPlayer():
+                print("in discard loop")
+                player.sendClientAObject(createClientGame(serverThreadInfo))
+        
         return False
 
 

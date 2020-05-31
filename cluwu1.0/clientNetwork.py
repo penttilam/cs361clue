@@ -13,6 +13,7 @@ class Network:
         self.server = "45.132.241.193"
         # self.server = "localhost"
         self.port   = 42069
+        # self.port   = 9001
         self.addr   = (self.server, self.port)
         self.id     = self.connect()
 
