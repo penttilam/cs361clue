@@ -139,10 +139,10 @@ class GameBoard:
         notebook.setHiddenLocation(WIDTH)
 
         # Accuse Button
-        accuseButton = Button("Accuse", layer1, handButton.getXLoc(), 20, 90, 30, object_id="accuseButton")
+        accuseButton = Button("Accuse", layer1, int(WIDTH), 20, 90, 30, object_id="accuseButton")
 
         # Suggest Button
-        suggestButton = Button("Suggest", layer1, handButton.getXLoc(), 80, 90, 30, object_id="suggestButton")
+        suggestButton = Button("Suggest", layer1, int(WIDTH), 80, 90, 30, object_id="suggestButton")
 
 
 
@@ -264,9 +264,14 @@ class GameBoard:
             if myTurn:
                 # Display and end turn button for the player next to the die
                 endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
+                accuseButton.setXLoc(diceButton.getXLoc()) 
+                if self.myToken.getLocation() != "outside":
+                    suggestButton.setXLoc(diceButton.getXLoc()) 
             else:
                 # Hide the end turn button off screen
                 endTurnButton.setXLoc(WIDTH)
+                accuseButton.setXLoc(WIDTH)
+                suggestButton.setXLoc(WIDTH)
             
             time_delta = clock.tick(60) / 1000.0
             
@@ -405,7 +410,7 @@ class GameBoard:
                                         accused[2] = event.ui_element.text
                                         break
                             if submitAccuse.getClickedStatus(event): 
-                                if not (accused[0] == None and accused[1] == None and accused[2] == None):
+                                if accused[0] != None and accused[1] != None and accused[2] != None:
                                     self.netConn.send("game.accuse:" + str(accused[0]) + "." + str(accused[1]) + "." + str(accused[2]))
                                     self.hidePanel(accuseHand)
                             

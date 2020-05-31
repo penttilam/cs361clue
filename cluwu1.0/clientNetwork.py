@@ -12,7 +12,7 @@ class Network:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server = "45.132.241.193"
         # self.server = "localhost"
-        self.port   = 4206
+        self.port   = 42069
         # self.port   = 9001
         self.addr   = (self.server, self.port)
         self.id     = self.connect()
