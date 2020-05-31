@@ -78,12 +78,16 @@ class GameBoard:
         self.managerList.append(layer2)
         layer3 = pygame_gui.UIManager((WIDTH, HEIGHT), './panelTheme.json')
         self.managerList.append(layer3)
+        layer4 = pygame_gui.UIManager((WIDTH, HEIGHT), './notebookPanelTheme.json')
+        self.managerList.append(layer4)
         
         # Display the background
         windowSurface = pygame.display.set_mode((WIDTH, HEIGHT))
         background = pygame.Surface((WIDTH, HEIGHT))
         windowSurface.blit(background, (0, 0))
-        Image('board.png', layer0, 0, 0, WIDTH, HEIGHT)
+        # Create the grid the player clicks to interact with the game board
+        self.gameGrid = GameGrid(WIDTH, HEIGHT, layer0)
+       
 
         # Set cards in player hand
         self.playerCards = self.clientGame.getMyCards()
@@ -91,8 +95,20 @@ class GameBoard:
         # Set full deck for player
         self.fullDeck = self.clientGame.getFullDeck()  
 
-        print("This is the full deck")
-        print(self.fullDeck) 
+        # Button to display the player's notebook
+        notebookButton = Button(manager=layer0, buttonText=" ")
+        notebookButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10))-45, int(HEIGHT/2+HEIGHT/20))
+        notebookButton.setWidthHeight(int(420), int(460))
+
+        # ImageButton to display player's hand of cards
+        handCards = len(self.playerCards)
+        handButton = ImageButton(layer3, imageFile="cardback" + str(handCards) + ".png", buttonText=" ")
+        handButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10))-60, int(HEIGHT/4) - 90)
+        handButton.setWidthHeight(int(142), int(180))
+        handButton.getButton().setManager(layer0)
+        Label("Your Cards", layer1, handButton.getXLoc(), handButton.getYLoc() + 180, 142, 20)
+        Image('board.png', layer0, 0, 0, WIDTH, HEIGHT)
+        handButton.getImage().setImage("cardback" + str(handCards) + ".png")
 
         # Display the turn order of players and display
         self.displayTurnOrder(self.clientGame.getTurnOrder(), layer1, initial=1)
@@ -100,55 +116,35 @@ class GameBoard:
         # Set layer the chatlog and input will be displayed on
         self.chatLog = TextBox(layer1)
         chatInput = InputBox(layer1)
-        
-        # Create the grid the player clicks to interact with the game board
-        self.gameGrid = GameGrid(WIDTH, HEIGHT, layer0)
-
-        # ImageButton to display player's hand of cards
-        handCards = len(self.playerCards)
-        handButton = ImageButton(layer3, imageFile="cardBack" + str(handCards) + ".png", buttonText=" ")
-        handButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)), int(HEIGHT/4) - 60)
-        handButton.setWidthHeight(int(142), int(180))
-        handButton.getButton().setManager(layer0)
-        Label("Look at Hand", layer1, handButton.getXLoc(), handButton.getYLoc() + 180, 142, 20)
 
         # ImageButton to roll the dice
         diceButton = ImageButton(layer0, imageFile='die6.png', buttonText=" ")
-        diceButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)), int(HEIGHT/4)+180)
+        diceButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10))-30, int(HEIGHT/4)+160)
         diceButton.setWidthHeight(int(80), int(80))
-        Label("Roll", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 100, 142, 20)
-        self.rollLabel = Label("Current Moves: 0", layer1, diceButton.getXLoc(), diceButton.getYLoc() - 20, 142, 20)
+        Label("Roll", layer1, diceButton.getXLoc() + 10, diceButton.getYLoc() + 90, 60, 20)
+        self.rollLabel = Label("Current Moves: 0", layer1, diceButton.getXLoc() - 30, diceButton.getYLoc() - 30, 142, 20)
         # myRoll should always be -1 unless it is that player's turn
         myRoll = -1
 
         # End turn Button
-        endTurnButton = Button("End turn", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 40, 90, 30)
-
-        # ImageButton to display the player's notebook
-        notebookButton = ImageButton(layer3, imageFile='cluwuNotebook.png', buttonText=" ")
-        notebookButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10))-70, int(HEIGHT/2+HEIGHT/20)+34)
-        notebookButton.setWidthHeight(int(450), int(475))
-        notebookButton.getButton().setManager(layer0)
+        endTurnButton = Button("End turn", layer1, diceButton.getXLoc(), diceButton.getYLoc() + 25, 90, 30)
 
         # Initilization of the notebook panel
-        notebook = Panel(layer3, layerHeight=2)
+        notebook = Panel(layer4, layerHeight=2)
         notebook.setXLocYLoc(int(WIDTH), int(HEIGHT/8))
         notebook.setWidthHeight(int(WIDTH/4), int(3*HEIGHT/4))
-        notebook.addImage(Image("clueNotepad.png", layer3, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
+        notebook.addImage(Image("clueNotepad.png", layer4, 0, 0, notebook.getWidth(), notebook.getHeight(), container=notebook.getContainer()))
         notebook.setVisibleLocation(int((WIDTH*3)/8))
         notebook.setHiddenLocation(WIDTH)
 
-        # Accuse Button
-        accuseButton = Button("Accuse", layer1, handButton.getXLoc(), 20, 90, 30, object_id="accuseButton")
-
-        # Suggest Button
-        suggestButton = Button("Suggest", layer1, handButton.getXLoc(), 80, 90, 30, object_id="suggestButton")
-
-
-
-
         # Creates a Button object to allow interaction with checkbox buttons
         checkBoxButton = createNotebook(notebook)
+
+        # Accuse Button
+        accuseButton = Button("Accuse", layer1, handButton.getXLoc() + 30, 20, 90, 30, object_id="accuseButton")
+
+        # Suggest Button
+        suggestButton = Button("Suggest", layer1, handButton.getXLoc() + 30, 80, 90, 30, object_id="suggestButton")
 
         # List of characters used to create tokens
         characterList = ["scarlet", "white", "mustard", "green", "peacock", "plum"]
@@ -203,11 +199,11 @@ class GameBoard:
                 tokenFileExtension = ".png"
             # Add the image to the character tokens
             self.characterTokens.append(Image(str(character) + tokenFileExtension, layer2, 0, 0, 30, 30, object_id=character))
-            # If token is player, assign token to myToken. Assigned here instead of above due to the [i] location not existing untit the Image is appended above
+            # If token is player, assign token to myToken. Assigned here instead of above due 
+            # to the [i] location not existing until the Image is appended above
             if tokenFileExtension == "mytoken.png":
                 self.myToken = self.characterTokens[i]
             self.characterTokens[i].setLocation("outside")
-            
             i += 1
 
         y = 10
@@ -278,6 +274,7 @@ class GameBoard:
                 # Display and end turn button for the player next to the die
                 endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
             else:
+                self.rollLabel.setText(currentTurnCharacter + "'s Turn")
                 # Hide the end turn button off screen
                 endTurnButton.setXLoc(WIDTH)
             
@@ -380,11 +377,6 @@ class GameBoard:
                         elif accuseButton.getClickedStatus(event):
                             self.hidePanel(self.discardHand)
                             self.showPanel(accuseHand)
-                        # else:
-                        #     # Check if the cards in the hand are clicked, used for accusations/suggestions NOT CURRENTLY IMPLEMENTED TO DO ANYTHING
-                        #     for clicked in range(int(self.discardHand.getHandSize()/2)):
-                        #         if (self.discardHand.getImageButton(clicked).getClickedStatus(event)):
-                        #             break
 
                     # If the accuse cards is visible, set the accuse cards to handle all events that come in to prevent clickthrough to the board
                     elif (not self.checkHidden(accuseHand)):
@@ -433,12 +425,10 @@ class GameBoard:
 
                         # Open the accuse hand
                         elif accuseButton.getClickedStatus(event):
-                            print(" Showed accuse")
                             self.showPanel(accuseHand)
                         
                         # End player turn, send command to server
                         elif endTurnButton.getClickedStatus(event):
-                            print("Clicked end turn")
                             self.netConn.send("game.turn")
                             # Hide end turn button
                             endTurnButton.setXLoc(WIDTH)
@@ -450,8 +440,8 @@ class GameBoard:
                         elif diceButton.getClickedStatus(event):
                             # If it's the player's turn and they haven't rolled yet, roll the die and store in myRoll
                             if myRoll == -1 and myTurn:
-                                myRoll = 100
-                                # myRoll = random.randrange(1,6,1)
+                                # myRoll = 80
+                                myRoll = random.randrange(1,6,1)
                                 diceButton.setImage("die" + str(myRoll) + ".png")
                                 self.rollLabel.setText("You rolled: " + str(myRoll))
                             # If player has already rolled this turn, indicate how many moves they have left
@@ -459,14 +449,16 @@ class GameBoard:
                                 self.rollLabel.setText("Current Moves: " + str(myRoll))
                             # If it is not the player's turn, roll for fun.
                             else:
-                                self.rollLabel.setText("You rolled: " + str(random.randrange(1,6,1)))
+                                diceButton.setImage("die" + str(random.randrange(1,6,1)) + ".png")
 
                         # Moves token if it is the player's turn, they have moves left, the notebook and hand are not visible and they clicked on a valid game tile
                         elif myTurn and myRoll > 0 and self.checkHidden(notebook) and self.checkHidden(hand) and self.gameGrid.clickedTile(event, self.myToken):
-                            self.netConn.send("game.move:"+str(self.myToken.getRow())+"."+str(self.myToken.getColumn()))
+                            self.netConn.send("game.move:" + str(self.myToken.getRow()) + "." + str(self.myToken.getColumn()))
                             # Decrease die roll by 1
                             myRoll -= 1
-                            self.rollLabel.setText("Current Moves: " + str(myRoll))
+                            self.rollLabel.setText("Moves Left: " + str(myRoll))
+                            if myRoll > 0:
+                                diceButton.setImage("die" + str(myRoll) + ".png")
             
             # Update events based on clock ticks
             for each in self.managerList:
@@ -489,10 +481,10 @@ class GameBoard:
         #displays discarded cards button if a player leaves the game
         if self.clientGame.getDiscardedCards() != self.clientUpdate.getDiscardedCards() and self.discardedButtonFlag == False:
             self.discardedButton = ImageButton(self.managerList[3], imageFile="cardPile.png", buttonText=" ")
-            self.discardedButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)) + 125, int(HEIGHT/4) - 60)
-            self.discardedButton.setWidthHeight(int(175), int(180))
+            self.discardedButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10)) + 115, int(HEIGHT/4) - 60)
+            self.discardedButton.setWidthHeight(int(142), int(180))
             self.discardedButton.getButton().setManager(self.managerList[0])
-            Label("Discarded", self.managerList[1], self.discardedButton.getXLoc(), self.discardedButton.getYLoc() + 180, 142, 20)
+            Label("View Discards", self.managerList[1], self.discardedButton.getXLoc(), self.discardedButton.getYLoc() + 180, 142, 20)
             self.discardedButtonFlag = True 
 
         for player in self.clientGame.getTurnOrder():
@@ -537,12 +529,12 @@ class GameBoard:
                 cardXLoc += 142 + buffer
                 i += 1
 
-        # self.clientGame = self.clientUpdate
         # Update the client game turn order
         if tokenUpdates[0].getGameToken().getTokenCharacter() != currentTurnCharacter:
             self.clientGame.setTurnOrder(tokenUpdates)
             self.displayTurnOrder(self.clientGame.getTurnOrder(), self.managerList[1])
             # Identify whose turn it is and update label accordingly
+            currentTurnCharacter = self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter()
             if self.myToken.getObjectId() != currentTurnCharacter:
                 self.rollLabel.setText(currentTurnCharacter + "'s Turn")
             else:
