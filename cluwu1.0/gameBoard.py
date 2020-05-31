@@ -408,11 +408,7 @@ class GameBoard:
                                 if not (accused[0] == None and accused[1] == None and accused[2] == None):
                                     self.netConn.send("game.accuse:" + str(accused[0]) + "." + str(accused[1]) + "." + str(accused[2]))
                                     self.hidePanel(accuseHand)
-                                
-                                
-                               
-                                    
-
+                            
                     else:
                         # Open the Notebook
                         if notebookButton.getClickedStatus(event):
@@ -490,6 +486,12 @@ class GameBoard:
             Label("Discarded", self.managerList[1], self.discardedButton.getXLoc(), self.discardedButton.getYLoc() + 180, 142, 20)
             self.discardedButtonFlag = True 
 
+        for player in self.clientGame.getTurnOrder():
+            if self.clientGame.getMyToken() == player.getGameToken():
+                if player.getLostGame() == True:
+                    print("You lost loser") 
+                    pass
+
 
         if self.clientGame.getDiscardedCards() != self.clientUpdate.getDiscardedCards():
             self.clientGame.setDiscardedCards(self.clientUpdate.getDiscardedCards())
@@ -504,16 +506,11 @@ class GameBoard:
             self.discardHand.setVisibleLocation(int(WIDTH/2-self.discardHand.getWidth()/2))
             self.discardHand.setHiddenLocation(WIDTH)
 
-            print("Are you the problem3")
-            
             # cardXLoc allows cards to be placed a card distance apart plus the buffer value between them
             cardXLoc = -142
             buffer = 10
             i = 0
 
-            print("card list")
-
-            print(self.clientGame.getDiscardedCards())
 
             # For each card in the player hand
             for card in self.clientGame.getDiscardedCards():
