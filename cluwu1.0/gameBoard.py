@@ -139,10 +139,10 @@ class GameBoard:
         notebook.setHiddenLocation(WIDTH)
 
         # Accuse Button
-        accuseButton = Button("Accuse", layer1, handButton.getXLoc(), 20, 90, 30)
+        accuseButton = Button("Accuse", layer1, handButton.getXLoc(), 20, 90, 30, object_id="accuseButton")
 
         # Suggest Button
-        suggestButton = Button("Suggest", layer1, handButton.getXLoc(), 80, 90, 30)
+        suggestButton = Button("Suggest", layer1, handButton.getXLoc(), 80, 90, 30, object_id="suggestButton")
 
 
 
@@ -428,10 +428,12 @@ class GameBoard:
 
                         # Open the accuse hand
                         elif accuseButton.getClickedStatus(event):
+                            print(" Showed accuse")
                             self.showPanel(accuseHand)
                         
                         # End player turn, send command to server
                         elif endTurnButton.getClickedStatus(event):
+                            print("Clicked end turn")
                             self.netConn.send("game.turn")
                             # Hide end turn button
                             endTurnButton.setXLoc(WIDTH)
