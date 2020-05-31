@@ -284,8 +284,8 @@ def testingFunction():
     gameBoard.gameBoard()
 
 # TESTING FUNCTION ENSURE COMMENTED OUT IF NEED TO TEST ANYTHING BEFORE THE GAME BOARD
-testingFunction()
+#testingFunction()
 # run the program
-# splash()
+splash()
 
 print("print after splash :D ")
