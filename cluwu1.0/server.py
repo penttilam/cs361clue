@@ -25,7 +25,7 @@ from serverThread import *
 
 #server = "45.132.241.193"
 server = "localhost"
-port = 4206
+port = 42069
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

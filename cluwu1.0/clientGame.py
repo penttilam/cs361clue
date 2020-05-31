@@ -1,12 +1,13 @@
 from clientToken import *
 
 class ClientGame:
-    def __init__(self, turnIn, tokenIn, cardsIn, chatIn):
+    def __init__(self, turnIn, tokenIn, cardsIn, chatIn, fullDeckIn):
         self.turnOrder = turnIn
         self.myToken = tokenIn
         self.myCards = cardsIn
         self.myChat = chatIn
         self.discards = None
+        self.fullDeck = fullDeckIn
 
     def getTurnOrder(self):
         return self.turnOrder
@@ -35,3 +36,5 @@ class ClientGame:
     def setDiscardedCards(self, cards):
         self.discards = cards
 
+    def getFullDeck(self): 
+        return self.fullDeck

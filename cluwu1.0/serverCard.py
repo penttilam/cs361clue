@@ -1,4 +1,5 @@
 import random
+import copy
 from serverPlayer import *
 
 class serverCards:
@@ -18,6 +19,7 @@ def createDecks():
 
     serverCardSet = []
     serverDeck = []
+    fullDeck = [] 
 
     dakimakura = serverCards("dakimakura", "weapon")
     katana = serverCards("katana", "weapon")
@@ -49,6 +51,13 @@ def createDecks():
 
     character = [colonelmustard, mrgreen, mrswhite, mspeacock, msscarlet, professorplum]
 
+    fullDeck.append(weapon.copy())
+    fullDeck.append(location.copy())
+    fullDeck.append(character.copy())
+
+    print("this is the copied deck")
+    print(fullDeck)
+
     guiltyCharacter = random.choice(character)
     guiltyWeapon = random.choice(weapon)
     guiltyLocation = random.choice(location)
@@ -67,6 +76,8 @@ def createDecks():
     random.shuffle(serverDeck)
     serverCardSet.append(serverDeck)
 
+    serverCardSet.append(fullDeck)
+
     return serverCardSet
 
 def dealCards(deckList, playerList):
@@ -83,6 +94,8 @@ def dealCards(deckList, playerList):
             tempHand.append(deckList.pop(0))
             remCards -= 1
         player.setHand(tempHand)
+
+
         
 
 
