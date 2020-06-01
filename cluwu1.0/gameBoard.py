@@ -26,8 +26,8 @@ HEIGHT = 900
 
 class GameBoard:
     def __init__(self, netConn):
-        # self.myChar = ClientPlayer(True, None, [], False, False)
         self.characterTokens = []
+        self.weaponTokens = []
         self.playerCards = []
         self.fullDeck = None
         self.managerList = []
@@ -77,7 +77,7 @@ class GameBoard:
         self.managerList.append(layer4)
         
         # Display the background
- 
+        
         background = pygame.Surface((WIDTH, HEIGHT))
         self.windowSurface.blit(background, (0, 0))
         # Create the grid the player clicks to interact with the game board
@@ -174,10 +174,6 @@ class GameBoard:
         suggestText = TextBox(layer3, "It was <b>" + person + "</b> in the <b>" + location + "</b> with the <b>" + weapon +"</b>.", xLoc=920, yLoc=170, width=170, height=195, container=suggestHand.getContainer(), layer=1, objectId="suggestText", wrapToHeight=True)
         # Accusation Submit Button
         submitSuggest = Button("Suggest", layer3, 955, 255, 90, 30, container=suggestHand.getContainer())
-        
-
-
-
 
         # cardXLoc allows cards to be placed a card distance apart plus the buffer value between them
         cardXLoc = -142
@@ -187,18 +183,13 @@ class GameBoard:
         for card in self.playerCards:
             # Create an ImageButton and add it to the hand, clean up this code once all images share the same extension type
             hand.addImageButton(ImageButton(hand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=hand.getContainer(), object_id="HandIB"+card.getCardName()))
-            if card.getCardCategory() == "weapon":
-                imageFormat = ".jpg"
-            else:
-                imageFormat = ".png"
+            imageFormat = ".png"
             # Set the image for the ImageButton
             hand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
             # Move the location of the next card in the hand
             cardXLoc += 142 + buffer
             i += 1
 
-
-        
         # For each character check if it is the player's token, if it is use the token with the purple highlight around it
         i = 0
         for character in characterList:
@@ -216,6 +207,21 @@ class GameBoard:
             self.characterTokens[i].setLocation("outside")
             i += 1
 
+        roomList = ["library", "school", "mangastore", "lovehotel", "beach", "hotsprings", "karaoke", "tearoom", "shrine"]
+        weaponList = ["dakimakura", "katana", "manga", "bento", "curse", "mecha"]
+        random.shuffle(weaponList)
+        random.shuffle(roomList)
+        # For each weapon, create a game image
+        i = 0
+        for weapon in weaponList:
+            tokenFileExtension = "weapon.png"
+            # Add the image to the character tokens
+            self.weaponTokens.append(Image(str(weapon) + tokenFileExtension, layer2, 0, 0, 30, 30, object_id=weapon))
+            # If token is player, assign token to myToken. Assigned here instead of above due 
+            # to the [i] location not existing until the Image is appended above
+            self.gameGrid.enterARoom(self.weaponTokens[i], roomList[i])
+            i += 1
+
         y = 10
         i = 0
         j = 1
@@ -228,10 +234,7 @@ class GameBoard:
             for card in cardType:
                 # Create an ImageButton and add it to the hand, clean up this code once all images share the same extension type
                 accuseHand.addImageButton(ImageButton(accuseHand.getManager(), cardXLoc + 142 + buffer, y, 142, 190, container=accuseHand.getContainer(), object_id="accuseHandIB"+card.getCardCategory(), buttonText=card.getCardName()))
-                if card.getCardCategory() == "weapon":
-                    imageFormat = ".jpg"
-                else:
-                    imageFormat = ".png"
+                imageFormat = ".png"
                 # Set the image for the ImageButton
                 accuseHand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
                 cardXLoc += 142 + buffer
@@ -253,12 +256,8 @@ class GameBoard:
                     break
                 # Create an ImageButton and add it to the hand, clean up this code once all images share the same extension type
                 suggestHand.addImageButton(ImageButton(suggestHand.getManager(), cardXLoc + 142 + buffer, y, 142, 190, container=suggestHand.getContainer(), object_id="suggestHandIB"+card.getCardCategory(), buttonText=card.getCardName()))
-                if card.getCardCategory() == "weapon":
-                    imageFormat = ".jpg"
-                else:
-                    imageFormat = ".png"
+                imageFormat = ".png"
                 # Set the image for the ImageButton
-
                 suggestHand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
                 cardXLoc += 142 + buffer
                 i += 1
@@ -302,7 +301,9 @@ class GameBoard:
             self.rollLabel.setText(currentTurnCharacter + "'s Turn")
         else:
             self.rollLabel.setText("Your Turn") 
-
+        Image(self.myToken.getObjectId() + "notebook.png", layer0, diceButton.getXLoc() - 120, diceButton.getYLoc() + 130, 550, 600)
+        # Set starting tile to not be occupiable again on first turn
+        self.myToken.addMove(self.gameGrid.grid[self.myToken.getRow()][self.myToken.getColumn()].getText())
         # Game loop
         while True:
 
@@ -327,7 +328,8 @@ class GameBoard:
                 # Display and end turn button for the player next to the die
                 endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
                 accuseButton.setXLoc(diceButton.getXLoc()) 
-                if self.myToken.getLocation() != "outside":
+                # check if player is in a room AND that they did not start the turn in that room
+                if self.myToken.getLocation() != "outside" and self.myToken.getMoveHistory()[0] != self.myToken.getLocation():
                     suggestButton.setXLoc(diceButton.getXLoc()) 
                 if myRoll == -1:
                     # diceButton.setImage("die6.png")
@@ -485,9 +487,17 @@ class GameBoard:
                             weapon = event.ui_element.text
                         elif submitSuggest.getClickedStatus(event): 
                             if not (person == "_____" and weapon == "_____"):
+                                for people in self.characterTokens:
+                                    if people.getObjectId() == person:
+                                        self.gameGrid.enterARoom(people, location)
+                                for weapons in self.weaponTokens:
+                                    if weapons.getObjectId() == weapon:
+                                        self.gameGrid.enterARoom(weapons, location)
                                 self.netConn.send("game.suggest:" + person + "." + location + "." + weapon)
                                 person = "_____"
                                 weapon = "_____"
+                                # Prevent movement after making a suggestion
+                                myRoll = 0
                                 self.hidePanel(suggestHand)
                         suggestText.addText("It was <b>" + person + "</b> in the <b>" + location + "</b> with the <b>" + weapon +"</b>.")
 
@@ -521,14 +531,18 @@ class GameBoard:
                             endTurnButton.setXLoc(WIDTH)
                             # reset myRoll to -1
                             myRoll = -1
-
+                            self.myToken.clearMoveHistory()
+                            # Set current token location to not be movable to again on the next turn, make room not re-enterable as well if inside a room
+                            self.myToken.addMove(self.gameGrid.grid[self.myToken.getRow()][self.myToken.getColumn()].getText())
+                            if self.myToken.getLocation() != "outside":
+                                self.myToken.addMove(self.myToken.getLocation())
 
                         # Roll the die
                         elif diceButton.getClickedStatus(event):
                             # If it's the player's turn and they haven't rolled yet, roll the die and store in myRoll
                             if myRoll == -1 and myTurn:
-                                myRoll = 80
-                                # myRoll = random.randrange(1,7,1)
+                                # myRoll = 80
+                                myRoll = random.randrange(1,7,1)
                                 diceButton.setImage("die" + str(myRoll) + ".png")
                                 self.rollLabel.setText("You rolled: " + str(myRoll))
                             # If player has already rolled this turn, indicate how many moves they have left
@@ -544,8 +558,8 @@ class GameBoard:
                             # Decrease die roll by 1
                             myRoll -= 1
                             self.rollLabel.setText("Moves Left: " + str(myRoll))
-                            # if myRoll > -1:
-                            #     diceButton.setImage("die" + str(myRoll) + ".png")
+                            if myRoll > -1:
+                                diceButton.setImage("die" + str(myRoll) + ".png")
             
             # Update events based on clock ticks
             for each in self.managerList:
@@ -564,7 +578,6 @@ class GameBoard:
         self.chatLog.setText(self.clientUpdate.getChat())
         # Call function to move the tokens to locations indicated by server
         self.updateTokenPositions(tokenUpdates)
-        print("565 processing update")
         #displays discarded cards button if a player leaves the game
         if self.clientGame.getDiscardedCards() != self.clientUpdate.getDiscardedCards() and self.discardedButtonFlag == False:
             self.discardedButton = ImageButton(self.managerList[3], imageFile="cardPile.png", buttonText=" ")
@@ -647,10 +660,7 @@ class GameBoard:
         for card in self.clientUpdate.getSuggestCards():
             # Create an ImageButton and add it to the hand, clean up this code once all images share the same extension type
             refuteHand.addImageButton(ImageButton(refuteHand.getManager(), cardXLoc + 142 + buffer, 55, 142, 190, buttonText=card.getCardName(), container=refuteHand.getContainer(), object_id="refuteHandIB"+card.getCardName()))
-            if card.getCardCategory() == "weapon":
-                imageFormat = ".jpg"
-            else:
-                imageFormat = ".png"
+            imageFormat = ".png"
             # Set the image for the ImageButton
             refuteHand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
             # Move the location of the next card in the hand
@@ -772,5 +782,4 @@ class GameBoard:
     
     # Catch updates from the server                    
     def getUpdates(self, arg1, arg2):
-        print("764 Update received")
         self.clientUpdate = self.netConn.catch()
