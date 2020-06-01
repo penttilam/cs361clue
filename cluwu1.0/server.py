@@ -107,6 +107,7 @@ def leaveCommand(serverThreadInfo, serverInfo):
         if removeLobby.getPNumber() == 0:
             serverInfo.getLobbyList().remove(removeLobby)
     finally:
+        #FIX ME MIKE I BROKED
         sendUpdatedLobby(removeLobby)
 
 
@@ -237,6 +238,35 @@ def accuseCommand(serverThreadInfo, block2):
                 player.setWonLostGame(False)
     updateGame(serverThreadInfo)
 
+def suggestCommand(serverThreadInfo, block2):
+    suggestion = block2.split(".")
+    suggestCards = []
+    firstPlayerFound = False
+    for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+        if not player == serverThreadInfo.getServerPlayer():
+            for i in range(3):
+                for j in range(len(player.getMyCards())):
+                    if suggestion[i] == player.getMyCards()[j].getCardName():
+                        firstPlayerFound = True
+                        suggestCards.append(player.getMyCards()[j])
+        if firstPlayerFound:
+            serverThreadInfo.getServerGame().setSuggestCards(suggestCards)
+            player.sendClientAObject(createClientGame(serverThreadInfo))
+            serverThreadInfo.getServerGame().setSuggestCards(None)
+            break
+
+def refuteCommand(serverThreadInfo, block2):
+    refute = block2
+    print(refute)
+    cards = serverThreadInfo.getServerPlayer().getMyCards()
+    for card in cards:
+        print(card)
+        if card.getCardName() == refute:
+            serverThreadInfo.getServerGame().setRefuteCard(card)
+            break
+    player = serverThreadInfo.getServerGame().getPlayerTurnOrder()[0]
+    player.sendClientAObject(createClientGame(serverThreadInfo))
+    serverThreadInfo.getServerGame().setRefuteCard(None)
 
 def gameCommand(block1, block2, serverThreadInfo, serverInfo):
     arguments = block1.split(".")
@@ -271,8 +301,18 @@ def gameCommand(block1, block2, serverThreadInfo, serverInfo):
         except:
             error_string = str(datetime.now()) + " -- error -- game.accuse Failed " 
             logging.debug(error_string)
-
-
+    elif arguments[1] == "suggest":
+        try:
+            suggestCommand(serverThreadInfo, block2)
+        except:
+            error_string = str(datetime.now()) + " -- error -- game.suggest Failed " 
+            logging.debug(error_string)
+    elif arguments[1] == "refute":
+        try:
+            refuteCommand(serverThreadInfo, block2)
+        except:
+            error_string = str(datetime.now()) + " -- error -- game.refute Failed " 
+            logging.debug(error_string)
 
 
 ##This is the command interperter from the client

@@ -63,8 +63,7 @@ def createDecks():
     weapon.remove(guiltyWeapon)
     location.remove(guiltyLocation)
 
-    # guiltyCards = [guiltyCharacter, guiltyLocation, guiltyWeapon]
-    guiltyCards = ["scarlet", "library", "manga"]
+    guiltyCards = [guiltyCharacter, guiltyLocation, guiltyWeapon]
     serverCardSet.append(guiltyCards)
 
     serverDeck.extend(weapon)

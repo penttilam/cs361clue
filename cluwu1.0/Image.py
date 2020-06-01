@@ -99,6 +99,7 @@ class Image:
         self.setObjectId()
 
     def setImage(self, imageFile, imagePath="./images/"):
+        self.image.kill()
         self.imageFile = imageFile
         self.imagePath = imagePath
         self.newImage()

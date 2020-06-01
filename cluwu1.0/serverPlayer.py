@@ -4,8 +4,8 @@
 
 import sys
 
-from serverConnection import Connection
-from serverToken import ServerToken
+from serverConnection import *
+from serverToken import *
 
 
 class ServerPlayer():

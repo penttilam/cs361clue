@@ -19,6 +19,8 @@ class ServerGame:
         self.discards = []
         serverCards = createDecks()
         self.fullDeck = serverCards[2]
+        self.suggestCards = None
+        self.refuteCard = None
 
 
     def getPlayerTurnOrder(self):
@@ -49,9 +51,19 @@ class ServerGame:
             self.playerTurnOrder.remove(player)
             self.playerTurnOrder.append(player)
             while(self.playerTurnOrder[0].getWonLostGame() == False):
-                tmpPlayer = self.playerTurnOrder[0]
-                self.playerTurnOrder.remove(self.playerTurnOrder[0])
-                self.playerTurnOrder.append(tmpPlayer)
+                self.changeTurn(self.playerTurnOrder[0])
+
+    def setSuggestCards(self, suggestCards):
+        self.suggestCards =suggestCards
+
+    def getSuggestCards(self):
+        return self.suggestCards
+
+    def getRefuteCard(self):
+        return self.refuteCard
+
+    def setRefuteCard(self, refuteCard):
+        self.refuteCard = refuteCard
 
     def getGameChat(self):
         return self.chat

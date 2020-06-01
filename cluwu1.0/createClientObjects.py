@@ -59,19 +59,9 @@ def createClientGame(serverThreadInfo):
     clientChat = createClientChat(serverThreadInfo.getServerGame().getGameChat())
     clientGame = ClientGame(clientTurnOrder, clientPlayerToken, clientCards, clientChat, serverThreadInfo.getServerGame().getFullDeck())
     clientGame.setDiscardedCards(serverThreadInfo.getServerGame().getDiscardedCards())
+    clientGame.setSuggestCards(serverThreadInfo.getServerGame().getSuggestCards())
+    clientGame.setRefuteCard(serverThreadInfo.getServerGame().getRefuteCard())
     return clientGame
-
-
-def updateClientGame(serverGame):
-    clientTurnOrder = []
-    htmlChatLine = ""
-    for players in serverGame.getPlayerTurnOrder():
-        clientTurnOrder.append(createClientToken(players.getMyToken()))
-    for chatlines in serverGame.getGameChat().getChatlog():
-        htmlChatLine + "<b>" +  str(chatlines[0].getMyToken().getTokeCharacter()) + "</b> " + str(chatlines[1]) + "<br>"
-    updateClientGame = UpdateClientGame(clientTurnOrder, htmlChatLine)
-    return updateClientGame
-    
 
 
 
