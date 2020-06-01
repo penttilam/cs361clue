@@ -17,7 +17,8 @@ class Image:
         self.row = 0
         self.location = "outside"
         self.newImage()
-        
+        self.moveHistory = []
+
     def newImage(self):
         if (self.container == ""):
             self.image = pygame_gui.elements.UIImage(relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), image_surface=pygame.image.load(self.imagePath+self.imageFile), manager=self.manager)
@@ -128,6 +129,13 @@ class Image:
         self.image.kill()
         self.manager = newContainer
         self.newImage()
+        
+    def getMoveHistory(self):
+        return self.moveHistory
+    def addMove(self, move):
+        self.moveHistory.append(move)
+    def clearMoveHistory(self):
+        self.moveHistory = []
 
     def kill(self):
         self.image.kill()

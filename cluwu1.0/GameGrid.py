@@ -1,5 +1,6 @@
 import pygame
 import pygame_gui
+import random
 from pygame.locals import *
 from Button import Button
 
@@ -15,23 +16,23 @@ class GameGrid:
         badMove = fileIn.read().split(" ") 
         fileIn.close()
         # Populate the rooms with the grid locations that are inside them
-        roomsIn = "233 304 258 260 262 257 330 309" 
+        roomsIn = "233 304 258 260 262 281 330 309 287 285 283 333 335" 
         hotelRooms = roomsIn.split(" ") 
-        roomsIn = "451 571 524 502 547 527 573 475"
+        roomsIn = "451 571 524 502 547 527 573 475 479 527 523 575 477"
         beachRooms = roomsIn.split(" ") 
-        roomsIn = "137 143 90 92 23 70 67 95"
+        roomsIn = "137 143 90 92 23 70 67 95 18 66 20 115 119 22"
         libraryRooms = roomsIn.split(" ") 
-        roomsIn = "105 155 156 61 13 11 59 117 109"
+        roomsIn = "105 155 156 61 13 11 59 117 109 132 109 59 107 84 36"
         schoolRooms = roomsIn.split(" ") 
-        roomsIn = "460 456 483 531 529 505 530 532"
+        roomsIn = "460 456 483 531 529 505 530 532 557 457 528 553 556 508"
         mangaRooms = roomsIn.split(" ") 
-        roomsIn = "289 365 364 361 337 362 314 316"
+        roomsIn = "289 365 364 361 337 362 314 316 313 315 340 363 339 360"
         tearoomRooms = roomsIn.split(" ") 
-        roomsIn = "78 72 29 27 5 28 51 4"
+        roomsIn = "78 48 29 27 5 28 51 4 2 76 52 25 1 49"
         shrineRooms = roomsIn.split(" ") 
-        roomsIn = "417 422 464 471 466 514 469 517 539 564"
+        roomsIn = "417 422 464 471 466 514 469 517 539 564 540 563 441 445 537 542"
         karaokeRooms = roomsIn.split(" ") 
-        roomsIn = "198 243 168 195 216 218 197 170"
+        roomsIn = "198 243 168 195 216 218 197 170 192 194 219 171 220 172"
         hotspringRooms = roomsIn.split(" ") 
         self.rooms = [("school", schoolRooms),("library", libraryRooms), ("lovehotel", hotelRooms), ("beach", beachRooms), ("karaoke", karaokeRooms), ("mangastore", mangaRooms), ("tearoom", tearoomRooms), ("hotspring", hotspringRooms), ("shrine", shrineRooms)]
 
@@ -44,12 +45,12 @@ class GameGrid:
         mangastoreExits = [461, "secret456"]
         tearoomExits = [265, 366]
         hotspringExits = [199, 267]
-        shrineExits = [102, "secret72"]
+        shrineExits = [102, "secret48"]
 
         self.roomExits = [("school", schoolExits), ("library", libraryExits), ("lovehotel", hotelExits), ("beach", beachExits), ("karaoke", karaokeExits), ("mangastore", mangastoreExits), ("tearoom", tearoomExits), ("hotspring", hotspringExits), ("shrine", shrineExits)]
         buttonNumber = -1
         # Identify spaces that act as secret doors
-        secretDoors = [72, 143, 456, 571]
+        secretDoors = [48, 143, 456, 571]
         # Identify spaces that are entrances to rooms
         doors = [78, 105, 137, 155, 156, 198, 233, 243, 289, 304, 365, 417, 422, 471, 451, 460, 464]
         # Build the grid
@@ -114,11 +115,15 @@ class GameGrid:
     def enterARoom(self, token, roomName):
         #set return value to false
         moved = False
+        # If player has already been in teh room this turn, deny entry
+        if roomName in token.getMoveHistory():
+            return moved
         # Assign the token location to the room desired
         token.setLocation(roomName)
         # Find the possible tiles in the room the token could be placed on
         possibleRoomPositions = self.findButtonByLocation(token.getLocation())
         # Check to see if the 
+        random.shuffle(possibleRoomPositions)
         for tile in possibleRoomPositions:
             # If no one is occupying the tile move to it and occupy it
             if not tile.getOccupied():
@@ -127,6 +132,12 @@ class GameGrid:
                 self.grid[tile.getRow()][tile.getColumn()].setOccupied(1)
                 moved = True
                 break
+        token.addMove(roomName)
+        # Cannot use secret passage on same turn as entering room
+        token.addMove(48)
+        token.addMove(143)
+        token.addMove(456)
+        token.addMove(571)
         return moved
 
     # exitARoom function takes a token (player) and a grid row and column number and allows player to exit a room
@@ -134,6 +145,8 @@ class GameGrid:
         #set return value to false
         moved = False
         gridLocation = self.grid[row][column]
+        if gridLocation.getText() in token.getMoveHistory():
+            return moved
         # Check if the token is in a certain room
         for room in self.roomExits:
                 if(token.getLocation() == room[0]):
@@ -171,7 +184,7 @@ class GameGrid:
         checkXMove = token.getRow() - row
         checkYMove = token.getColumn() - column
         # If the player is not inside a room, the move is 1 square away, not diaganol, and the tile is not already occupied
-        if (token.getLocation() == "outside" and (-2 < checkXMove < 2) and (-2 < checkYMove < 2) and (abs(checkXMove) + abs(checkYMove) < 2) and not newLocation.getOccupied()):
+        if (token.getLocation() == "outside" and (-2 < checkXMove < 2) and (-2 < checkYMove < 2) and (abs(checkXMove) + abs(checkYMove) < 2) and not newLocation.getOccupied() and newLocation.getText() not in token.getMoveHistory()):
             # If player is moving along a path and not entering a room, move them and occupy new tile
             if (newLocation.getLocation() == "outside"):
                 # Free the current space that player occupied
@@ -182,6 +195,7 @@ class GameGrid:
                 # Occupy new tile
                 newLocation.setOccupied(1)
                 moved = True
+                token.addMove(newLocation.getText())
             # If player is moving into a room, find the first non-occupied space in that room and move to it
             else:
                 for room in self.roomExits:
@@ -191,10 +205,11 @@ class GameGrid:
                             currentLocation.setOccupied(0)
                             # Enter the room and return result to moved variable
                             moved = self.enterARoom(token, newLocation.getLocation())
+                            token.addMove(newLocation.getText())
                             break
         else:
             moved = self.exitARoom(token, row, column)
-            
+            token.addMove(newLocation.getText())
         return moved
 
     
