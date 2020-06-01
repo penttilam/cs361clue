@@ -45,7 +45,7 @@ def OpenMainMenu():
     background = pygame.Surface((WIDTH, HEIGHT))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
-    mainMenu = Label("Main Menu", manager)
+    mainMenu = Label("Main Menu", manager, width=72, height=20)
     mainMenu.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(HEIGHT/2-HEIGHT/5))
     mainMenu.setWidthHeight(int(WIDTH/10), int(HEIGHT/10))
 
@@ -99,7 +99,7 @@ def hostGame():
     background = pygame.Surface((WIDTH, HEIGHT))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
-    gameNameLabel = Label("Enter name for your game", manager)
+    gameNameLabel = Label("Enter name for your game", manager, width=192, height=20)
     gameNameLabel.setXLocYLoc(int(WIDTH/2-WIDTH/10), int(HEIGHT/2-HEIGHT/5))
     gameNameLabel.setWidthHeight(int(WIDTH/5), int(HEIGHT/20))
 
@@ -137,7 +137,6 @@ def hostGame():
                     netConn.send("lobby.new:"+gameNameCamel)
                     newLobby = netConn.catch()
                     startLobby = LobbyStart(netConn, newLobby)
-                    print(startLobby)
                     startedLobby = startLobby.startLobby()
                     return
 
@@ -172,7 +171,6 @@ def startGameList():
 
     lobbyList = []
 
-    print(gameSelectListActiveGamesList)
     for clientLobby in gameSelectListActiveGamesList:
         lobbyList.append(str(clientLobby.getId())+" "+str(clientLobby.getNumberOfPlayers())+ " players")
 
@@ -284,8 +282,8 @@ def testingFunction():
     gameBoard.gameBoard()
 
 # TESTING FUNCTION ENSURE COMMENTED OUT IF NEED TO TEST ANYTHING BEFORE THE GAME BOARD
-testingFunction()
+# testingFunction()
 # run the program
-# splash()
+splash()
 
 print("print after splash :D ")

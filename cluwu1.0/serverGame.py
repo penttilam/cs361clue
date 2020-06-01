@@ -1,7 +1,7 @@
-from serverPlayer import *
-from serverCard import *
-from serverToken import *
-from serverChat import *
+from serverPlayer import ServerPlayer
+from serverCard import serverCards, createDecks, dealCards
+from serverToken import ServerToken, assignTokens
+from serverChat import ServerChat
 import random
 
 
@@ -19,6 +19,8 @@ class ServerGame:
         self.discards = []
         serverCards = createDecks()
         self.fullDeck = serverCards[2]
+        self.suggestCards = None
+        self.refuteCard = None
 
 
     def getPlayerTurnOrder(self):
@@ -39,42 +41,41 @@ class ServerGame:
     def assignCards(self):
         serverCards = createDecks()
         self.guiltyCards = serverCards[0]
-        # print("server cards 2")
-        # print(serverCards[2])
-        # self.fullDeck = serverCards[2]
         dealCards(serverCards[1], self.playerTurnOrder)
 
     def getFullDeck(self):
         return self.fullDeck 
 
     def changeTurn(self, player):
-        print("in change")
-        print(self.playerTurnOrder)
-        print(self.playerTurnOrder[0])
-        print(player)
         if self.playerTurnOrder[0] is player:
-            print("in if")
             self.playerTurnOrder.remove(player)
             self.playerTurnOrder.append(player)
+            while(self.playerTurnOrder[0].getWonLostGame() == False):
+                self.changeTurn(self.playerTurnOrder[0])
+
+    def setSuggestCards(self, suggestCards):
+        self.suggestCards =suggestCards
+
+    def getSuggestCards(self):
+        return self.suggestCards
+
+    def getRefuteCard(self):
+        return self.refuteCard
+
+    def setRefuteCard(self, refuteCard):
+        self.refuteCard = refuteCard
 
     def getGameChat(self):
         return self.chat
 
     def setGameChat(self, chatIn):
-        print("start chat")
         if len(self.chat) == 10:
-            print("in if")
             del(self.chat[0])
         self.chat.append(chatIn)
-        print(self.chat)
 
     def setDiscardedCards(self, player): 
         for card in player.getMyCards():
             self.discards.append(card)
-        # print("print from SET discarded cards")
-        # self.discards.append(player.getMyCards())
-        # print(player.getMyCards()) 
-        # print(self.discards)
 
     def getDiscardedCards(self): 
         return self.discards

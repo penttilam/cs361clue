@@ -1,6 +1,6 @@
 import random
 import copy
-from serverPlayer import *
+from serverPlayer import ServerPlayer
 
 class serverCards:
     def __init__(self, cardName, cardCategory):
@@ -55,9 +55,6 @@ def createDecks():
     fullDeck.append(location.copy())
     fullDeck.append(character.copy())
 
-    print("this is the copied deck")
-    print(fullDeck)
-
     guiltyCharacter = random.choice(character)
     guiltyWeapon = random.choice(weapon)
     guiltyLocation = random.choice(location)
@@ -66,7 +63,7 @@ def createDecks():
     weapon.remove(guiltyWeapon)
     location.remove(guiltyLocation)
 
-    guiltyCards = [guiltyCharacter, guiltyWeapon, guiltyLocation]
+    guiltyCards = [guiltyCharacter, guiltyLocation, guiltyWeapon]
     serverCardSet.append(guiltyCards)
 
     serverDeck.extend(weapon)

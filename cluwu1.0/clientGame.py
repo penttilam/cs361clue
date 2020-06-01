@@ -8,6 +8,9 @@ class ClientGame:
         self.myChat = chatIn
         self.discards = None
         self.fullDeck = fullDeckIn
+        self.wonLostGame = None
+        self.suggestCards = None
+        self.refuteCard = None
 
     def getTurnOrder(self):
         return self.turnOrder
@@ -38,3 +41,21 @@ class ClientGame:
 
     def getFullDeck(self): 
         return self.fullDeck
+
+    def getSuggestCards(self):
+        return self.suggestCards
+        
+    def setSuggestCards(self, suggestCards):
+        self.suggestCards = suggestCards
+
+    def getRefuteCard(self):
+        return self.refuteCard
+
+    def setRefuteCard(self, refuteCard):
+        self.refuteCard = refuteCard
+
+    def getWonLostGame(self):
+        return self.wonLostGame
+
+    def setWonLostGame(self, wonLost):
+        self.wonLostGame = wonLost
