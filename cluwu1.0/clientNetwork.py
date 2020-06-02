@@ -47,6 +47,6 @@ class Network:
     
 ## this catches the objects list 
     def catch(self):
-         data = pickle.loads(self.client.recv(2048))
+         data = pickle.loads(self.client.recv(4096))
          return data
 

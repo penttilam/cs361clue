@@ -1,5 +1,5 @@
 from clientToken import *
-
+from clientWeapon import *
 class ClientGame:
     def __init__(self, turnIn, tokenIn, cardsIn, chatIn, fullDeckIn):
         self.turnOrder = turnIn
@@ -11,6 +11,7 @@ class ClientGame:
         self.wonLostGame = None
         self.suggestCards = None
         self.refuteCard = None
+        self.weaponTokens = None
 
     def getTurnOrder(self):
         return self.turnOrder
@@ -22,7 +23,7 @@ class ClientGame:
         return self.myCards
 
     def getMyTurn(self):
-        if(self.turnOrder[0].getTokenCharacter() == self.myToken.getTokenCharacter()):
+        if(self.turnOrder[0].getGameToken().getTokenCharacter() == self.myToken.getTokenCharacter()):
             return True
         else:
             return False
@@ -59,3 +60,6 @@ class ClientGame:
 
     def setWonLostGame(self, wonLost):
         self.wonLostGame = wonLost
+
+    def getWeapons(self):
+        return self.weaponTokens

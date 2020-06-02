@@ -22,7 +22,7 @@ class GameGrid:
         beachRooms = roomsIn.split(" ") 
         roomsIn = "137 143 90 92 23 70 67 95 18 66 20 115 119 22"
         libraryRooms = roomsIn.split(" ") 
-        roomsIn = "105 155 156 61 13 11 59 117 109 132 109 59 107 84 36"
+        roomsIn = "105 155 156 61 13 11 59 83 109 132 109 59 107 84 36"
         schoolRooms = roomsIn.split(" ") 
         roomsIn = "460 456 483 531 529 505 530 532 557 457 528 553 556 508"
         mangaRooms = roomsIn.split(" ") 
@@ -115,13 +115,15 @@ class GameGrid:
     def enterARoom(self, token, roomName):
         #set return value to false
         moved = False
-        # If player has already been in teh room this turn, deny entry
+        print(token.getObjectId())
+        print(roomName)
+        # If player has already been in the room this turn, deny entry
         if roomName in token.getMoveHistory():
             return moved
         # Assign the token location to the room desired
         token.setLocation(roomName)
         # Find the possible tiles in the room the token could be placed on
-        possibleRoomPositions = self.findButtonByLocation(token.getLocation())
+        possibleRoomPositions = self.findButtonByLocation(roomName)
         # Check to see if the 
         random.shuffle(possibleRoomPositions)
         for tile in possibleRoomPositions:
@@ -178,11 +180,11 @@ class GameGrid:
     def movePlayerToken(self, token, row, column):
         #set return value to false
         moved = False
-        newLocation = self.grid[row][column]
+        newLocation = self.grid[int(row)][int(column)]
         currentLocation = self.grid[token.getRow()][token.getColumn()]
         # check distance away from current location
-        checkXMove = token.getRow() - row
-        checkYMove = token.getColumn() - column
+        checkXMove = token.getRow() - int(row)
+        checkYMove = token.getColumn() - int(column)
         # If the player is not inside a room, the move is 1 square away, not diaganol, and the tile is not already occupied
         if (token.getLocation() == "outside" and (-2 < checkXMove < 2) and (-2 < checkYMove < 2) and (abs(checkXMove) + abs(checkYMove) < 2) and not newLocation.getOccupied() and newLocation.getText() not in token.getMoveHistory()):
             # If player is moving along a path and not entering a room, move them and occupy new tile

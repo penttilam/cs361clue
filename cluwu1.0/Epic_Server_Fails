@@ -663,3 +663,31 @@ DEBUG:root:2020-06-01 00:20:06.673862 -- error -- lobby.start Failed
 DEBUG:root:2020-06-01 00:20:08.194602 -- error -- connection22:quit
 DEBUG:root:2020-06-01 00:21:46.934341 -- error -- lobby.join Failed 
 DEBUG:root:2020-06-01 00:22:07.034811 -- error -- connection23:lobby.join:dasdad
+DEBUG:root:2020-06-01 12:41:32.411826 -- error -- connection2:game.create
+DEBUG:root:2020-06-01 12:45:07.752257 -- error -- connection3:game.move:2.19
+DEBUG:root:2020-06-01 14:51:52.424454 -- error -- connection7:game.create
+DEBUG:root:2020-06-01 15:19:51.736696 -- error -- connection11:game.create
+DEBUG:root:2020-06-01 15:20:55.720041 -- error -- connection12:game.create
+DEBUG:root:2020-06-01 15:21:37.175818 -- error -- connection13:game.create
+DEBUG:root:2020-06-01 17:56:33.346609 -- error -- connection15:game.create
+DEBUG:root:2020-06-01 17:58:22.606908 -- error -- connection16:game.turn
+DEBUG:root:2020-06-01 17:59:59.700247 -- error -- connection17:game.turn
+DEBUG:root:2020-06-01 18:43:42.149502 -- error -- connection22:quit
+DEBUG:root:2020-06-01 18:43:44.326637 -- error -- connection21:quit
+DEBUG:root:2020-06-01 18:43:46.798549 -- error -- connection20:quit
+DEBUG:root:2020-06-01 18:43:52.225927 -- error -- connection19:quit
+DEBUG:root:2020-06-01 18:51:47.882992 -- error -- connection24:quit
+DEBUG:root:2020-06-01 18:51:48.703565 -- error -- connection25:quit
+DEBUG:root:2020-06-01 18:51:49.567495 -- error -- connection28:quit
+DEBUG:root:2020-06-01 18:51:58.156219 -- error -- connection26:quit
+DEBUG:root:2020-06-01 18:56:24.355190 -- error -- connection32:quit
+DEBUG:root:2020-06-01 18:56:27.545572 -- error -- connection30:quit
+DEBUG:root:2020-06-01 18:56:30.371266 -- error -- connection31:quit
+DEBUG:root:2020-06-01 18:56:32.905990 -- error -- connection29:quit
+DEBUG:root:2020-06-01 19:12:02.165755 -- error -- connection4:quit
+DEBUG:root:2020-06-01 19:12:16.524596 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x0334FD90>
+DEBUG:root:2020-06-01 19:12:20.119150 -- error -- game.turn -- <serverPlayer.ServerPlayer object at 0x0334FD90>
+DEBUG:root:2020-06-01 19:12:38.413710 -- error -- connection1:quit
+DEBUG:root:2020-06-01 19:12:39.314096 -- error -- connection3:quit
+DEBUG:root:2020-06-01 19:12:40.688097 -- error -- connection5:quit
+DEBUG:root:2020-06-02 09:53:02.669946 -- error -- connection1:game.create

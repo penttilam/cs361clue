@@ -80,6 +80,7 @@ class GameBoard:
         
         background = pygame.Surface((WIDTH, HEIGHT))
         self.windowSurface.blit(background, (0, 0))
+        Image('board.png', layer0, 0, 0, WIDTH, HEIGHT)
         # Create the grid the player clicks to interact with the game board
         self.gameGrid = GameGrid(WIDTH, HEIGHT, layer0)
        
@@ -102,7 +103,7 @@ class GameBoard:
         handButton.setWidthHeight(int(142), int(180))
         handButton.getButton().setManager(layer0)
         Label("Your Cards", layer1, handButton.getXLoc(), handButton.getYLoc() + 180, 142, 20)
-        Image('board.png', layer0, 0, 0, WIDTH, HEIGHT)
+        # Image('board.png', layer0, 0, 0, WIDTH, HEIGHT)
         handButton.getImage().setImage("cardback" + str(handCards) + ".png")
 
         # Display the turn order of players and display
@@ -113,7 +114,7 @@ class GameBoard:
         chatInput = InputBox(layer1)
 
         # ImageButton to roll the dice
-        diceButton = ImageButton(layer0, imageFile='die6.png', buttonText=" ")
+        diceButton = ImageButton(layer0, imageFile='dieRoll.png', buttonText=" ")
         diceButton.setXLocYLoc(int((WIDTH*16)/17-(WIDTH/10))-30, int(HEIGHT/4)+160)
         diceButton.setWidthHeight(int(80), int(80))
         Label("Roll", layer1, diceButton.getXLoc() + 10, diceButton.getYLoc() + 90, 60, 20)
@@ -206,21 +207,15 @@ class GameBoard:
                 self.myToken = self.characterTokens[i]
             self.characterTokens[i].setLocation("outside")
             i += 1
-
-        roomList = ["library", "school", "mangastore", "lovehotel", "beach", "hotsprings", "karaoke", "tearoom", "shrine"]
         weaponList = ["dakimakura", "katana", "manga", "bento", "curse", "mecha"]
-        random.shuffle(weaponList)
-        random.shuffle(roomList)
         # For each weapon, create a game image
         i = 0
         for weapon in weaponList:
             tokenFileExtension = "weapon.png"
             # Add the image to the character tokens
             self.weaponTokens.append(Image(str(weapon) + tokenFileExtension, layer2, 0, 0, 30, 30, object_id=weapon))
-            # If token is player, assign token to myToken. Assigned here instead of above due 
-            # to the [i] location not existing until the Image is appended above
-            self.gameGrid.enterARoom(self.weaponTokens[i], roomList[i])
             i += 1
+        self.updateWeaponPositions(self.clientGame.getWeapons())
 
         y = 10
         i = 0
@@ -323,16 +318,19 @@ class GameBoard:
 
 
             # check if it's the player's turn
-            myTurn = self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter() == self.myToken.getObjectId()
+            myTurn = self.clientGame.getMyTurn()
             if myTurn:
                 # Display and end turn button for the player next to the die
                 endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
                 accuseButton.setXLoc(diceButton.getXLoc()) 
                 # check if player is in a room AND that they did not start the turn in that room
                 if self.myToken.getLocation() != "outside" and self.myToken.getMoveHistory()[0] != self.myToken.getLocation():
-                    suggestButton.setXLoc(diceButton.getXLoc()) 
+                    suggestButton.setXLoc(diceButton.getXLoc())
+                # if they started turn in room, hide suggestion button
+                elif self.myToken.getLocation() != "outside" and self.myToken.getMoveHistory()[0] == self.myToken.getLocation():
+                    suggestButton.setXLoc(WIDTH) 
                 if myRoll == -1:
-                    # diceButton.setImage("die6.png")
+                    diceButton.setImage("dieRoll.png")
                     self.rollLabel.setText("Your Turn")
             else:
                 self.rollLabel.setText(self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter() + "'s Turn")
@@ -533,9 +531,10 @@ class GameBoard:
                             myRoll = -1
                             self.myToken.clearMoveHistory()
                             # Set current token location to not be movable to again on the next turn, make room not re-enterable as well if inside a room
-                            self.myToken.addMove(self.gameGrid.grid[self.myToken.getRow()][self.myToken.getColumn()].getText())
                             if self.myToken.getLocation() != "outside":
                                 self.myToken.addMove(self.myToken.getLocation())
+                            self.myToken.addMove(self.gameGrid.grid[self.myToken.getRow()][self.myToken.getColumn()].getText())
+                            
 
                         # Roll the die
                         elif diceButton.getClickedStatus(event):
@@ -572,12 +571,14 @@ class GameBoard:
     def processClientUpdates(self):
         # Store the current turn order
         tokenUpdates = self.clientUpdate.getTurnOrder()
+        # weaponUpdates = self.clientUpdate.getWeapons()
         # Store the character who has the current turn
         currentTurnCharacter = self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter()
         # Update the Chatlog from the server, currently stores 10 lines of text
         self.chatLog.setText(self.clientUpdate.getChat())
         # Call function to move the tokens to locations indicated by server
         self.updateTokenPositions(tokenUpdates)
+        # self.updateWeaponPositions(weaponUpdates)
         #displays discarded cards button if a player leaves the game
         if self.clientGame.getDiscardedCards() != self.clientUpdate.getDiscardedCards() and self.discardedButtonFlag == False:
             self.discardedButton = ImageButton(self.managerList[3], imageFile="cardPile.png", buttonText=" ")
@@ -633,10 +634,7 @@ class GameBoard:
         for card in self.clientGame.getDiscardedCards():
             # Create an ImageButton and add it to the hand, clean up this code once all images share the same extension type
             self.discardHand.addImageButton(ImageButton(self.discardHand.getManager(), cardXLoc + 142 + buffer, 10, 142, 190, container=self.discardHand.getContainer(), object_id="discardIB"+card.getCardName()))
-            if card.getCardCategory() == "weapon":
-                imageFormat = ".jpg"
-            else:
-                imageFormat = ".png"
+            imageFormat = ".png"
             # Set the image for the ImageButton
             self.discardHand.getImageButton(i).setImage(card.getCardName() + card.getCardCategory() + imageFormat)
             # Move the location of the next card in the hand
@@ -767,18 +765,19 @@ class GameBoard:
     def updateTokenPositions(self, tokenUpdates):
         for player in self.characterTokens:
             for token in tokenUpdates:
-                if player.getObjectId() == token.getGameToken().getTokenCharacter():
-                    currentLocation = self.gameGrid.grid[player.getRow()][player.getColumn()]
-                    # Leave current location
-                    currentLocation.setOccupied(0)
-                    tokenRow = int(token.getGameToken().getRow())
-                    tokenColumn = int(token.getGameToken().getColumn())
-                    newLocation = self.gameGrid.grid[tokenRow][tokenColumn]
-                    # Move token to new location
-                    player.setXLocYLoc(newLocation.getXLoc(), newLocation.getYLoc())
-                    player.setRowColumn(tokenRow, tokenColumn)
-                    # Occupy new tile
-                    newLocation.setOccupied(1)
+                if player.getObjectId() == token.getGameToken().getTokenCharacter() and token.getGameToken().getLocation() == "outside":
+                    self.gameGrid.movePlayerToken(player, int(token.getGameToken().getRow()), int(token.getGameToken().getColumn()))
+                elif player.getObjectId() != token.getGameToken().getTokenCharacter():
+                    pass
+                else:
+                    self.gameGrid.enterARoom(player, token.getGameToken().getLocation())
+        
+    # Update the token positions based on server locations
+    def updateWeaponPositions(self, weaponUpdates):
+        i=0
+        for weapon in weaponUpdates:
+            self.gameGrid.enterARoom(self.weaponTokens[i], weapon.getLocation())
+            i += 1
     
     # Catch updates from the server                    
     def getUpdates(self, arg1, arg2):

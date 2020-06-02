@@ -1,9 +1,10 @@
 
 class ClientToken:
-    def __init__(self, characterName, tokenRow, tokenColumn):
+    def __init__(self, characterName, tokenRow, tokenColumn, tokenLocation):
         self.tokenCharacter = characterName
         self.tokenRow = tokenRow
         self.tokenColumn = tokenColumn
+        self.tokenLocation = "outside"
 
     def getTokenCharacter(self):
         return self.tokenCharacter
@@ -13,4 +14,7 @@ class ClientToken:
 
     def getColumn(self):
         return self.tokenColumn
+    
+    def getLocation(self):
+        return self.tokenLocation
 
