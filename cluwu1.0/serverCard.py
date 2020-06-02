@@ -1,5 +1,6 @@
 import random
-from serverPlayer import *
+import copy
+from serverPlayer import ServerPlayer
 
 class serverCards:
     def __init__(self, cardName, cardCategory):
@@ -18,6 +19,7 @@ def createDecks():
 
     serverCardSet = []
     serverDeck = []
+    fullDeck = [] 
 
     dakimakura = serverCards("dakimakura", "weapon")
     katana = serverCards("katana", "weapon")
@@ -49,6 +51,10 @@ def createDecks():
 
     character = [colonelmustard, mrgreen, mrswhite, mspeacock, msscarlet, professorplum]
 
+    fullDeck.append(weapon.copy())
+    fullDeck.append(location.copy())
+    fullDeck.append(character.copy())
+
     guiltyCharacter = random.choice(character)
     guiltyWeapon = random.choice(weapon)
     guiltyLocation = random.choice(location)
@@ -57,7 +63,7 @@ def createDecks():
     weapon.remove(guiltyWeapon)
     location.remove(guiltyLocation)
 
-    guiltyCards = [guiltyCharacter, guiltyWeapon, guiltyLocation]
+    guiltyCards = [guiltyCharacter, guiltyLocation, guiltyWeapon]
     serverCardSet.append(guiltyCards)
 
     serverDeck.extend(weapon)
@@ -66,6 +72,8 @@ def createDecks():
 
     random.shuffle(serverDeck)
     serverCardSet.append(serverDeck)
+
+    serverCardSet.append(fullDeck)
 
     return serverCardSet
 
@@ -83,9 +91,8 @@ def dealCards(deckList, playerList):
             tempHand.append(deckList.pop(0))
             remCards -= 1
         player.setHand(tempHand)
+
+
         
-
-
-
 
 

@@ -23,9 +23,9 @@ from serverThread import *
 
 ##Creating the server socket and listening for a connection
 
-# server = "45.132.241.193"
-server = "localhost"
-port = 42069
+server = "45.132.241.193"
+#server = "localhost"
+port = 4206
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -51,30 +51,10 @@ class ServerInfo():
 
 ##This functions creates a new lobby and adds the current Player
 def newCommand(newLobbyName, serverThreadInfo, serverInfo):
-    try:
         newLobbyName = ServerLobby(serverThreadInfo.getServerPlayer(), newLobbyName)
-    except:
-        error_string = str(datetime.now()) + " -- error -- ServerLobby __init__ Failed " 
-        logging.debug(error_string)
-    try:
         serverInfo.getLobbyList().append(newLobbyName)
-        print("lobby list: " + str(serverInfo.getLobbyList()))
-    except:
-        error_string = str(datetime.now()) + " -- error -- serverInfo.getLobbyList Failed " 
-        logging.debug(error_string)
-    try:
         serverThreadInfo.setServerLobby(newLobbyName)
-        print("lobby: " + str(serverThreadInfo.getServerLobby()))
-        print("lobbyName: " + str(serverThreadInfo.getServerLobby().getId()))
-    except:
-        error_string = str(datetime.now()) + " -- error -- serverThreadInfo.getServerLobby Failed " 
-        logging.debug(error_string)
-    try:
         sendUpdatedLobby(serverThreadInfo.getServerLobby())
-    except:
-        error_string = str(datetime.now()) + " -- error -- sendUpdatedLobby Failed " 
-        logging.debug(error_string)
-
 
 
 ##This function adds a user to a given lobby
@@ -94,8 +74,7 @@ def listCommand(serverThreadInfo, serverInfo):
     clientLobbyList = []
     for serverLobby in serverInfo.getLobbyList():
         clientLobbyList.append(createClientLobby(serverLobby))
-    print(clientLobbyList)
-    player.sendClientAObject(clientLobbyList)
+    serverThreadInfo.getServerPlayer().sendClientAObject(clientLobbyList)
 
 
 ##this function revomes a player from their lobby
@@ -111,6 +90,7 @@ def leaveCommand(serverThreadInfo, serverInfo):
         if removeLobby.getPNumber() == 0:
             serverInfo.getLobbyList().remove(removeLobby)
     finally:
+        #FIX ME MIKE I BROKED
         sendUpdatedLobby(removeLobby)
 
 
@@ -201,15 +181,17 @@ def createCommand(serverThreadInfo, serverInfo):
 def moveTokenCommand(serverThreadInfo, block2):
     arguments = block2.split(".")
     serverThreadInfo.getServerPlayer().getMyToken().setTokenXLocYLoc(arguments[0], arguments[1])
+    serverThreadInfo.getServerPlayer().getMyToken().setTokenRoom(arguments[2])
     for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
-        player.sendClientAObject(createClientGame(serverThreadInfo))
+        if not player is serverThreadInfo.getServerPlayer():
+            player.sendClientAObject(createClientGame(serverThreadInfo))
 
 
 def turnCommand(serverThreadInfo):
     try:
         serverThreadInfo.getServerGame().changeTurn(serverThreadInfo.getServerPlayer())
-        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
-            player.sendClientAObject(createClientGame(serverThreadInfo))
+        updateGame(serverThreadInfo)
+
     except:
         error_string = str(datetime.now()) + " -- error -- game.turn -- " + str(serverThreadInfo.getServerPlayer())
         logging.debug(error_string)
@@ -217,10 +199,74 @@ def turnCommand(serverThreadInfo):
 
 def chatCommand(serverThreadInfo, argumentInput):
     htmlString = "<b>" + str(serverThreadInfo.getServerPlayer().getMyToken().getTokenCharacter()) + "</b> " + str(argumentInput) + "<br>"
-    serverGame.setGameChat(htmlString)
+    serverThreadInfo.getServerGame().setGameChat(htmlString)
+    updateGame(serverThreadInfo)
+
+def updateGame(serverThreadInfo):
     for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
         player.sendClientAObject(createClientGame(serverThreadInfo))
 
+
+def accuseCommand(serverThreadInfo, block2):
+    accused = block2.split(".")
+    for x in range(3):
+        if accused[x] != serverThreadInfo.getServerGame().getGuiltyCards()[x].getCardName():
+            serverThreadInfo.getServerPlayer().setWonLostGame(False)
+            break
+    
+    if serverThreadInfo.getServerPlayer().getWonLostGame() == None:
+        serverThreadInfo.getServerPlayer().setWonLostGame(True)
+        for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+            if not player == serverThreadInfo.getServerPlayer():
+                player.setWonLostGame(False)
+    updateGame(serverThreadInfo)
+
+def suggestCommand(serverThreadInfo, block2):
+    suggestion = block2.split(".")
+    suggestCards = []
+    for weapon in serverThreadInfo.getServerGame().getServerWeapons():
+        if weapon.getName() == suggestion[2]:
+            weapon.setLocation(suggestion[1])
+    token_changed = False 
+    for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+        if suggestion[0] == player.getMyToken().getTokenCharacter():
+            player.getMyToken().setTokenRoom(suggestion[1])
+            break
+    suggestedToken = ClientToken(suggestion[0], None, None, suggestion[1])
+    suggestedPlayer = ClientPlayer(None, suggestedToken, None, None, None)
+    suggestedTokenList = []
+    suggestedTokenList.append(suggestedPlayer)
+    firstPlayerFound = False
+    for player in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+        if not player == serverThreadInfo.getServerPlayer():
+            for i in range(3):
+                for j in range(len(player.getMyCards())):
+                    if suggestion[i] == player.getMyCards()[j].getCardName():
+                        firstPlayerFound = True
+                        suggestCards.append(player.getMyCards()[j])
+        if firstPlayerFound:
+            serverThreadInfo.getServerGame().setSuggestCards(suggestCards)
+            clientPackage = createClientGame(serverThreadInfo)
+            clientPackage.setSuggestionMove(suggestedTokenList)
+            player.sendClientAObject(clientPackage)
+            serverThreadInfo.getServerGame().setSuggestCards(None)
+            clientPackage = createClientGame(serverThreadInfo)
+            clientPackage.setSuggestionMove(suggestedTokenList)
+            for otherPlayer in serverThreadInfo.getServerGame().getPlayerTurnOrder():
+                if player != otherPlayer:
+                    otherPlayer.sendClientAObject(clientPackage)
+            break
+
+def refuteCommand(serverThreadInfo, block2):
+    refute = block2
+    cards = serverThreadInfo.getServerPlayer().getMyCards()
+    for card in cards:
+        if card.getCardName() == refute:
+            serverThreadInfo.getServerGame().setRefuteCard(card)
+            break
+    player = serverThreadInfo.getServerGame().getPlayerTurnOrder()[0]
+    player.sendClientAObject(createClientGame(serverThreadInfo))
+    serverThreadInfo.getServerGame().setRefuteCard(None)
 
 def gameCommand(block1, block2, serverThreadInfo, serverInfo):
     arguments = block1.split(".")
@@ -245,11 +291,28 @@ def gameCommand(block1, block2, serverThreadInfo, serverInfo):
             logging.debug(error_string)
     elif arguments[1] == "chat":
         try:
-            chatCommand(serverThreadInfo, arguments[2])
+            chatCommand(serverThreadInfo, block2)
         except:
             error_string = str(datetime.now()) + " -- error -- game.chat Failed " 
             logging.debug(error_string)
-
+    elif arguments[1] == "accuse":
+        try:
+            accuseCommand(serverThreadInfo, block2)
+        except:
+            error_string = str(datetime.now()) + " -- error -- game.accuse Failed " 
+            logging.debug(error_string)
+    elif arguments[1] == "suggest":
+        try:
+            suggestCommand(serverThreadInfo, block2)
+        except:
+            error_string = str(datetime.now()) + " -- error -- game.suggest Failed " 
+            logging.debug(error_string)
+    elif arguments[1] == "refute":
+        try:
+            refuteCommand(serverThreadInfo, block2)
+        except:
+            error_string = str(datetime.now()) + " -- error -- game.refute Failed " 
+            logging.debug(error_string)
 
 
 ##This is the command interperter from the client
@@ -274,6 +337,7 @@ def clientCommand(clientCommand, serverThreadInfo, serverInfo):
             return True
 
     elif arguments[0] == "quit":
+        
         return False
 
 
@@ -296,16 +360,26 @@ def Threaded_Client(serverThreadInfo, serverInfo):
             error_string = str(datetime.now()) + " -- error -- " + str(data)
             logging.debug(error_string)
             break
+    try:
+        if not serverThreadInfo.getServerGame() == None:
+            serverThreadInfo.getServerGame().setDiscardedCards(serverThreadInfo.getServerPlayer())
+            removeGame = serverThreadInfo.getServerGame()
+            removeGame.removePlayer(serverThreadInfo.getServerPlayer())
+            updateGame(serverThreadInfo)
+            serverThreadInfo.setServerGame(None)
+            if len(removeGame.getPlayerTurnOrder()) == 0:
+                serverInfo.getGameList().remove(removeGame)
+    except:
+        pass
+
 
     try:
         if not serverThreadInfo.getServerLobby() == None:
             removeLobby = serverThreadInfo.getServerLobby()
             removeLobby.removePlayer(serverThreadInfo.getServerPlayer())
             serverThreadInfo.setServerLobby(None)
-            print("Removed from Lobby")
             if removeLobby.getPNumber() == 0:
                 serverInfo.getLobbyList().remove(removeLobby)
-                print("Lobby Removed")
     except:
         pass
         

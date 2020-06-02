@@ -9,13 +9,11 @@ from clientGame import *
 from serverCard import *
 from clientCard import *
 from serverChat import *
+from clientWeapon import *
+from serverWeapon import *
 
 def createClientPlayer(serverPlayer):
-    print(serverPlayer.getMyToken())
-    print(createClientToken(serverPlayer.getMyToken()))
-    clientPlayer = ClientPlayer(serverPlayer.getReady(), createClientToken(serverPlayer.getMyToken()), serverPlayer.getMyCards(), serverPlayer.getMyTurn(), serverPlayer.getLostGame())
-    print("after clientPlayer")
-    print(clientPlayer)
+    clientPlayer = ClientPlayer(serverPlayer.getReady(), createClientToken(serverPlayer.getMyToken()), serverPlayer.getMyCards(), serverPlayer.getMyTurn(), serverPlayer.getWonLostGame())
     return clientPlayer
 
 
@@ -24,17 +22,14 @@ def createClientLobby(serverLobby):
     serverPlayers = []
     serverPlayers = serverLobby.getPlayers()
     for player in serverPlayers:
-        print("before")
         clientPlayer = createClientPlayer(player)
-        print("After")
         clientPlayerList.append(clientPlayer)
-    print(clientPlayerList)
     clientLobby = ClientLobby(serverLobby.getId(), serverLobby.getPNumber(), clientPlayerList, serverLobby.getLobbyReady(), serverLobby.getStartGame())
     return clientLobby
 
 def createClientToken(serverToken):
     try:
-        clientToken = ClientToken(serverToken.getTokenCharacter(), serverToken.getTokenXLoc(), serverToken.getTokenYLoc())
+        clientToken = ClientToken(serverToken.getTokenCharacter(), serverToken.getTokenXLoc(), serverToken.getTokenYLoc(), serverToken.getTokenRoom())
     except:
         clientToken = None
     return clientToken
@@ -54,44 +49,27 @@ def createClientChat(serverChat):
     return htmlString
 
 
-
+def createClientWeapon(serverWeapon):
+    weaponList = []
+    for weapon in serverWeapon:
+        clientWeapon = ClientWeapon(weapon.getName(), weapon.getLocation())
+        weaponList.append(clientWeapon)
+    return weaponList
 
 
 def createClientGame(serverThreadInfo):
-    print("ClientGameStart")
     clientTurnOrder = []
     for players in serverThreadInfo.getServerGame().getPlayerTurnOrder():
-        print("ClientGameFor")
         clientTurnOrder.append(createClientPlayer(players))
-    print("ClientGameAfterFor")
     clientPlayerToken = createClientToken(serverThreadInfo.getServerPlayer().getMyToken())
-    print("ClientGameAfterToken")
     clientCards = createClientCards(serverThreadInfo.getServerPlayer().getMyCards())
-    print("ClientGameAfterCards")
     clientChat = createClientChat(serverThreadInfo.getServerGame().getGameChat())
-    print("ClientGameAfterChar")
-    clientGame = ClientGame(clientTurnOrder, clientPlayerToken, clientCards, clientChat)
-    print("ClientGameAfterCLIENTGAME")
+    clientWeapon = createClientWeapon(serverThreadInfo.getServerGame().getServerWeapons())
+    clientGame = ClientGame(clientTurnOrder, clientPlayerToken, clientCards, clientChat, serverThreadInfo.getServerGame().getFullDeck(), clientWeapon)
+    clientGame.setDiscardedCards(serverThreadInfo.getServerGame().getDiscardedCards())
+    clientGame.setSuggestCards(serverThreadInfo.getServerGame().getSuggestCards())
+    clientGame.setRefuteCard(serverThreadInfo.getServerGame().getRefuteCard())
     return clientGame
-
-
-def updateClientGame(serverGame):
-    clientTurnOrder = []
-    print("before the string")
-    htmlChatLine = ""
-    print("after the string")
-    for players in serverGame.getPlayerTurnOrder():
-        print("in loop")
-        clientTurnOrder.append(createClientToken(players.getMyToken()))
-        print("in ploop")
-    for chatlines in serverGame.getGameChat().getChatlog():
-        print("in loop2")
-        htmlChatLine + "<b>" +  str(chatlines[0].getMyToken().getTokeCharacter()) + "</b> " + str(chatlines[1]) + "<br>"
-    print("after before")
-    updateClientGame = UpdateClientGame(clientTurnOrder, htmlChatLine)
-    print("after")
-    return updateClientGame
-    
 
 
 

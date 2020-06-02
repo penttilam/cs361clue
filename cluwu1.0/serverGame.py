@@ -1,7 +1,8 @@
-from serverPlayer import *
-from serverCard import *
-from serverToken import *
-from serverChat import *
+from serverPlayer import ServerPlayer
+from serverCard import serverCards, createDecks, dealCards
+from serverToken import ServerToken, assignTokens
+from serverChat import ServerChat
+from serverWeapon import ServerWeapon, assignWeapons 
 import random
 
 
@@ -16,6 +17,14 @@ class ServerGame:
         assignTokens(self.playerTurnOrder)
         self.assignCards()
         self.chat = []
+        self.discards = []
+        serverCards = createDecks()
+        self.weaponTokens = assignWeapons()
+
+        self.fullDeck = serverCards[2]
+        self.suggestCards = None
+        self.refuteCard = None
+
 
     def getPlayerTurnOrder(self):
         return self.playerTurnOrder
@@ -37,10 +46,27 @@ class ServerGame:
         self.guiltyCards = serverCards[0]
         dealCards(serverCards[1], self.playerTurnOrder)
 
+    def getFullDeck(self):
+        return self.fullDeck 
+
     def changeTurn(self, player):
         if self.playerTurnOrder[0] is player:
             self.playerTurnOrder.remove(player)
             self.playerTurnOrder.append(player)
+            while(self.playerTurnOrder[0].getWonLostGame() == False):
+                self.changeTurn(self.playerTurnOrder[0])
+
+    def setSuggestCards(self, suggestCards):
+        self.suggestCards =suggestCards
+
+    def getSuggestCards(self):
+        return self.suggestCards
+
+    def getRefuteCard(self):
+        return self.refuteCard
+
+    def setRefuteCard(self, refuteCard):
+        self.refuteCard = refuteCard
 
     def getGameChat(self):
         return self.chat
@@ -48,12 +74,20 @@ class ServerGame:
     def setGameChat(self, chatIn):
         if len(self.chat) == 10:
             del(self.chat[0])
-        self.chat.append(chatIn) 
+        self.chat.append(chatIn)
 
+    def setDiscardedCards(self, player): 
+        for card in player.getMyCards():
+            self.discards.append(card)
 
+    def getDiscardedCards(self): 
+        return self.discards
+        
+    def getServerWeapons(self):
+        return self.weaponTokens
 
-
-
+    def removePlayer(self, player):
+        self.playerTurnOrder.remove(player)
 
 
 

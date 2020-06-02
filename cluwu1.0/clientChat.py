@@ -1,8 +1,6 @@
-from clientPlayer import *
-
 class clientChat:
     def __init__(self, htmlChatIn):
-        self.htmlChatline = htmlCharIn
+        self.htmlChatline = htmlChatIn
 
     def getHtmlChat(self):
         return self.htmlChatline

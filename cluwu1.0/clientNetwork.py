@@ -12,7 +12,8 @@ class Network:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server = "45.132.241.193"
         # self.server = "localhost"
-        self.port   = 42069
+        self.port   = 4206
+        # self.port   = 9001
         self.addr   = (self.server, self.port)
         self.id     = self.connect()
 
@@ -46,6 +47,6 @@ class Network:
     
 ## this catches the objects list 
     def catch(self):
-         data = pickle.loads(self.client.recv(2048))
+         data = pickle.loads(self.client.recv(4096))
          return data
 

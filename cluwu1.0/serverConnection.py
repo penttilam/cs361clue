@@ -20,7 +20,7 @@ class Connection():
         print("    Sent -- " + str(self.id) + ".object:" + str(type(clientObject)))
 
     def getClientMessage(self):
-        return pickle.loads(self.conn.recv(2048))
+        return pickle.loads(self.conn.recv(4096))
 
     def getId(self):
         return self.id

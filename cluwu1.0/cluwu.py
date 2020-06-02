@@ -45,7 +45,7 @@ def OpenMainMenu():
     background = pygame.Surface((WIDTH, HEIGHT))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
-    mainMenu = Label("Main Menu", manager)
+    mainMenu = Label("Main Menu", manager, width=72, height=20)
     mainMenu.setXLocYLoc(int(WIDTH/2-WIDTH/20), int(HEIGHT/2-HEIGHT/5))
     mainMenu.setWidthHeight(int(WIDTH/10), int(HEIGHT/10))
 
@@ -70,17 +70,18 @@ def OpenMainMenu():
                 netConn.send("quit")
                 raise SystemExit
             if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
-                if hostButton.getClickedStatus(event):
-                    #when host is pressed starts the game list by calling the function
-                    return hostGame()
-
-                if joinButton.getClickedStatus(event):
-                    #when join button is pressed starts the game list by calling the function
-                    return startGameList()
-
+                
                 if quitButton.getClickedStatus(event):
                     netConn.send("quit")
                     raise SystemExit
+
+                elif hostButton.getClickedStatus(event):
+                    #when host is pressed starts the game list by calling the function
+                    hostGame()
+
+                elif joinButton.getClickedStatus(event):
+                    #when join button is pressed starts the game list by calling the function
+                    startGameList()
 
             manager.process_events(event)
             manager.update(time_delta)
@@ -98,7 +99,7 @@ def hostGame():
     background = pygame.Surface((WIDTH, HEIGHT))
     background.fill(manager.ui_theme.get_colour('dark_bg'))
 
-    gameNameLabel = Label("Enter name for your game", manager)
+    gameNameLabel = Label("Enter name for your game", manager, width=192, height=20)
     gameNameLabel.setXLocYLoc(int(WIDTH/2-WIDTH/10), int(HEIGHT/2-HEIGHT/5))
     gameNameLabel.setWidthHeight(int(WIDTH/5), int(HEIGHT/20))
 
@@ -122,10 +123,10 @@ def hostGame():
             if event.type == QUIT:
                 netConn.send("quit")
                 raise SystemExit
-            try:
-                event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED or event.type == KEYDOWN
+          
+            if event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED or event.type == KEYDOWN:
                 if backButton.getClickedStatus(event):
-                    return OpenMainMenu()
+                    return 
 
                 if startButton.getClickedStatus(event) and gameName.getText() != "":
                     gameNameCamel = gameName.getText()
@@ -136,14 +137,9 @@ def hostGame():
                     netConn.send("lobby.new:"+gameNameCamel)
                     newLobby = netConn.catch()
                     startLobby = LobbyStart(netConn, newLobby)
-                    print(startLobby)
                     startedLobby = startLobby.startLobby()
-                    if startedLobby == "leave":
-                        OpenMainMenu()
-                    else:
-                        return
-            except:
-                pass
+                    return
+
             # Redraw the background
             windowSurface.blit(background, (0, 0))
             # Update events based on clock ticks
@@ -175,7 +171,6 @@ def startGameList():
 
     lobbyList = []
 
-    print(gameSelectListActiveGamesList)
     for clientLobby in gameSelectListActiveGamesList:
         lobbyList.append(str(clientLobby.getId())+" "+str(clientLobby.getNumberOfPlayers())+ " players")
 
@@ -220,11 +215,7 @@ def startGameList():
                     joinResponse = netConn.catch()
                     joinLobby = LobbyStart(netConn, joinResponse)
                     joinedLobby = joinLobby.startLobby()
-                    if joinedLobby == "leave":
-                        return OpenMainMenu()
-                    #otherwise refresh the lobby list
-                    else:
-                        return startGameList()
+                    return
 
                 #events for refresh button 
                 elif refreshButton.getClickedStatus(event):
@@ -232,7 +223,7 @@ def startGameList():
                 
                 #events for back button
                 elif backButton.getClickedStatus(event):
-                    return OpenMainMenu()
+                    return 
 
             # Redraw the background
             windowSurface.blit(background, (0, 0))
