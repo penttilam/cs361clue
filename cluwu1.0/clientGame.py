@@ -1,16 +1,21 @@
 from clientToken import *
+from clientWeapon import *
 
 class ClientGame:
-    def __init__(self, turnIn, tokenIn, cardsIn, chatIn, fullDeckIn):
+    def __init__(self, turnIn, tokenIn, cardsIn, chatIn, fullDeckIn, wpTokenIn):
         self.turnOrder = turnIn
         self.myToken = tokenIn
         self.myCards = cardsIn
         self.myChat = chatIn
-        self.discards = None
-        self.fullDeck = fullDeckIn
+        self.weaponTokens = wpTokenIn
+
         self.wonLostGame = None
         self.suggestCards = None
         self.refuteCard = None
+        self.discards = None
+        self.suggestionMove = None
+
+        self.fullDeck = fullDeckIn
 
     def getTurnOrder(self):
         return self.turnOrder
@@ -59,3 +64,14 @@ class ClientGame:
 
     def setWonLostGame(self, wonLost):
         self.wonLostGame = wonLost
+
+    def getWeaponTokens(self):
+        return self.weaponTokens
+
+    def getSuggestionMove(self):
+        return self.suggestionMove
+
+    def setSuggestionMove(self, tokenIn):
+        self.suggestionMove = tokenIn
+
+
