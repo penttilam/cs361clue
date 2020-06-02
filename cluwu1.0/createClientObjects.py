@@ -9,6 +9,8 @@ from clientGame import *
 from serverCard import *
 from clientCard import *
 from serverChat import *
+from clientWeapon import *
+from serverWeapon import *
 
 def createClientPlayer(serverPlayer):
     clientPlayer = ClientPlayer(serverPlayer.getReady(), createClientToken(serverPlayer.getMyToken()), serverPlayer.getMyCards(), serverPlayer.getMyTurn(), serverPlayer.getWonLostGame())
@@ -27,7 +29,7 @@ def createClientLobby(serverLobby):
 
 def createClientToken(serverToken):
     try:
-        clientToken = ClientToken(serverToken.getTokenCharacter(), serverToken.getTokenXLoc(), serverToken.getTokenYLoc())
+        clientToken = ClientToken(serverToken.getTokenCharacter(), serverToken.getTokenXLoc(), serverToken.getTokenYLoc(), serverToken.getTokenRoom())
     except:
         clientToken = None
     return clientToken
@@ -47,7 +49,12 @@ def createClientChat(serverChat):
     return htmlString
 
 
-
+def createClientWeapon(serverWeapon):
+    weaponList = []
+    for weapon in serverWeapon:
+        clientWeapon = ClientWeapon(weapon.getName(), weapon.getLocation())
+        weaponList.append(clientWeapon)
+    return weaponList
 
 
 def createClientGame(serverThreadInfo):
@@ -57,7 +64,8 @@ def createClientGame(serverThreadInfo):
     clientPlayerToken = createClientToken(serverThreadInfo.getServerPlayer().getMyToken())
     clientCards = createClientCards(serverThreadInfo.getServerPlayer().getMyCards())
     clientChat = createClientChat(serverThreadInfo.getServerGame().getGameChat())
-    clientGame = ClientGame(clientTurnOrder, clientPlayerToken, clientCards, clientChat, serverThreadInfo.getServerGame().getFullDeck())
+    clientWeapon = createClientWeapon(serverThreadInfo.getServerGame().getServerWeapons())
+    clientGame = ClientGame(clientTurnOrder, clientPlayerToken, clientCards, clientChat, serverThreadInfo.getServerGame().getFullDeck(), clientWeapon)
     clientGame.setDiscardedCards(serverThreadInfo.getServerGame().getDiscardedCards())
     clientGame.setSuggestCards(serverThreadInfo.getServerGame().getSuggestCards())
     clientGame.setRefuteCard(serverThreadInfo.getServerGame().getRefuteCard())

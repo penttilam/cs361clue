@@ -2,6 +2,7 @@ from serverPlayer import ServerPlayer
 from serverCard import serverCards, createDecks, dealCards
 from serverToken import ServerToken, assignTokens
 from serverChat import ServerChat
+from serverWeapon import ServerWeapon, assignWeapons 
 import random
 
 
@@ -18,6 +19,8 @@ class ServerGame:
         self.chat = []
         self.discards = []
         serverCards = createDecks()
+        self.weaponTokens = assignWeapons()
+
         self.fullDeck = serverCards[2]
         self.suggestCards = None
         self.refuteCard = None
@@ -80,11 +83,11 @@ class ServerGame:
     def getDiscardedCards(self): 
         return self.discards
         
+    def getServerWeapons(self):
+        return self.weaponTokens
 
-
-
-
-
+    def removePlayer(self, player):
+        self.playerTurnOrder.remove(player)
 
 
 
