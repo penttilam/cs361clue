@@ -115,13 +115,12 @@ class GameGrid:
     def enterARoom(self, token, roomName):
         #set return value to false
         moved = False
-        print(token.getObjectId())
-        print(roomName)
         # If player has already been in the room this turn, deny entry
         if roomName in token.getMoveHistory():
             return moved
         # Assign the token location to the room desired
         token.setLocation(roomName)
+        self.grid[int(token.getRow())][int(token.getColumn())].setOccupied(0)
         # Find the possible tiles in the room the token could be placed on
         possibleRoomPositions = self.findButtonByLocation(roomName)
         # Check to see if the 
@@ -147,8 +146,6 @@ class GameGrid:
         #set return value to false
         moved = False
         gridLocation = self.grid[row][column]
-        if gridLocation.getText() in token.getMoveHistory():
-            return moved
         # Check if the token is in a certain room
         for room in self.roomExits:
                 if(token.getLocation() == room[0]):
@@ -167,7 +164,7 @@ class GameGrid:
                         moved = self.enterARoom(token, token.getLocation())
                         break
                     # If player clicked on one of the tiles that is a valid room exit, un-occupy current space, move to exit space and occupy it
-                    elif (int(gridLocation.getText()) in room[1] and not gridLocation.getOccupied()):
+                    elif (int(gridLocation.getText()) in room[1] and not gridLocation.getOccupied()) and gridLocation.getText() not in token.getMoveHistory():
                         self.grid[token.getRow()][token.getColumn()].setOccupied(0)
                         token.setLocation(gridLocation.getLocation())
                         token.setXLocYLoc(gridLocation.getXLoc(), gridLocation.getYLoc())
@@ -177,7 +174,7 @@ class GameGrid:
         return moved
 
     # movePlayerToken takes a token (player) and a grid row and column and attempts to move the player
-    def movePlayerToken(self, token, row, column):
+    def movePlayerToken(self, token, row, column, turn=1):
         #set return value to false
         moved = False
         newLocation = self.grid[int(row)][int(column)]
@@ -186,7 +183,7 @@ class GameGrid:
         checkXMove = token.getRow() - int(row)
         checkYMove = token.getColumn() - int(column)
         # If the player is not inside a room, the move is 1 square away, not diaganol, and the tile is not already occupied
-        if (token.getLocation() == "outside" and (-2 < checkXMove < 2) and (-2 < checkYMove < 2) and (abs(checkXMove) + abs(checkYMove) < 2) and not newLocation.getOccupied() and newLocation.getText() not in token.getMoveHistory()):
+        if (token.getLocation() == "outside" and ((-2 < checkXMove < 2) and (-2 < checkYMove < 2) and (abs(checkXMove) + abs(checkYMove) < 2) and not newLocation.getOccupied() and newLocation.getText() not in token.getMoveHistory()) or turn == 0):
             # If player is moving along a path and not entering a room, move them and occupy new tile
             if (newLocation.getLocation() == "outside"):
                 # Free the current space that player occupied

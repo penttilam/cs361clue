@@ -47,6 +47,7 @@ class GameBoard:
         self.refuteHand = None
         self.windowSurface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
+        self.waitingForRefute = False
 
     def gameBoard(self):
 
@@ -215,7 +216,7 @@ class GameBoard:
             # Add the image to the character tokens
             self.weaponTokens.append(Image(str(weapon) + tokenFileExtension, layer2, 0, 0, 30, 30, object_id=weapon))
             i += 1
-        self.updateWeaponPositions(self.clientGame.getWeapons())
+        self.updateWeaponPositions(self.clientGame.getWeaponTokens())
 
         y = 10
         i = 0
@@ -321,13 +322,14 @@ class GameBoard:
             myTurn = self.clientGame.getMyTurn()
             if myTurn:
                 # Display and end turn button for the player next to the die
-                endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
+                if not self.waitingForRefute:
+                    endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
                 accuseButton.setXLoc(diceButton.getXLoc()) 
                 # check if player is in a room AND that they did not start the turn in that room
                 if self.myToken.getLocation() != "outside" and self.myToken.getMoveHistory()[0] != self.myToken.getLocation():
                     suggestButton.setXLoc(diceButton.getXLoc())
                 # if they started turn in room, hide suggestion button
-                elif self.myToken.getLocation() != "outside" and self.myToken.getMoveHistory()[0] == self.myToken.getLocation():
+                elif self.myToken.getLocation() != "outside" and self.myToken.getLocation() not in self.myToken.getMoveHistory():
                     suggestButton.setXLoc(WIDTH) 
                 if myRoll == -1:
                     diceButton.setImage("dieRoll.png")
@@ -496,6 +498,8 @@ class GameBoard:
                                 weapon = "_____"
                                 # Prevent movement after making a suggestion
                                 myRoll = 0
+                                endTurnButton.setXLoc(WIDTH)
+                                self.waitingForRefute = True
                                 self.hidePanel(suggestHand)
                         suggestText.addText("It was <b>" + person + "</b> in the <b>" + location + "</b> with the <b>" + weapon +"</b>.")
 
@@ -553,7 +557,7 @@ class GameBoard:
 
                         # Moves token if it is the player's turn, they have moves left, the notebook and hand are not visible and they clicked on a valid game tile
                         elif myTurn and myRoll > 0 and self.checkHidden(notebook) and self.checkHidden(hand) and self.gameGrid.clickedTile(event, self.myToken):
-                            self.netConn.send("game.move:" + str(self.myToken.getRow()) + "." + str(self.myToken.getColumn()))
+                            self.netConn.send("game.move:" + str(self.myToken.getRow()) + "." + str(self.myToken.getColumn()) + "." + self.myToken.getLocation())
                             # Decrease die roll by 1
                             myRoll -= 1
                             self.rollLabel.setText("Moves Left: " + str(myRoll))
@@ -571,14 +575,19 @@ class GameBoard:
     def processClientUpdates(self):
         # Store the current turn order
         tokenUpdates = self.clientUpdate.getTurnOrder()
-        # weaponUpdates = self.clientUpdate.getWeapons()
+        suggestionMove = self.clientUpdate.getSuggestionMove()
+        weaponUpdates = self.clientUpdate.getWeaponTokens()
         # Store the character who has the current turn
         currentTurnCharacter = self.clientGame.getTurnOrder()[0].getGameToken().getTokenCharacter()
         # Update the Chatlog from the server, currently stores 10 lines of text
         self.chatLog.setText(self.clientUpdate.getChat())
         # Call function to move the tokens to locations indicated by server
         self.updateTokenPositions(tokenUpdates)
-        # self.updateWeaponPositions(weaponUpdates)
+        if suggestionMove != None:
+            self.updateTokenPositions(suggestionMove)
+        
+        self.updateWeaponPositions(weaponUpdates)
+
         #displays discarded cards button if a player leaves the game
         if self.clientGame.getDiscardedCards() != self.clientUpdate.getDiscardedCards() and self.discardedButtonFlag == False:
             self.discardedButton = ImageButton(self.managerList[3], imageFile="cardPile.png", buttonText=" ")
@@ -644,7 +653,7 @@ class GameBoard:
     def refuteSuggestion(self):
         # Create the panel to display the cards to pick to show to rebut a suggestion
         refuteHand = Panel(self.managerList[3], layerHeight=2)
-        refuteHand.setWidthHeight((len(self.clientUpdate.getSuggestCards()))*142 + (len(self.clientUpdate.getSuggestCards()) + 2) * 10, 304)
+        refuteHand.setWidthHeight((len(self.clientUpdate.getSuggestCards()))*142 + (len(self.clientUpdate.getSuggestCards()) + 3) * 10, 304)
         refuteHand.setXLocYLoc(int(WIDTH/2-refuteHand.getWidth()/2), int(HEIGHT/2) - int(refuteHand.getHeight()/2))
         refuteCard = "_____"
         refuteText = TextBox(self.managerList[3], "You have chosen <b>" + refuteCard + "</b>.", xLoc=int(refuteHand.getWidth()/2) - 110, yLoc=10, width=220, height=30, container=refuteHand.getContainer(), layer=1, objectId="refuteText", wrapToHeight=True)
@@ -696,7 +705,7 @@ class GameBoard:
     def showRefuteCard(self):
         # Create the panel to display the refuted card
         refuteCard = Panel(self.managerList[3], layerHeight=2)
-        refuteCard.setWidthHeight(162, 300)
+        refuteCard.setWidthHeight(172, 300)
         refuteCard.setXLocYLoc(int(WIDTH/2-int(refuteCard.getWidth()/2)), int(HEIGHT/2) - int(refuteCard.getHeight()/2))
         refuteImage = Image(self.clientUpdate.getRefuteCard().getCardName() + self.clientUpdate.getRefuteCard().getCardCategory() + ".png", self.managerList[3], 10, 60, 142, 190, container=refuteCard.getContainer())
         Label("This card wrong", self.managerList[3], xLoc=int(refuteCard.getWidth()/2) - 80, yLoc=10, width=160, height=20, container=refuteCard.getContainer())
@@ -716,6 +725,7 @@ class GameBoard:
                         refuteCard.kill()
                         refuteImage.kill()
                         okayButton.kill()
+                        self.waitingForRefute = False
                         self.clientUpdate.setRefuteCard(None)
                         return
                 # Update events based on clock ticks
@@ -766,10 +776,10 @@ class GameBoard:
         for player in self.characterTokens:
             for token in tokenUpdates:
                 if player.getObjectId() == token.getGameToken().getTokenCharacter() and token.getGameToken().getLocation() == "outside":
-                    self.gameGrid.movePlayerToken(player, int(token.getGameToken().getRow()), int(token.getGameToken().getColumn()))
+                    self.gameGrid.movePlayerToken(player, int(token.getGameToken().getRow()), int(token.getGameToken().getColumn()), 0)
                 elif player.getObjectId() != token.getGameToken().getTokenCharacter():
                     pass
-                else:
+                elif player.getObjectId() == token.getGameToken().getTokenCharacter() and token.getGameToken().getLocation() != "outside":
                     self.gameGrid.enterARoom(player, token.getGameToken().getLocation())
         
     # Update the token positions based on server locations

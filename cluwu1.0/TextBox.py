@@ -20,9 +20,7 @@ class TextBox:
 
     def newTextBox(self):
         if (self.container == ""):
-            print(self.text)
             self.textBox = pygame_gui.elements.UITextBox(html_text=self.text, relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, object_id=self.object_id, wrap_to_height=self.wrapToHeight, layer_starting_height=self.layer)
-            print(self.text)
         else:
             self.textBox = pygame_gui.elements.UITextBox(html_text=self.text, relative_rect=pygame.Rect((self.xLoc, self.yLoc), (self.width, self.height)), manager=self.manager, container=self.container, object_id=self.object_id, wrap_to_height=self.wrapToHeight, layer_starting_height=self.layer)
 

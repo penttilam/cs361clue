@@ -12,6 +12,7 @@ class ClientGame:
         self.suggestCards = None
         self.refuteCard = None
         self.weaponTokens = None
+        self.suggestionMove = None
 
     def getTurnOrder(self):
         return self.turnOrder
@@ -61,5 +62,8 @@ class ClientGame:
     def setWonLostGame(self, wonLost):
         self.wonLostGame = wonLost
 
-    def getWeapons(self):
+    def getWeaponTokens(self):
         return self.weaponTokens
+
+    def getSuggestionMove(self):
+        return self.suggestionMove
