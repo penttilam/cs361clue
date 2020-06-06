@@ -11,7 +11,6 @@ class ClientGame:
         self.wonLostGame = None
         self.suggestCards = None
         self.refuteCard = None
-        self.weaponTokens = None
         self.suggestionMove = None
         self.discards = None
         self.suggestionMove = None
