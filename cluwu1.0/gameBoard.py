@@ -643,6 +643,8 @@ class GameBoard:
                     print("You lost loser")
                     # Trigger LOSER SCREEN HERE
                     loseScreen = Image("lose.png", self.managerList[4], width=WIDTH, height=HEIGHT)
+                    winner = Image(player.getGameToken().getTokenCharacter() + "Head.png", self.managerList[4], xLoc=400 ,yLoc=300, width=142, height=190)
+                    loser = Image(self.myToken.getObjectId() + "Head.png", self.managerList[4],  xLoc=1300 ,yLoc=300, width=142, height=190)
                     self.managerList[4].draw_ui(self.windowSurface)
                     pygame.display.update()
                     while True:
