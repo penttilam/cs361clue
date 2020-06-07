@@ -111,7 +111,7 @@ class LobbyStart:
                 startButtonX = int(WIDTH/17)
                 startButton.setXLoc(startButtonX)
                 # If there are 1 or more players that are ready, enable the start button, otherwise disable
-                if self.lobbyStatus.getLobbyReadyStatus() and self.lobbyStatus.getNumberOfPlayers() > 0:
+                if self.lobbyStatus.getLobbyReadyStatus() and self.lobbyStatus.getNumberOfPlayers() > 2:
                     startButton.enable()
                 else:
                     startButton.disable()
