@@ -3,7 +3,7 @@ import pygame_gui
 from pygame.locals import *
 
 class InputBox:
-    def __init__(self, manager, xLoc=8, yLoc=870, width=341, height=30, container="", object_id="", text=""):
+    def __init__(self, manager, xLoc=8, yLoc=770, width=341, height=30, container="", object_id="", text=""):
         self.xLoc = xLoc
         self.yLoc = yLoc
         self.width = width

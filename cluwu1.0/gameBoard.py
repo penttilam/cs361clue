@@ -81,7 +81,7 @@ class GameBoard:
         
         background = pygame.Surface((WIDTH, HEIGHT))
         self.windowSurface.blit(background, (0, 0))
-        Image('board.png', layer0, 0, 0, WIDTH, HEIGHT)
+        # Image('board.png', layer0, 0, 0, WIDTH, HEIGHT) # Un-comment to view grid numbers during game
         # Create the grid the player clicks to interact with the game board
         self.gameGrid = GameGrid(WIDTH, HEIGHT, layer0)
        
@@ -104,7 +104,7 @@ class GameBoard:
         handButton.setWidthHeight(int(142), int(180))
         handButton.getButton().setManager(layer0)
         Label("Your Cards", layer1, handButton.getXLoc(), handButton.getYLoc() + 180, 142, 20)
-        # Image('board.png', layer0, 0, 0, WIDTH, HEIGHT)
+        Image('board.png', layer0, 0, 0, WIDTH, HEIGHT) #Un-comment to display board without grid numbers for normal gameplay
         handButton.getImage().setImage("cardback" + str(handCards) + ".png")
 
         # Display the turn order of players and display
@@ -211,10 +211,10 @@ class GameBoard:
         weaponList = ["dakimakura", "katana", "manga", "bento", "curse", "mecha"]
         # For each weapon, create a game image
         i = 0
-        for weapon in weaponList:
+        for weapons in weaponList:
             tokenFileExtension = "weapon.png"
             # Add the image to the character tokens
-            self.weaponTokens.append(Image(str(weapon) + tokenFileExtension, layer2, 0, 0, 30, 30, object_id=weapon))
+            self.weaponTokens.append(Image(str(weapons) + tokenFileExtension, layer2, 0, 0, 30, 30, object_id=weapons))
             i += 1
         self.updateWeaponPositions(self.clientGame.getWeaponTokens())
 
@@ -300,6 +300,7 @@ class GameBoard:
         Image(self.myToken.getObjectId() + "notebook.png", layer0, diceButton.getXLoc() - 120, diceButton.getYLoc() + 130, 550, 600)
         # Set starting tile to not be occupiable again on first turn
         self.myToken.addMove(self.gameGrid.grid[self.myToken.getRow()][self.myToken.getColumn()].getText())
+        suggested = False
         # Game loop
         while True:
 
@@ -312,6 +313,22 @@ class GameBoard:
             if not clientThreads.is_alive():
                 # If the object sent back is not a string, process it
                 if type(self.clientUpdate) != type(""):
+                    # If someone refuted your suggestion, hide any panels you may have open
+                    if self.clientUpdate.getRefuteCard() != None:
+                        self.hidePanel(notebook)
+                        self.hidePanel(hand)
+                        self.hidePanel(accuseHand)
+                        self.hidePanel(suggestHand)
+                        if self.discardHand != None:
+                            self.hidePanel(self.discardHand)
+                    # If you are the closest person in turn order with a card to refute a suggestion, hide any panels you may have open
+                    if self.clientUpdate.getSuggestCards() != None:
+                        self.hidePanel(notebook)
+                        self.hidePanel(hand)
+                        self.hidePanel(accuseHand)
+                        self.hidePanel(suggestHand)
+                        if self.discardHand != None:
+                            self.hidePanel(self.discardHand)
                     self.processClientUpdates()
                 # Start the thread back up
                 clientThreads = threading.Thread(target=self.getUpdates, args=(None, None))
@@ -326,7 +343,7 @@ class GameBoard:
                     endTurnButton.setXLoc(diceButton.getXLoc() + diceButton.getWidth() + 10)
                 accuseButton.setXLoc(diceButton.getXLoc()) 
                 # check if player is in a room AND that they did not start the turn in that room
-                if self.myToken.getLocation() != "outside" and self.myToken.getMoveHistory()[0] != self.myToken.getLocation():
+                if self.myToken.getLocation() != "outside" and self.myToken.getMoveHistory()[0] != self.myToken.getLocation() and not suggested:
                     suggestButton.setXLoc(diceButton.getXLoc())
                 # if they started turn in room, hide suggestion button
                 elif self.myToken.getLocation() != "outside" and self.myToken.getLocation() not in self.myToken.getMoveHistory():
@@ -349,13 +366,9 @@ class GameBoard:
                 
                 # If the player clicked a button or pressed a key
                 if (event.type == USEREVENT and event.user_type == pygame_gui.UI_BUTTON_PRESSED) or event.type == KEYDOWN:
-                    # If they hit the return key and the chat box is not empty, send the chat to the server
-                    if chatInput.getText() != "" and event.type == KEYDOWN and event.key == K_RETURN:
-                        self.netConn.send("game.chat.add:" + chatInput.getText())
-                        # Blank out the chat input box
-                        chatInput.setText("")
+
                     # If the notebook is visible, set the notebook to handle all events that come in to prevent clickthrough to the board
-                    elif (not self.checkHidden(notebook)):
+                    if (not self.checkHidden(notebook)):
                         notebook.panel.process_event(event)
                         # If the player clicks the notebook image again or hits escape key, close the notebook
                         if event.type == KEYDOWN and event.key == K_ESCAPE or notebookButton.getClickedStatus(event):
@@ -501,11 +514,19 @@ class GameBoard:
                                 endTurnButton.setXLoc(WIDTH)
                                 self.waitingForRefute = True
                                 self.hidePanel(suggestHand)
+                                suggested = True
+                                suggestButton.setXLoc(WIDTH)
                         suggestText.addText("It was <b>" + person + "</b> in the <b>" + location + "</b> with the <b>" + weapon +"</b>.")
 
                     else:
+                        if chatInput.getText() != "" and event.type == KEYDOWN and event.key == K_RETURN:
+                            self.netConn.send("game.chat.add:" + chatInput.getText())
+                            # Blank out the chat input box
+                            chatInput.setText("")
+                        if chatInput.getInputBox().focused and event.type == KEYDOWN and (event.key == K_w or event.key == K_a or event.key == K_s or event.key == K_d):
+                            pass
                         # Open the Notebook
-                        if notebookButton.getClickedStatus(event):
+                        elif notebookButton.getClickedStatus(event):
                             self.showPanel(notebook)
                         
                         # Open the Hand
@@ -533,18 +554,20 @@ class GameBoard:
                             endTurnButton.setXLoc(WIDTH)
                             # reset myRoll to -1
                             myRoll = -1
+                            suggested = False
                             self.myToken.clearMoveHistory()
                             # Set current token location to not be movable to again on the next turn, make room not re-enterable as well if inside a room
                             if self.myToken.getLocation() != "outside":
                                 self.myToken.addMove(self.myToken.getLocation())
-                            self.myToken.addMove(self.gameGrid.grid[self.myToken.getRow()][self.myToken.getColumn()].getText())
+                            else:
+                                self.myToken.addMove(self.gameGrid.grid[self.myToken.getRow()][self.myToken.getColumn()].getText())
                             
 
                         # Roll the die
                         elif diceButton.getClickedStatus(event):
                             # If it's the player's turn and they haven't rolled yet, roll the die and store in myRoll
                             if myRoll == -1 and myTurn:
-                                # myRoll = 80
+                                # myRoll = 80 # Testing remnant!
                                 myRoll = random.randrange(1,7,1)
                                 diceButton.setImage("die" + str(myRoll) + ".png")
                                 self.rollLabel.setText("You rolled: " + str(myRoll))
@@ -596,15 +619,46 @@ class GameBoard:
             self.discardedButton.getButton().setManager(self.managerList[0])
             Label("View Discards", self.managerList[1], self.discardedButton.getXLoc(), self.discardedButton.getYLoc() + 180, 142, 20)
             self.discardedButtonFlag = True 
-
+        
+        
         for player in self.clientUpdate.getTurnOrder():
-            if self.myToken.getObjectId() == player.getGameToken().getTokenCharacter() and player.getWonLostGame() == False:
-                print("You lost loser")
-                break
-            elif self.myToken.getObjectId() == player.getGameToken().getTokenCharacter() and player.getWonLostGame() == True:
-                print("You're a weiner")
-                # Trigger WINNER SCREEN HERE
-                break
+            if player.getWonLostGame() == True:
+                if self.myToken.getObjectId() == player.getGameToken().getTokenCharacter():
+                    print("You're a weiner")
+                    # Trigger WINNER SCREEN HERE
+                    winScreen = Image("win.png", self.managerList[3], width=WIDTH, height=HEIGHT)
+                    self.managerList[3].draw_ui(self.windowSurface)
+                    pygame.display.update()
+                    while True:
+                        for event in pygame.event.get():
+                            # Quit when window X button is clicked
+                            if event.type == QUIT:
+                                self.netConn.send("quit")
+                                raise SystemExit
+                            # Display menu options if splash screen is clicked
+                            if event.type == KEYDOWN and event.key == K_RETURN:
+                                self.netConn.send("quit")
+                                raise SystemExit
+                else:
+                    print("You lost loser")
+                    # Trigger LOSER SCREEN HERE
+                    loseScreen = Image("lose.png", self.managerList[3], width=WIDTH, height=HEIGHT)
+                    self.managerList[3].draw_ui(self.windowSurface)
+                    pygame.display.update()
+                    while True:
+                        for event in pygame.event.get():
+                            # Quit when window X button is clicked
+                            if event.type == QUIT:
+                                self.netConn.send("quit")
+                                raise SystemExit
+                            # Display menu options if splash screen is clicked
+                            if event.type == KEYDOWN and event.key == K_RETURN:
+                                self.netConn.send("quit")
+                                raise SystemExit
+                        
+
+
+
 
         if self.clientGame.getDiscardedCards() != self.clientUpdate.getDiscardedCards():
             self.showDiscardedCards()
@@ -651,12 +705,13 @@ class GameBoard:
             i += 1
 
     def refuteSuggestion(self):
+
         # Create the panel to display the cards to pick to show to rebut a suggestion
         refuteHand = Panel(self.managerList[3], layerHeight=2)
-        refuteHand.setWidthHeight((len(self.clientUpdate.getSuggestCards()))*142 + (len(self.clientUpdate.getSuggestCards()) + 3) * 10, 304)
+        refuteHand.setWidthHeight((len(self.clientUpdate.getSuggestCards()))*142 + (len(self.clientUpdate.getSuggestCards()) + 2) * 10 + 8, 304)
         refuteHand.setXLocYLoc(int(WIDTH/2-refuteHand.getWidth()/2), int(HEIGHT/2) - int(refuteHand.getHeight()/2))
         refuteCard = "_____"
-        refuteText = TextBox(self.managerList[3], "You have chosen <b>" + refuteCard + "</b>.", xLoc=int(refuteHand.getWidth()/2) - 110, yLoc=10, width=220, height=30, container=refuteHand.getContainer(), layer=1, objectId="refuteText", wrapToHeight=True)
+        refuteText = TextBox(self.managerList[3], "You have chosen <b>" + refuteCard + "</b>.", xLoc=int(refuteHand.getWidth()/2) - 110, yLoc=10, width=140, height=30, container=refuteHand.getContainer(), layer=1, objectId="refuteText", wrapToHeight=True)
         # Accusation Submit Button
         submitRefute = Button("Refute", self.managerList[3], int(refuteHand.getWidth()/2) - 45, 250, 90, 30, container=refuteHand.getContainer())
         # cardXLoc allows cards to be placed a card distance apart plus the buffer value between them

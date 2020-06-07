@@ -44,6 +44,6 @@ class ClientLobby:
             if player.getReady():
                 htmlString +="Ready<br>"
             else:
-                htmlString +="Ready up little bitch<br>"
+                htmlString +="Not Ready<br>"
         return htmlString
 

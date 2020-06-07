@@ -3,7 +3,7 @@ import pygame_gui
 import random
 from pygame.locals import *
 from Button import Button
-
+# SHRINE SECRET LOCATION BROKEN
 class GameGrid:
     def __init__(self, windowWidth, windowHeight, manager):
         self.grid = []
@@ -104,10 +104,24 @@ class GameGrid:
             xLocYLoc = event.ui_element.object_ids[0].split(",")
             row = int(xLocYLoc[0])
             column = int(xLocYLoc[1])
+
             gridLocation = self.grid[row][column]
             # If the button was clicked, call the move function
             if (gridLocation.getClickedStatus(event)):
                 moved = self.movePlayerToken(token, row, column)
+        if (event.type == KEYDOWN):
+            if event.key == K_UP or event.key == K_w:
+                if self.grid[token.getRow() - 1][token.getColumn()].getEnabled():
+                    moved = self.movePlayerToken(token, token.getRow() - 1, token.getColumn())
+            elif event.key == K_DOWN or event.key == K_s:
+                if self.grid[token.getRow() + 1][token.getColumn()].getEnabled():
+                    moved = self.movePlayerToken(token, token.getRow() + 1, token.getColumn())
+            elif event.key == K_LEFT or event.key == K_a:
+                if self.grid[token.getRow()][token.getColumn() - 1].getEnabled():
+                    moved = self.movePlayerToken(token, token.getRow(), token.getColumn() - 1)
+            elif event.key == K_RIGHT or event.key == K_d:
+                if self.grid[token.getRow()][token.getColumn() + 1].getEnabled():
+                    moved = self.movePlayerToken(token, token.getRow(), token.getColumn() + 1)
         return moved
 
     # enterARoom function takes a token (player or weapon) and a room name. This allows the calling function to assign any token
@@ -116,10 +130,22 @@ class GameGrid:
         #set return value to false
         moved = False
         # If player has already been in the room this turn, deny entry
+        if token.getLocation() == roomName:
+            return moved
         if roomName in token.getMoveHistory():
             return moved
         # Assign the token location to the room desired
         token.setLocation(roomName)
+        if roomName == "shrine":
+            token.addMove(str(48))
+        elif roomName == "beach":
+            token.addMove(str(571))
+        elif roomName == "library":
+            token.addMove(str(143))
+        elif roomName == "mangastore":
+            token.addMove(str(456))
+        # Cannot use secret passage on same turn as entering room
+        token.addMove(roomName)
         self.grid[int(token.getRow())][int(token.getColumn())].setOccupied(0)
         # Find the possible tiles in the room the token could be placed on
         possibleRoomPositions = self.findButtonByLocation(roomName)
@@ -133,12 +159,7 @@ class GameGrid:
                 self.grid[tile.getRow()][tile.getColumn()].setOccupied(1)
                 moved = True
                 break
-        token.addMove(roomName)
-        # Cannot use secret passage on same turn as entering room
-        token.addMove(48)
-        token.addMove(143)
-        token.addMove(456)
-        token.addMove(571)
+     
         return moved
 
     # exitARoom function takes a token (player) and a grid row and column number and allows player to exit a room
@@ -150,18 +171,22 @@ class GameGrid:
         for room in self.roomExits:
                 if(token.getLocation() == room[0]):
                     # If the player clicked on a secret door, move them to the appropriate room
-                    if "secret" + str(gridLocation.text) in room[1]:
+                    if "secret" + gridLocation.getText() in room[1] and gridLocation.getText() not in token.getMoveHistory():
                         self.grid[token.getRow()][token.getColumn()].setOccupied(0)
                         if(room[0] == "beach"):
-                            token.setLocation("shrine")
+                            newLocation = "shrine"
+                            token.addMove(str(48))
                         elif(room[0] == "shrine"):
-                            token.setLocation("beach")
+                            newLocation = "beach"
+                            token.addMove(str(571))
                         elif(room[0] == "mangastore"):
-                            token.setLocation("library")
+                            newLocation = "library"
+                            token.addMove(str(143))
                         elif(room[0] == "library"):
-                            token.setLocation("mangastore")
+                            newLocation = "mangastore"
+                            token.addMove(str(456))
                         # Enter a room and return result to moved
-                        moved = self.enterARoom(token, token.getLocation())
+                        moved = self.enterARoom(token, newLocation)
                         break
                     # If player clicked on one of the tiles that is a valid room exit, un-occupy current space, move to exit space and occupy it
                     elif (int(gridLocation.getText()) in room[1] and not gridLocation.getOccupied()) and gridLocation.getText() not in token.getMoveHistory():
@@ -170,6 +195,7 @@ class GameGrid:
                         token.setXLocYLoc(gridLocation.getXLoc(), gridLocation.getYLoc())
                         token.setRowColumn(gridLocation.getRow(), gridLocation.getColumn())
                         gridLocation.setOccupied(1)
+                        token.addMove(gridLocation.getText())
                         moved = True
         return moved
 
@@ -203,12 +229,12 @@ class GameGrid:
                             # Free the current space that player occupied
                             currentLocation.setOccupied(0)
                             # Enter the room and return result to moved variable
-                            moved = self.enterARoom(token, newLocation.getLocation())
-                            token.addMove(newLocation.getText())
-                            break
-        else:
+                            if newLocation.getLocation() not in token.getMoveHistory():
+                                moved = self.enterARoom(token, newLocation.getLocation())
+                                break
+        elif token.getLocation() != "outside":
             moved = self.exitARoom(token, row, column)
-            token.addMove(newLocation.getText())
+            
         return moved
 
     

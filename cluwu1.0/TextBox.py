@@ -3,7 +3,7 @@ import pygame_gui
 from pygame.locals import *
 
 class TextBox:
-    def __init__(self, manager, text="", xLoc=8, yLoc=670, width=341, height=208, container="", layer=1, wrapToHeight=False, objectId="chatlog"):
+    def __init__(self, manager, text="", xLoc=8, yLoc=570, width=341, height=208, container="", layer=1, wrapToHeight=False, objectId="chatlog"):
         self.xLoc = xLoc
         self.yLoc = yLoc
         self.width = width

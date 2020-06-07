@@ -2,7 +2,7 @@ import random
 
 
 weaponChoices = ["dakimakura", "katana", "manga", "bento", "curse", "mecha"]
-locationChoices = ["shrine", "library", "tearoom", "karaoke", "lovehotel", "managastore", "school", "hotspring", "beach"]
+locationChoices = ["shrine", "library", "tearoom", "karaoke", "lovehotel", "mangastore", "school", "hotspring", "beach"]
 
 
 class ServerWeapon:

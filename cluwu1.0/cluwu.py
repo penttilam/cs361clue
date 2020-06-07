@@ -24,6 +24,7 @@ pygame.init()
 pygame.display.set_caption('cluwu')
 #set the icon
 icon = pygame.image.load('images/cluwuIcon.png')
+
 pygame.display.set_icon(icon)
 
 #set up network connection

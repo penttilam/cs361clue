@@ -18,6 +18,7 @@ class Button:
         self.row = 0
         self.newButton()
         self.occupied = 0
+        self.enabledStatus = True
         
     def newButton(self):
         if (self.container == ""):
@@ -104,9 +105,11 @@ class Button:
         self.setObjectId()
 
     def enable(self):
+        self.enabledStatus = True
         self.button.enable()
 
     def disable(self):
+        self.enabledStatus = False
         self.button.disable()
 
     def select(self):
@@ -128,6 +131,9 @@ class Button:
             return event.ui_element.object_ids == self.button.object_ids
         elif (event.type == KEYDOWN):
             return event.key == self.shortcutKey
-
+            
+    def getEnabled(self):
+        return self.enabledStatus
+    
     def kill(self):
         self.button.kill()

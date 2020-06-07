@@ -105,21 +105,6 @@ class Image:
         self.imagePath = imagePath
         self.newImage()
 
-    def enable(self):
-        self.image.enable()
-
-    def disable(self):
-        self.image.disable()
-
-    def select(self):
-        self.image.select()
-    
-    def update(self, time_delta):
-        self.image.update(time_delta)
-
-    def unselect(self):
-        self.image.unselect()
-
     def setManager(self, newManager):
         self.image.kill()
         self.manager = newManager

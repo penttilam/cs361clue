@@ -24,8 +24,8 @@ from serverThread import *
 ##Creating the server socket and listening for a connection
 
 server = "45.132.241.193"
-#server = "localhost"
-port = 4206
+# server = "localhost"
+port = 42069
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
