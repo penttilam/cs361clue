@@ -626,8 +626,8 @@ class GameBoard:
                 if self.myToken.getObjectId() == player.getGameToken().getTokenCharacter():
                     print("You're a weiner")
                     # Trigger WINNER SCREEN HERE
-                    winScreen = Image("win.png", self.managerList[3], width=WIDTH, height=HEIGHT)
-                    self.managerList[3].draw_ui(self.windowSurface)
+                    winScreen = Image("win.png", self.managerList[4], width=WIDTH, height=HEIGHT)
+                    self.managerList[4].draw_ui(self.windowSurface)
                     pygame.display.update()
                     while True:
                         for event in pygame.event.get():
@@ -642,8 +642,8 @@ class GameBoard:
                 else:
                     print("You lost loser")
                     # Trigger LOSER SCREEN HERE
-                    loseScreen = Image("lose.png", self.managerList[3], width=WIDTH, height=HEIGHT)
-                    self.managerList[3].draw_ui(self.windowSurface)
+                    loseScreen = Image("lose.png", self.managerList[4], width=WIDTH, height=HEIGHT)
+                    self.managerList[4].draw_ui(self.windowSurface)
                     pygame.display.update()
                     while True:
                         for event in pygame.event.get():
